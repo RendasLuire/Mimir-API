@@ -1,6 +1,7 @@
-import express from 'express'
-import router from 'express.Router'
-import User from '../models/user.model'
+import { Router } from 'express'
+import User from '../models/user.model.js'
+
+const router = Router()
 
 const getUser = async(req, res, next) => {
     let user
@@ -41,7 +42,7 @@ router.get('/', async (req, res) => {
         if (users.length === 0) {
             return res.status(204).json([])
         }
-        return res(users)
+        return res.json(users)
     } catch (error) {
         return res.status(500).json({message: error.message})
     }
@@ -73,3 +74,5 @@ router.post('/', async (req, res) => {
         message: error.message
     }
 })
+
+export default router

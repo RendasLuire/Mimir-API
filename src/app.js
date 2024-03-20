@@ -1,19 +1,19 @@
 import  express  from 'express'
-import { Mongoose } from 'mongoose'
+import mongoose from 'mongoose'
 import bodyParser from 'body-parser'
 import { config } from 'dotenv'
 
 config()
 
-import userRoutes from './routes/user.routes'
+import userRoutes from './routes/user.routes.js'
 
 const app = express();
 app.use(bodyParser.json())
 
-Mongoose.connect(process.env.MONGO_URL, {dbName: process.env.MONGO_DB_NAME })
+mongoose.connect(process.env.MONGO_URL, {dbName: process.env.MONGO_DB_NAME })
 const db = mongoose.connection
 
-app.use('/books', userRoutes)
+app.use('/users', userRoutes)
 
 const port = process.env.PORT || 3000
 
