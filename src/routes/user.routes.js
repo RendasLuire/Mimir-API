@@ -75,4 +75,73 @@ router.post('/', async (req, res) => {
     }
 })
 
+router.get('/:id', getUser, async (req, res) => {
+    res.json(res.user)
+})
+
+router.put('/:id', getUser, async (req, res) => {
+    try {
+        const user = res.user
+
+        user.name = req.body.name || user.name
+        user.nickname = req.body.nickname || user.nickname
+        user.type = req.body.type || user.type
+        user.password = req.body.password || user.password
+        user.email = req.body.email || user.email
+
+        const updatedUser = await user.save()
+        res.json(updatedUser)
+
+    } catch (error) {
+        res.status(400).json({
+            message: error.message
+        })
+    }
+})
+
+router.patch('/:id', getUser, async (req, res) => {
+
+    if(!req.body.name && !req.body.nickname && !req.body.type && !req.body.password && !req.body.email){
+        res.status(400).json({
+            message: 'Al menos alguno de estos campos debe ser enviado'
+        })
+    }
+
+    try {
+        const user = res.user
+
+        user.name = req.body.name || user.name
+        user.nickname = req.body.nickname || user.nickname
+        user.type = req.body.type || user.type
+        user.password = req.body.password || user.password
+        user.email = req.body.email || user.email
+
+        const updatedUser = await user.save()
+        res.json(updatedUser)
+
+    } catch (error) {
+        res.status(400).json({
+            message: error.message
+        })
+    }
+})
+
+router.delete('/:id', getUser, async (req, res) => {
+    try {
+        const user = res.user
+        await user.deleteOne({
+            _id: user._id
+        })
+        res.json({
+            message: `El usuario ${user.name} fue eliminado correctamente.`
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        })
+    }
+})
+
+
+
 export default router
