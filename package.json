@@ -1,0 +1,22 @@
+{
+  "name": "mimir-api",
+  "version": "1.0.0",
+  "description": "This project is for a type of ERP, or resource management in computing specifically. The principal object is providing a tool that manage users, computers, monitors, and periodically changes of computers.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon src/app.js"
+  },
+  "keywords": [],
+  "author": "Uriel Aguirre",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.0",
+    "mongoose": "^8.2.2"
+  }
+}
