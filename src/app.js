@@ -6,6 +6,7 @@ import { config } from 'dotenv'
 config()
 
 import userRoutes from './routes/user.routes.js'
+import annexedRoutes from './routes/annexed.routes.js'
 
 const app = express();
 app.use(bodyParser.json())
@@ -14,6 +15,7 @@ mongoose.connect(process.env.MONGO_URL, {dbName: process.env.MONGO_DB_NAME })
 const db = mongoose.connection
 
 app.use('/users', userRoutes)
+app.use('/annexeds', annexedRoutes)
 
 const port = process.env.PORT || 3000
 
