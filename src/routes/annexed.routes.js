@@ -39,7 +39,11 @@ const getAnnexed = async (req, res, next) => {
 
 router.get('/', async (req, res) => {
     try {
-        const annexed = await Annexed.find()
+        const annexeds = await Annexed.find()
+        if (annexeds.length === 0) {
+            return res.status(204).json([])
+        }
+        return res.json(annexeds)
     } catch (error) {
         return res.status(500).json(
             {
