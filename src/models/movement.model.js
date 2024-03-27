@@ -1,4 +1,4 @@
-import { Mongoose } from "mongoose";
+import Mongoose  from "mongoose";
 
 const movementSchema = new Mongoose.Schema(
     {
@@ -6,7 +6,7 @@ const movementSchema = new Mongoose.Schema(
         computer: String,
         type: String,
         date: Date,
-        Description: String
+        description: String
     }
 )
 
