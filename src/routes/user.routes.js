@@ -68,6 +68,19 @@ router.post('/', async (req, res) => {
     )
 
     try {
+        const userAlreadyExists = await User.findOne({ $or: [
+            {nickname: user.name},
+            {email: user.email}
+        ]})
+    
+        if (userAlreadyExists) {
+            return res.status(409).json(
+                {
+                    message: 'El usuario ya existe.'
+                }
+            )
+        }
+
         const newUser = await user.save()
         res.status(201).json(newUser)
     } catch (error) {
