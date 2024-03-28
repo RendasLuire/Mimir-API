@@ -10,6 +10,7 @@ import annexedRoutes from './routes/annexed.routes.js'
 import computerRoutes from './routes/computer.routes.js'
 import movementRoutes from './routes/movement.routes.js'
 import personRoutes from './routes/person.routes.js'
+import storageRoutes from './routes/storage.routes.js'
 
 const app = express();
 app.use(bodyParser.json())
@@ -22,6 +23,7 @@ app.use('/annexeds', annexedRoutes)
 app.use('/computers', computerRoutes)
 app.use('/movements', movementRoutes)
 app.use('/persons', personRoutes)
+app.use('/storages', storageRoutes)
 
 const port = process.env.PORT || 3000
 

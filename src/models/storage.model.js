@@ -1,6 +1,6 @@
-import { Mongoose } from "mongoose";
+import mongoose from "mongoose";
 
-const storageSchema = new Mongoose.Schema(
+const storageSchema = new mongoose.Schema(
     {
         name: String,
         bussinessUnit: String,
@@ -8,4 +8,4 @@ const storageSchema = new Mongoose.Schema(
     }
 )
 
-export default Mongoose.model('Storage', storageSchema)
+export default mongoose.model('Storage', storageSchema)
