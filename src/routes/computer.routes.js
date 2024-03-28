@@ -52,11 +52,11 @@ router.get('/', async (req, res) => {
 })
 
 router.post('/', async (req, res) => {
-    const { brand, model, serialNumber, annexed, ubication, status, type } = req.body
+    const { brand, model, serialNumber, type, user} = req.body
 
-    if (!brand || !model || !serialNumber || !annexed || !ubication || !status || !type) {
+    if (!brand || !model || !serialNumber || !type || !user) {
         return res.status(400).json({
-            message: 'Los campos Marca, Modelo, Numero de Serie, Anexo, Ubicacion, Status  y tipo son obligatorios.'
+            message: 'Los campos Marca, Modelo, Numero de Serie, usuario y tipo son obligatorios.'
         })
     }
 
@@ -65,14 +65,22 @@ router.post('/', async (req, res) => {
             brand,
             model,
             serialNumber,
-            annexed,
-            ubication,
-            status,
             type
         }
     )
 
     try {
+
+        const computerAlreadyExist = await Computer.findOne({serialNumber: computer.serialNumber})
+
+        if (!computerAlreadyExist) {
+            return res.status(409).json(
+                {
+                    message: `Esta ${computer.type} ya esta registrada.`
+                }
+            )
+        }
+
         const newComputer = await computer.save()
         res.status(201).json(newComputer)
     } catch (error) {

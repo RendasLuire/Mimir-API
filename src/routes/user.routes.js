@@ -1,6 +1,8 @@
 import { Router } from 'express'
 import bcrypt from 'bcrypt'
 import User from '../models/user.model.js'
+import jwt from '../services/jwt.js'
+import auth from '../middlewares/auth.js'
 
 const router = Router()
 
@@ -37,7 +39,7 @@ const getUser = async(req, res, next) => {
     next()
 }
 
-router.get('/', async (req, res) => {
+router.get('/' , async (req, res) => {
     try {
         const users = await User.find()
         if (users.length === 0) {
@@ -81,12 +83,15 @@ router.post('/login', async (req, res) => {
             )
         }
 
+        const token = jwt.createToken(user)
+
         return res.status(200).json(
             {
                 user:{
                     id: user._id,
                     name: user.name
                 },
+                token,
                 message: 'Login correcto.'
             }
         )
@@ -102,7 +107,7 @@ router.post('/login', async (req, res) => {
 
 })
 
-router.post('/', async (req, res) => {
+router.post('/' , async (req, res) => {
     const { name, nickname, type, password, email } = req.body
 
     if(!name || !nickname || !type || !password || !email) {
@@ -145,11 +150,11 @@ router.post('/', async (req, res) => {
     }
 })
 
-router.get('/:id', getUser, async (req, res) => {
+router.get('/:id' , getUser, async (req, res) => {
     res.json(res.user)
 })
 
-router.put('/:id', getUser, async (req, res) => {
+router.put('/:id' , getUser, async (req, res) => {
     try {
         const user = res.user
 
@@ -169,7 +174,7 @@ router.put('/:id', getUser, async (req, res) => {
     }
 })
 
-router.patch('/:id', getUser, async (req, res) => {
+router.patch('/:id' , getUser, async (req, res) => {
 
     if(!req.body.name && !req.body.nickname && !req.body.type && !req.body.password && !req.body.email){
         res.status(400).json({
@@ -196,7 +201,7 @@ router.patch('/:id', getUser, async (req, res) => {
     }
 })
 
-router.delete('/:id', getUser, async (req, res) => {
+router.delete('/:id' , getUser, async (req, res) => {
     try {
         const user = res.user
         await user.deleteOne({
