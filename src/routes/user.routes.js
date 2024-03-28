@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import bcrypt from 'bcrypt'
 import User from '../models/user.model.js'
 
 const router = Router()
@@ -48,6 +49,59 @@ router.get('/', async (req, res) => {
     }
 })
 
+router.post('/login', async (req, res) => {
+    const { nickname, password } = req.body
+
+    if (!nickname || !password) {
+        return res.status(400).json(
+            {
+                message: 'Los campos de nick y contraseña son obligatorios.'
+            }
+        )
+    }
+
+    try {
+        const user = await User.findOne({nickname: nickname})
+
+        if (!user) {
+            return res.status(400).json(
+                {
+                    message: 'El usuario no existe.'
+                }
+            )
+        }
+
+        const pwd = bcrypt.compareSync(password, user.password)
+
+        if (!pwd) {
+            return res.status(400).json(
+                {
+                    message: 'La contraseña es incorrecta.'
+                }
+            )
+        }
+
+        return res.status(200).json(
+            {
+                user:{
+                    id: user._id,
+                    name: user.name
+                },
+                message: 'Login correcto.'
+            }
+        )
+
+
+    } catch (error) {
+        return res.status(500).json(
+            {
+                message: error.message
+            }
+        )
+    }
+
+})
+
 router.post('/', async (req, res) => {
     const { name, nickname, type, password, email } = req.body
 
@@ -69,7 +123,7 @@ router.post('/', async (req, res) => {
 
     try {
         const userAlreadyExists = await User.findOne({ $or: [
-            {nickname: user.name},
+            {nickname: user.nickname},
             {email: user.email}
         ]})
     
@@ -80,6 +134,9 @@ router.post('/', async (req, res) => {
                 }
             )
         }
+
+        let pwd = await bcrypt.hash(user.password, 10)
+        user.password = pwd
 
         const newUser = await user.save()
         res.status(201).json(newUser)
