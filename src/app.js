@@ -2,6 +2,7 @@ import  express  from 'express'
 import mongoose from 'mongoose'
 import bodyParser from 'body-parser'
 import { config } from 'dotenv'
+import cors from 'cors'
 
 config()
 
@@ -13,6 +14,7 @@ import personRoutes from './routes/person.routes.js'
 import storageRoutes from './routes/storage.routes.js'
 
 const app = express();
+app.use(cors());
 app.use(bodyParser.json())
 
 mongoose.connect(process.env.MONGO_URL, {dbName: process.env.MONGO_DB_NAME })
