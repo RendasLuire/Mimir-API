@@ -1,7 +1,7 @@
 import jwt from 'jwt-simple'
 import moment from 'moment'
 
-const secret = ""
+const secret = "La_Frase_Super_Secreta"
 
 const createToken = (user) => {
     const data = {
