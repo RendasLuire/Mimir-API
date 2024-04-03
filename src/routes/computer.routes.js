@@ -1,160 +1,19 @@
 import { Router } from "express";
-import Computer from '../models/computer.model.js'
+import token from "../middlewares/auth.js";
+import computerController from "../controllers/computer.js";
 
-const router = Router()
+const router = Router();
 
-const getComputer = async (req, res, next) => {
-    let computer
-    const { id } = req.params
+router.get("/listall", token.auth, computerController.showAll);
 
-    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-        return res.status(404).json(
-            {
-                message: 'El ID del equipo no es valido.'
-            }
-        )
-    }
+router.post("/register", token.auth, computerController.register);
 
-    try {
-        computer = await Computer.findById(id)
-        if (!computer) {
-            return res.status(404).json(
-                {
-                    message: 'El equipo no fue encontrado'
-                }
-            )
-        }
-    } catch (error) {
-        return res.status(500).json(
-            {
-                messaje: error.message
-            }
-        )
-    }
+router.get("/:id", token.auth, computerController.showOne);
 
-    res.computer = computer
-    next()
-}
+router.put("/:id", token.auth, computerController.updatePut);
 
-router.get('/', async (req, res) => {
-    try {
-        const computers = await Computer.find()
-        if (computers.length === 0) {
-            return res.status(204).json([])
-        }
-    } catch (error) {
-        return res.status(500).json(
-            {
-                message: error.message
-            }
-        )
-    }
-})
+router.patch("/:id", token.auth, computerController.updatePatch);
 
-router.post('/', async (req, res) => {
-    const { brand, model, serialNumber, type, user} = req.body
+router.delete("/:id", token.auth, computerController.deleteOne);
 
-    if (!brand || !model || !serialNumber || !type || !user) {
-        return res.status(400).json({
-            message: 'Los campos Marca, Modelo, Numero de Serie, usuario y tipo son obligatorios.'
-        })
-    }
-
-    const computer = new Computer(
-        {
-            brand,
-            model,
-            serialNumber,
-            type
-        }
-    )
-
-    try {
-
-        const computerAlreadyExist = await Computer.findOne({serialNumber: computer.serialNumber})
-
-        if (!computerAlreadyExist) {
-            return res.status(409).json(
-                {
-                    message: `Esta ${computer.type} ya esta registrada.`
-                }
-            )
-        }
-
-        const newComputer = await computer.save()
-        res.status(201).json(newComputer)
-    } catch (error) {
-        message: error.message
-    }
-})
-
-router.get('/:id', getComputer, async (req, res) => {
-    res.json(res.computer)
-})
-
-router.put('/:id', getComputer, async (req, res) => {
-    try {
-        const computer = res.computer
-
-        computer.brand = req.body.brand || computer.brand
-        computer.model = req.body.model || computer.model
-        computer.serialNumber = req.body.serialNumber || computer.serialNumber
-        computer.annexed = req.body.annexed || computer.annexed
-        computer.ubication = req.body.ubication || computer.ubication
-        computer.status = req.body.status || computer.status
-        computer.type = req.body.type || computer.type
-
-        const updatedComputer = await computer.save()
-        res.json(updatedComputer)
-    } catch (error) {
-        res.status(400).json({
-            message: error.message
-        })
-    }
-})
-
-router.patch('/:id', getComputer, async (req, res) => {
-    if (!req.body.brand && !req.body.model && !req.body.serialNumber && !req.body.annexed && !req.body.ubication && !req.body.status && !req.body.type) {
-        res.status(400).json({
-            message: 'Al menos alguno de estos campos debe ser enviado.'
-        })
-    }
-
-    try {
-        const computer = res.computer
-
-        computer.brand = req.body.brand || computer.brand
-        computer.model = req.body.model || computer.model
-        computer.serialNumber = req.body.serialNumber || computer.serialNumber
-        computer.annexed = req.body.annexed || computer.annexed
-        computer.ubication = req.body.ubication || computer.ubication
-        computer.status = req.body.status || computer.status
-        computer.type = req.body.type || computer.type
-
-        const updatedComputer = await computer.save()
-        res.json(updatedComputer)
-
-    } catch (error) {
-        req.status(400).json({
-            message: error.message
-        })
-    }
-})
-
-router.delete('/:id', getComputer, async (req, res) => {
-    try {
-        const computer = res.compose
-        await computer.deleteOne({
-            _id: computer._id
-        })
-        res.json({
-            message: `El equipo ${computer.serialNumber} fue eliminado correctamente.`
-        })
-    } catch (error) {
-        res.status(500).json({
-            message: error.message
-        })
-    }
-})
-
-export default router
+export default router;
