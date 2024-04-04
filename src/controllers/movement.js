@@ -15,6 +15,21 @@ const showAll = async (req, res) => {
   }
 };
 
+const showAllFilter = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const movements = await Movement.find({ computer: id });
+    if (movements.length === 0) {
+      return res.status(204).json([]);
+    }
+    return res.json(movements);
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 const register = async (req, res) => {
   const { user, computer, type, description } = req.body;
   const date = moment().unix();
@@ -53,6 +68,7 @@ const deleteOne = async (req, res) => {};
 
 export default {
   showAll,
+  showAllFilter,
   register,
   showOne,
   updatePut,
