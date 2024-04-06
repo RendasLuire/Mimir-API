@@ -31,17 +31,17 @@ const showAllFilter = async (req, res) => {
 };
 
 const register = async (req, res) => {
-  const { user, computer, type, description } = req.body;
+  const { userTI, computer, type, description } = req.body;
   const date = moment().unix();
 
-  if (!user || !computer || !type || !description) {
+  if (!userTI || !computer || !type || !description) {
     return res.status(400).json({
       message: "Los campos de usuario, equipo, tipo, fecha y descripcion",
     });
   }
 
   const movement = new Movement({
-    user,
+    userTI,
     computer,
     type,
     date,

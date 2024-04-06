@@ -10,7 +10,7 @@ router.post("/register", token.auth, computerController.register);
 
 router.get("/:id", token.auth, computerController.showOne);
 
-router.put("/:id", token.auth, computerController.updatePut);
+router.put("/update/:id", token.auth, computerController.updatePut);
 
 router.patch("/:id", token.auth, computerController.updatePatch);
 
