@@ -81,7 +81,68 @@ const register = async (req, res) => {
   }
 };
 
+const updatePut = async (req, res) => {
+  const { name, department, position, manager, userTI } = req.body;
+
+  const { id } = req.params;
+
+  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(404).json({
+      message: "El ID del usuario no es valido.",
+    });
+  }
+  try {
+    let person = await Person.findById(id);
+    if (!person) {
+      return res.status(404).json({
+        message: "El usuario no fue encontrado",
+      });
+    }
+
+    person.name = name || person.name;
+    person.department = department || person.department;
+    person.position = position || person.position;
+    person.manager = manager || person.manager;
+
+    const updatedPerson = await person.save();
+
+    const date = moment().format("DD/MM/YYYY HH:mm:ss");
+
+    const userData = await User.findById(userTI);
+    console.log("userTI: " + userData);
+
+    const description =
+      "Person updated " +
+      updatedPerson.serialNumber +
+      " on " +
+      date +
+      " by user: " +
+      userData.name +
+      " .";
+
+    const movement = new Movement({
+      userTI,
+      computer: updatedPerson._id,
+      type: "person",
+      date,
+      description,
+    });
+
+    const newMovement = await movement.save();
+
+    res.status(200).json({
+      computer: updatedPerson,
+      movement: newMovement,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
 export default {
   showAll,
   register,
+  updatePut,
 };
