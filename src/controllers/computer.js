@@ -17,6 +17,8 @@ const showAll = async (req, res) => {
 const register = async (req, res) => {
   const { brand, model, serialNumber, type, userTI } = req.body;
 
+  console.log("computer: " + req.body);
+
   if (!brand || !model || !serialNumber || !type || !userTI) {
     return res.status(400).json({
       message:
@@ -41,6 +43,7 @@ const register = async (req, res) => {
 
     if (computerAlreadyExist) {
       return res.status(409).json({
+        status: 409,
         message: `Esta ${computer.type} ya esta registrada.`,
       });
     }
@@ -69,6 +72,7 @@ const register = async (req, res) => {
     const newMovement = await movement.save();
 
     res.status(201).json({
+      status: 201,
       computer: newComputer,
       movement: newMovement,
     });
@@ -119,8 +123,6 @@ const updatePut = async (req, res) => {
   } = req.body;
 
   const { id } = req.params;
-
-  console.log(req.body);
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
