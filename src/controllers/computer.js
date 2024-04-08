@@ -2,6 +2,7 @@ import moment from "moment";
 import Computer from "../models/computer.model.js";
 import Movement from "../models/movement.model.js";
 import User from "../models/user.model.js";
+
 const showAll = async (req, res) => {
   try {
     const computers = await Computer.find();
@@ -16,8 +17,6 @@ const showAll = async (req, res) => {
 
 const register = async (req, res) => {
   const { brand, model, serialNumber, type, userTI } = req.body;
-
-  console.log("computer: " + req.body);
 
   if (!brand || !model || !serialNumber || !type || !userTI) {
     return res.status(400).json({
