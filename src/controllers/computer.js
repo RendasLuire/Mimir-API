@@ -30,7 +30,8 @@ const register = async (req, res) => {
     model,
     serialNumber,
     type,
-    user: "",
+    userId: "unassigned",
+    userName: "unassigned",
     status: "available",
     hostname: "MV-" + serialNumber,
   });
@@ -185,6 +186,7 @@ const updatePut = async (req, res) => {
 const updatePatch = async (req, res) => {
   let computer;
   const { id } = req.params;
+  const { userTI } = req.body;
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
@@ -198,7 +200,10 @@ const updatePatch = async (req, res) => {
     !req.body.annexed &&
     !req.body.ubication &&
     !req.body.status &&
-    !req.body.type
+    !req.body.type &&
+    !req.body.userId &&
+    !req.body.userName &&
+    !req.body.hostname
   ) {
     res.status(400).json({
       message: "Al menos alguno de estos campos debe ser enviado.",
@@ -220,9 +225,40 @@ const updatePatch = async (req, res) => {
     computer.ubication = req.body.ubication || computer.ubication;
     computer.status = req.body.status || computer.status;
     computer.type = req.body.type || computer.type;
+    computer.userId = req.body.userId || computer.userId;
+    computer.userName = req.body.userName || computer.userName;
+    computer.hostname = req.body.hostname || computer.hostname;
 
     const updatedComputer = await computer.save();
-    res.json(updatedComputer);
+
+    const date = moment().format("DD/MM/YYYY HH:mm:ss");
+
+    const userData = await User.findById(userTI);
+    console.log("userTI: " + userData);
+
+    const description =
+      "Computer updated " +
+      updatedComputer.serialNumber +
+      " on " +
+      date +
+      " by user: " +
+      userData.name +
+      " .";
+
+    const movement = new Movement({
+      userTI,
+      computer: updatedComputer._id,
+      type: "computer",
+      date,
+      description,
+    });
+
+    const newMovement = await movement.save();
+
+    res.status(200).json({
+      computer: updatedComputer,
+      movement: newMovement,
+    });
   } catch (error) {
     req.status(400).json({
       message: error.message,

@@ -12,7 +12,7 @@ router.get("/:id", token.auth, computerController.showOne);
 
 router.put("/update/:id", token.auth, computerController.updatePut);
 
-router.patch("/:id", token.auth, computerController.updatePatch);
+router.patch("/update/:id", token.auth, computerController.updatePatch);
 
 router.delete("/:id", token.auth, computerController.deleteOne);
 

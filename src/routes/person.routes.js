@@ -35,9 +35,7 @@ router.get("/listall", token.auth, personController.showAll);
 
 router.post("/register", token.auth, personController.register);
 
-router.get("/:id", getPerson, async (req, res) => {
-  res.json(res.user);
-});
+router.get("/:id", token.auth, personController.showOne);
 
 router.put("/:id", getPerson, async (req, res) => {
   try {

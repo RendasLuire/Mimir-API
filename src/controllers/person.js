@@ -81,6 +81,34 @@ const register = async (req, res) => {
   }
 };
 
+const showOne = async (req, res) => {
+  let person;
+  const { id } = req.params;
+
+  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(404).json({
+      message: "El ID de la persona no es valido.",
+    });
+  }
+
+  try {
+    person = await Person.findById(id);
+    if (!person) {
+      return res.status(404).json({
+        message: "La persona no fue encontrada",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+
+  return res.status(200).json({
+    person,
+  });
+};
+
 const updatePut = async (req, res) => {
   const { name, department, position, manager, userTI } = req.body;
 
@@ -144,5 +172,6 @@ const updatePut = async (req, res) => {
 export default {
   showAll,
   register,
+  showOne,
   updatePut,
 };

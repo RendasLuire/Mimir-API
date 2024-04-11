@@ -8,7 +8,8 @@ const computerSchema = new mongoose.Schema({
   ubication: String,
   status: String,
   type: String,
-  user: String,
+  userId: String,
+  userName: String,
   hostname: String,
 });
 
