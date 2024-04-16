@@ -2,6 +2,7 @@ import moment from "moment";
 import Person from "../models/person.model.js";
 import Movement from "../models/movement.model.js";
 import User from "../models/user.model.js";
+import Computer from "../models/computer.model.js";
 
 const showAll = async (req, res) => {
   try {
@@ -110,6 +111,37 @@ const showOne = async (req, res) => {
   return res.status(200).json({
     person,
   });
+};
+
+const showAllFilter = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const computers = await Computer.find({
+      userId: id,
+    });
+
+    if (computers.length === 0) {
+      return res.status(204).json({
+        data: {
+          message: "No hay equipos asignados.",
+        },
+      });
+    }
+
+    return res.status(200).json({
+      data: {
+        computers,
+        message: "Lista de equipos asignados.",
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      data: {
+        message: error.message,
+      },
+    });
+  }
 };
 
 const updatePut = async (req, res) => {
@@ -248,6 +280,7 @@ export default {
   showAll,
   register,
   showOne,
+  showAllFilter,
   updatePut,
   updatePatch,
 };

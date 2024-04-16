@@ -248,7 +248,7 @@ const updatePatch = async (req, res) => {
       userTI,
       computer: updatedComputer._id,
       type: "computer",
-      date,
+      date: moment().unix(),
       description,
     });
 
@@ -259,7 +259,7 @@ const updatePatch = async (req, res) => {
       movement: newMovement,
     });
   } catch (error) {
-    req.status(400).json({
+    return res.status(400).json({
       message: error.message,
     });
   }
