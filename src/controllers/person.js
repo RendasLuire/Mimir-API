@@ -67,7 +67,7 @@ const register = async (req, res) => {
       userTI,
       computer: newPerson._id,
       type: "person",
-      date,
+      date: moment().unix(),
       description,
     });
 
