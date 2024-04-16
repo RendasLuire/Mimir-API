@@ -32,8 +32,10 @@ const register = async (req, res) => {
     name,
     department,
     position,
-    managerId: "",
-    managerName: "",
+    manager: {
+      managerId: "unassigned",
+      managerName: "unassigned",
+    },
   });
 
   try {
@@ -174,8 +176,6 @@ const updatePatch = async (req, res) => {
   const { id } = req.params;
   const { userTI } = req.body;
 
-  console.log(req.body);
-
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
       message: "El ID de la persona no es valido.",
@@ -188,7 +188,7 @@ const updatePatch = async (req, res) => {
     !req.body.department &&
     !req.body.manager
   ) {
-    res.status(400).json({
+    return res.status(400).json({
       message: "Al menos alguno de estos campos debe ser enviado.",
     });
   }
@@ -207,6 +207,8 @@ const updatePatch = async (req, res) => {
     person.manager = req.body.manager || person.manager;
 
     const updatedPerson = await person.save();
+
+    console.log(updatedPerson);
 
     const date = moment().format("DD/MM/YYYY HH:mm:ss");
 
