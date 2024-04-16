@@ -32,7 +32,8 @@ const register = async (req, res) => {
     name,
     department,
     position,
-    manager: "",
+    managerId: "",
+    managerName: "",
   });
 
   try {
@@ -137,11 +138,10 @@ const updatePut = async (req, res) => {
     const date = moment().format("DD/MM/YYYY HH:mm:ss");
 
     const userData = await User.findById(userTI);
-    console.log("userTI: " + userData);
 
     const description =
       "Person updated " +
-      updatedPerson.serialNumber +
+      updatedPerson.name +
       " on " +
       date +
       " by user: " +
@@ -169,9 +169,83 @@ const updatePut = async (req, res) => {
   }
 };
 
+const updatePatch = async (req, res) => {
+  let person;
+  const { id } = req.params;
+  const { userTI } = req.body;
+
+  console.log(req.body);
+
+  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(404).json({
+      message: "El ID de la persona no es valido.",
+    });
+  }
+
+  if (
+    !req.body.name &&
+    !req.body.position &&
+    !req.body.department &&
+    !req.body.manager
+  ) {
+    res.status(400).json({
+      message: "Al menos alguno de estos campos debe ser enviado.",
+    });
+  }
+
+  try {
+    person = await Person.findById(id);
+    if (!person) {
+      return res.status(404).json({
+        message: "La persona no fue encontrada",
+      });
+    }
+
+    person.name = req.body.name || person.name;
+    person.position = req.body.position || person.position;
+    person.department = req.body.department || person.department;
+    person.manager = req.body.manager || person.manager;
+
+    const updatedPerson = await person.save();
+
+    const date = moment().format("DD/MM/YYYY HH:mm:ss");
+
+    const userData = await User.findById(userTI);
+
+    const description =
+      "Person updated " +
+      updatedPerson.name +
+      " on " +
+      date +
+      " by user: " +
+      userData.name +
+      " .";
+
+    const movement = new Movement({
+      userTI,
+      computer: updatedPerson._id,
+      type: "person",
+      date: moment().unix(),
+      description,
+    });
+
+    const newMovement = await movement.save();
+
+    res.status(200).json({
+      computer: updatedPerson,
+      movement: newMovement,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
 export default {
   showAll,
   register,
   showOne,
   updatePut,
+  updatePatch,
 };

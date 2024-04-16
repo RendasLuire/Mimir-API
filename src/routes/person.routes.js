@@ -37,55 +37,9 @@ router.post("/register", token.auth, personController.register);
 
 router.get("/:id", token.auth, personController.showOne);
 
-router.put("/:id", getPerson, async (req, res) => {
-  try {
-    const person = res.person;
+router.put("/update/:id", token.auth, personController.updatePut);
 
-    person.name = req.body.name || person.name;
-    person.department = req.body.department || person.department;
-    person.position = req.body.position || person.position;
-    person.manager = req.body.manager || person.manager;
-    person.managerPosition = req.body.managerPosition || person.managerPosition;
-
-    const updatedPerson = await person.save();
-    res.json(updatedPerson);
-  } catch (error) {
-    res.status(400).json({
-      message: error.message,
-    });
-  }
-});
-
-router.patch("/:id", getPerson, async (req, res) => {
-  if (
-    !req.body.name &&
-    !req.body.department &&
-    !req.body.position &&
-    !req.body.manager &&
-    !req.body.managerPosition
-  ) {
-    res.status(400).json({
-      message: "Al menos alguno de estos campos debe ser enviado",
-    });
-  }
-
-  try {
-    const person = res.user;
-
-    person.name = req.body.name || person.name;
-    person.department = req.body.department || person.department;
-    person.position = req.body.position || person.position;
-    person.manager = req.body.manager || person.manager;
-    person.managerPosition = req.body.managerPosition || person.managerPosition;
-
-    const updatedPerson = await person.save();
-    res.json(updatedPerson);
-  } catch (error) {
-    res.status(400).json({
-      message: error.message,
-    });
-  }
-});
+router.patch("/update/:id", token.auth, personController.updatePatch);
 
 router.delete("/:id", getPerson, async (req, res) => {
   try {

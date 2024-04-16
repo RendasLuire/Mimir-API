@@ -234,7 +234,6 @@ const updatePatch = async (req, res) => {
     const date = moment().format("DD/MM/YYYY HH:mm:ss");
 
     const userData = await User.findById(userTI);
-    console.log("userTI: " + userData);
 
     const description =
       "Computer updated " +
