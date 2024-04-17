@@ -6,11 +6,19 @@ const showAll = async (req, res) => {
   try {
     const users = await User.find();
     if (users.length === 0) {
-      return res.status(204).json([]);
+      return res.status(204).json({
+        data: {
+          message: "No hay usuarios registrados.",
+        },
+      });
     }
     return res.json(users);
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({
+      data: {
+        message: error.message,
+      },
+    });
   }
 };
 
@@ -19,7 +27,9 @@ const login = async (req, res) => {
 
   if (!nickname || !password) {
     return res.status(400).json({
-      message: "Los campos de nick y contraseña son obligatorios.",
+      data: {
+        message: "Los campos de nick y contraseña son obligatorios.",
+      },
     });
   }
 
@@ -28,7 +38,9 @@ const login = async (req, res) => {
 
     if (!user) {
       return res.status(400).json({
-        message: "El usuario no existe.",
+        data: {
+          message: "El usuario no existe.",
+        },
       });
     }
 
@@ -36,23 +48,29 @@ const login = async (req, res) => {
 
     if (!pwd) {
       return res.status(400).json({
-        message: "La contraseña es incorrecta.",
+        data: {
+          message: "La contraseña es incorrecta.",
+        },
       });
     }
 
     const token = jwt.createToken(user);
 
     return res.status(200).json({
-      user: {
-        _id: user._id,
-        name: user.name,
+      data: {
+        user: {
+          _id: user._id,
+          name: user.name,
+        },
+        token,
+        message: "Login correcto.",
       },
-      token,
-      message: "Login correcto.",
     });
   } catch (error) {
     return res.status(500).json({
-      message: error.message,
+      data: {
+        message: error.message,
+      },
     });
   }
 };
@@ -62,8 +80,10 @@ const register = async (req, res) => {
 
   if (!name || !nickname || !type || !password || !email) {
     return res.status(400).json({
-      message:
-        "Los campos de usuario, nick, tipo, contraseña y correo son obligatorios.",
+      data: {
+        message:
+          "Los campos de usuario, nick, tipo, contraseña y correo son obligatorios.",
+      },
     });
   }
 
@@ -82,7 +102,9 @@ const register = async (req, res) => {
 
     if (userAlreadyExists) {
       return res.status(409).json({
-        message: "El usuario ya existe.",
+        data: {
+          message: "El usuario ya existe.",
+        },
       });
     }
 
@@ -90,9 +112,18 @@ const register = async (req, res) => {
     user.password = pwd;
 
     const newUser = await user.save();
-    res.status(201).json(newUser);
+    res.status(201).json({
+      data: {
+        message: "Usuario creado con exito.",
+        newUser,
+      },
+    });
   } catch (error) {
-    message: error.message;
+    res.status(500).json({
+      data: {
+        message: error.message,
+      },
+    });
   }
 };
 
@@ -102,7 +133,9 @@ const showOne = async (req, res) => {
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
-      message: "El ID del usuario no es valido",
+      data: {
+        message: "El ID del usuario no es valido",
+      },
     });
   }
 
@@ -110,15 +143,24 @@ const showOne = async (req, res) => {
     user = await User.findById(id);
     if (!user) {
       return res.status(404).json({
-        message: "El usuario no fue encontrado",
+        data: {
+          message: "El usuario no fue encontrado",
+        },
       });
     }
   } catch (error) {
     return res.status(500).json({
-      message: error.message,
+      data: {
+        message: error.message,
+      },
     });
   }
-  return res.json(user);
+  return res.status(200).json({
+    data: {
+      user,
+      message: "Informacion del usuario",
+    },
+  });
 };
 
 const updatePut = async (req, res) => {
@@ -127,7 +169,9 @@ const updatePut = async (req, res) => {
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
-      message: "El ID del usuario no es valido",
+      data: {
+        message: "El ID del usuario no es valido",
+      },
     });
   }
 
@@ -135,7 +179,9 @@ const updatePut = async (req, res) => {
     user = await User.findById(id);
     if (!user) {
       return res.status(404).json({
-        message: "El usuario no fue encontrado",
+        data: {
+          message: "El usuario no fue encontrado",
+        },
       });
     }
 
@@ -146,10 +192,17 @@ const updatePut = async (req, res) => {
     user.email = req.body.email || user.email;
 
     const updatedUser = await user.save();
-    res.json(updatedUser);
+    res.status(200).json({
+      data: {
+        updatedUser,
+        message:
+      }
+    });
   } catch (error) {
     res.status(400).json({
-      message: error.message,
+      data: {
+        message: error.message,
+      },
     });
   }
 };
@@ -160,7 +213,9 @@ const updatePatch = async (req, res) => {
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
-      message: "El ID del usuario no es valido",
+      data: {
+        message: "El ID del usuario no es valido",
+      }
     });
   }
 
@@ -172,7 +227,9 @@ const updatePatch = async (req, res) => {
     !req.body.email
   ) {
     res.status(400).json({
-      message: "Al menos alguno de estos campos debe ser enviado",
+      data: {
+        message: "Al menos alguno de estos campos debe ser enviado",
+      }
     });
   }
 
@@ -180,7 +237,9 @@ const updatePatch = async (req, res) => {
     user = await User.findById(id);
     if (!user) {
       return res.status(404).json({
-        message: "El usuario no fue encontrado",
+        data: {
+          message: "El usuario no fue encontrado",
+        }
       });
     }
 
@@ -191,10 +250,17 @@ const updatePatch = async (req, res) => {
     user.email = req.body.email || user.email;
 
     const updatedUser = await user.save();
-    res.json(updatedUser);
+    res.status(200).json({
+      data: {
+        updatedUser,
+        message: "El usuario se actualizo con exito."
+      }
+    });
   } catch (error) {
     res.status(400).json({
-      message: error.message,
+      data: {
+        message: error.message,
+      }
     });
   }
 };
@@ -206,18 +272,24 @@ const deleteOne = async (req, res) => {
     user = await User.findById(id);
     if (!user) {
       return res.status(404).json({
-        message: "El usuario no fue encontrado",
+        data: {
+          message: "El usuario no fue encontrado",
+        }
       });
     }
     await user.deleteOne({
       _id: user._id,
     });
-    res.json({
-      message: `El usuario ${user.name} fue eliminado correctamente.`,
+    res.status(200).json({
+      data: {
+        message: `El usuario ${user.name} fue eliminado correctamente.`,
+      }
     });
   } catch (error) {
     res.status(500).json({
-      message: error.message,
+      data: {
+        message: error.message,
+      }
     });
   }
 };
