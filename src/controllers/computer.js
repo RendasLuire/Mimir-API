@@ -213,10 +213,18 @@ const updatePut = async (req, res) => {
     computer.bussinesUnit = bussinesUnit || computer.bussinesUnit;
     computer.user = user || computer.user;
 
-    computer.custom = custom || computer.custom;
-    computer.headphones = headphones || computer.headphones;
-    computer.adaptVGA = adaptVGA || computer.adaptVGA;
-    computer.mouse = mouse || computer.mouse;
+    if (typeof custom !== "undefined" && custom !== null) {
+      computer.custom = custom;
+    }
+    if (typeof headphones !== "undefined" && headphones !== null) {
+      computer.headphones = headphones;
+    }
+    if (typeof adaptVGA !== "undefined" && adaptVGA !== null) {
+      computer.adaptVGA = adaptVGA;
+    }
+    if (typeof mouse !== "undefined" && mouse !== null) {
+      computer.mouse = mouse;
+    }
 
     console.log("voy a guardar:" + computer.custom);
 
