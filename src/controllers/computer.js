@@ -44,11 +44,30 @@ const register = async (req, res) => {
     brand,
     model,
     serialNumber,
-    type,
-    userId: "Sin asignar",
-    userName: "Sin asignar",
-    status: "activo",
+    details: "",
     hostname: "MV-" + serialNumber,
+    status: "activo",
+    annexed: "Sin asignar",
+    ubication: "",
+    type,
+    ip: "",
+    user: {
+      id: "Sin asignar",
+      name: "Sin asignar",
+    },
+    custom: false,
+    bussinesUnit: "",
+    departament: {
+      id: "Sin asignar",
+      name: "Sin asignar",
+    },
+    monitor: {
+      id: "Sin asignar",
+      serialNumber: "Sin asignar",
+    },
+    headphones: false,
+    adaptVGA: false,
+    mouse: false,
   });
 
   try {
@@ -142,15 +161,25 @@ const showOne = async (req, res) => {
 const updatePut = async (req, res) => {
   const {
     brand,
-    hostname,
     model,
     serialNumber,
+    details,
+    hostname,
     status,
     annexed,
     ubication,
     type,
+    ip,
+    custom,
+    bussinesUnit,
+    headphones,
+    adaptVGA,
+    mouse,
+    user,
     userTI,
   } = req.body;
+
+  console.log("Recibo: " + custom);
 
   const { id } = req.params;
 
@@ -175,10 +204,21 @@ const updatePut = async (req, res) => {
     computer.brand = brand || computer.brand;
     computer.model = model || computer.model;
     computer.serialNumber = serialNumber || computer.serialNumber;
+    computer.details = details || computer.details;
     computer.annexed = annexed || computer.annexed;
     computer.ubication = ubication || computer.ubication;
     computer.status = status || computer.status;
     computer.type = type || computer.type;
+    computer.ip = ip || computer.ip;
+    computer.bussinesUnit = bussinesUnit || computer.bussinesUnit;
+    computer.user = user || computer.user;
+
+    computer.custom = custom || computer.custom;
+    computer.headphones = headphones || computer.headphones;
+    computer.adaptVGA = adaptVGA || computer.adaptVGA;
+    computer.mouse = mouse || computer.mouse;
+
+    console.log("voy a guardar:" + computer.custom);
 
     const updatedComputer = await computer.save();
 
@@ -199,7 +239,6 @@ const updatePut = async (req, res) => {
       userTI,
       computer: updatedComputer._id,
       type: "Equipo",
-      date,
       description,
     });
 
@@ -225,6 +264,8 @@ const updatePatch = async (req, res) => {
   const { id } = req.params;
   const { userTI } = req.body;
 
+  console.log(req.body);
+
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
       data: {
@@ -236,12 +277,20 @@ const updatePatch = async (req, res) => {
     !req.body.brand &&
     !req.body.model &&
     !req.body.serialNumber &&
+    !req.body.details &&
+    !req.body.status &&
     !req.body.annexed &&
     !req.body.ubication &&
-    !req.body.status &&
     !req.body.type &&
-    !req.body.userId &&
-    !req.body.userName &&
+    !req.body.ip &&
+    !req.body.user &&
+    !req.body.custom &&
+    !req.body.bussinesUnit &&
+    !req.body.departament &&
+    !req.body.monitor &&
+    !req.body.headphones &&
+    !req.body.adaptVGA &&
+    !req.body.mouse &&
     !req.body.hostname
   ) {
     res.status(400).json({
@@ -261,16 +310,24 @@ const updatePatch = async (req, res) => {
       });
     }
 
+    computer.hostname = req.body.hostname || computer.hostname;
+    computer.user = req.body.user || computer.user;
     computer.brand = req.body.brand || computer.brand;
     computer.model = req.body.model || computer.model;
     computer.serialNumber = req.body.serialNumber || computer.serialNumber;
+    computer.details = req.body.details || computer.details;
     computer.annexed = req.body.annexed || computer.annexed;
     computer.ubication = req.body.ubication || computer.ubication;
     computer.status = req.body.status || computer.status;
     computer.type = req.body.type || computer.type;
-    computer.userId = req.body.userId || computer.userId;
-    computer.userName = req.body.userName || computer.userName;
-    computer.hostname = req.body.hostname || computer.hostname;
+    computer.ip = req.body.ip || computer.ip;
+    computer.custom = req.body.custom || computer.custom;
+    computer.bussinesUnit = req.body.bussinesUnit || computer.bussinesUnit;
+    computer.headphones = req.body.headphones || computer.headphones;
+    computer.adaptVGA = req.body.adaptVGA || computer.adaptVGA;
+    computer.mouse = req.body.mouse || computer.mouse;
+
+    console.log(computer);
 
     const updatedComputer = await computer.save();
 
