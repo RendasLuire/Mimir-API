@@ -4,7 +4,10 @@ const movementSchema = new Mongoose.Schema({
   userTI: String,
   computer: String,
   type: String,
-  date: Date,
+  date: {
+    type: Date,
+    default: Date.now,
+  },
   description: String,
 });
 

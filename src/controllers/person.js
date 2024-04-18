@@ -8,13 +8,24 @@ const showAll = async (req, res) => {
   try {
     const persons = await Person.find();
     if (persons.length === 0) {
-      return res.status(204).json([]);
+      return res.status(204).json({
+        data: {
+          message: "No hay personas registradas.",
+        },
+      });
     }
 
-    return res.status(200).json(persons);
+    return res.status(200).json({
+      data: {
+        persons,
+        message: "Lista de personas registradas.",
+      },
+    });
   } catch (erro) {
     return res.status(500).json({
-      message: error.message,
+      data: {
+        message: error.message,
+      },
     });
   }
 };
@@ -24,8 +35,10 @@ const register = async (req, res) => {
 
   if (!name || !department || !position || !userTI) {
     return res.status(400).json({
-      message:
-        "Los campos Nombre, Departamento, Posicion y usuario son obligatorios.",
+      data: {
+        message:
+          "Los campos Nombre, Departamento, Posicion y usuario son obligatorios.",
+      },
     });
   }
 
@@ -34,8 +47,8 @@ const register = async (req, res) => {
     department,
     position,
     manager: {
-      managerId: "unassigned",
-      managerName: "unassigned",
+      managerId: "Sin asignar",
+      managerName: "Sin asignar",
     },
   });
 
@@ -46,8 +59,9 @@ const register = async (req, res) => {
 
     if (personAlreadyExist) {
       return res.status(409).json({
-        status: 409,
-        message: "Esta persona ya esta registrada.",
+        data: {
+          message: "Esta persona ya esta registrada.",
+        },
       });
     }
 
@@ -55,32 +69,35 @@ const register = async (req, res) => {
     const date = moment().format("DD/MM/YYYY HH:mm:ss");
     const userData = await User.findById(userTI);
     const description =
-      "Person " +
+      "Persona: " +
       newPerson.name +
-      " registered on " +
+      " registrada el " +
       date +
-      " by user " +
+      " por el usuario " +
       userData.name +
       " .";
 
     const movement = new Movement({
       userTI,
       computer: newPerson._id,
-      type: "person",
-      date: moment().unix(),
+      type: "persona",
       description,
     });
 
     const newMovement = await movement.save();
 
     res.status(201).json({
-      status: 201,
-      person: newPerson,
-      movement: newMovement,
+      data: {
+        message: "Informacion de la persona y movimiento.",
+        person: newPerson,
+        movement: newMovement,
+      },
     });
   } catch (error) {
     return res.status(500).json({
-      message: error.message,
+      data: {
+        message: error.message,
+      },
     });
   }
 };
@@ -91,7 +108,9 @@ const showOne = async (req, res) => {
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
-      message: "El ID de la persona no es valido.",
+      data: {
+        message: "El ID de la persona no es valido.",
+      },
     });
   }
 
@@ -99,17 +118,24 @@ const showOne = async (req, res) => {
     person = await Person.findById(id);
     if (!person) {
       return res.status(404).json({
-        message: "La persona no fue encontrada",
+        data: {
+          message: "La persona no fue encontrada",
+        },
       });
     }
   } catch (error) {
     return res.status(500).json({
-      message: error.message,
+      data: {
+        message: error.message,
+      },
     });
   }
 
   return res.status(200).json({
-    person,
+    data: {
+      person,
+      message: "Informacion de la persona.",
+    },
   });
 };
 
@@ -151,14 +177,18 @@ const updatePut = async (req, res) => {
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
-      message: "El ID del usuario no es valido.",
+      data: {
+        message: "El ID del usuario no es valido.",
+      },
     });
   }
   try {
     let person = await Person.findById(id);
     if (!person) {
       return res.status(404).json({
-        message: "El usuario no fue encontrado",
+        data: {
+          message: "El usuario no fue encontrado",
+        },
       });
     }
 
@@ -174,31 +204,35 @@ const updatePut = async (req, res) => {
     const userData = await User.findById(userTI);
 
     const description =
-      "Person updated " +
+      "Persona: " +
       updatedPerson.name +
-      " on " +
+      " actualizada el " +
       date +
-      " by user: " +
+      " por el usuario: " +
       userData.name +
       " .";
 
     const movement = new Movement({
       userTI,
       computer: updatedPerson._id,
-      type: "person",
-      date,
+      type: "persona",
       description,
     });
 
     const newMovement = await movement.save();
 
     res.status(200).json({
-      computer: updatedPerson,
-      movement: newMovement,
+      data: {
+        computer: updatedPerson,
+        movement: newMovement,
+        message: "Informacion de persona actualizada.",
+      },
     });
   } catch (error) {
     res.status(400).json({
-      message: error.message,
+      data: {
+        message: error.message,
+      },
     });
   }
 };
@@ -210,7 +244,9 @@ const updatePatch = async (req, res) => {
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
-      message: "El ID de la persona no es valido.",
+      data: {
+        message: "El ID de la persona no es valido.",
+      },
     });
   }
 
@@ -221,7 +257,9 @@ const updatePatch = async (req, res) => {
     !req.body.manager
   ) {
     return res.status(400).json({
-      message: "Al menos alguno de estos campos debe ser enviado.",
+      data: {
+        message: "Al menos alguno de estos campos debe ser enviado.",
+      },
     });
   }
 
@@ -229,7 +267,9 @@ const updatePatch = async (req, res) => {
     person = await Person.findById(id);
     if (!person) {
       return res.status(404).json({
-        message: "La persona no fue encontrada",
+        data: {
+          message: "La persona no fue encontrada",
+        },
       });
     }
 
@@ -240,38 +280,40 @@ const updatePatch = async (req, res) => {
 
     const updatedPerson = await person.save();
 
-    console.log(updatedPerson);
-
     const date = moment().format("DD/MM/YYYY HH:mm:ss");
 
     const userData = await User.findById(userTI);
 
     const description =
-      "Person updated " +
+      "Persona:  " +
       updatedPerson.name +
-      " on " +
+      " actualizado el " +
       date +
-      " by user: " +
+      " por el usuario: " +
       userData.name +
       " .";
 
     const movement = new Movement({
       userTI,
       computer: updatedPerson._id,
-      type: "person",
-      date: moment().unix(),
+      type: "persona",
       description,
     });
 
     const newMovement = await movement.save();
 
     res.status(200).json({
-      computer: updatedPerson,
-      movement: newMovement,
+      data: {
+        message: "Persona actualizada con exito.",
+        computer: updatedPerson,
+        movement: newMovement,
+      },
     });
   } catch (error) {
     res.status(400).json({
-      message: error.message,
+      data: {
+        message: error.message,
+      },
     });
   }
 };

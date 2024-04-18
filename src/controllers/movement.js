@@ -5,12 +5,23 @@ const showAll = async (req, res) => {
   try {
     const movements = await Movement.find();
     if (movements.length === 0) {
-      return res.status(204).json([]);
+      return res.status(204).json({
+        data: {
+          message: "No hay movimientos por mostrar.",
+        },
+      });
     }
-    return res.json(movements);
+    return res.status(200).json({
+      data: {
+        message: "Lista de movimientos.",
+        movements,
+      },
+    });
   } catch (error) {
     return res.status(500).json({
-      message: error.message,
+      data: {
+        message: error.message,
+      },
     });
   }
 };
@@ -20,12 +31,23 @@ const showAllFilter = async (req, res) => {
   try {
     const movements = await Movement.find({ computer: id });
     if (movements.length === 0) {
-      return res.status(204).json([]);
+      return res.status(204).json({
+        data: {
+          message: "No hay movimientos por mostrar.",
+        },
+      });
     }
-    return res.json(movements);
+    return res.status(200).json({
+      data: {
+        movements,
+        message: "Lista de los movimientos.",
+      },
+    });
   } catch (error) {
     return res.status(500).json({
-      message: error.message,
+      data: {
+        message: error.message,
+      },
     });
   }
 };
@@ -36,7 +58,9 @@ const register = async (req, res) => {
 
   if (!userTI || !computer || !type || !description) {
     return res.status(400).json({
-      message: "Los campos de usuario, equipo, tipo, fecha y descripcion",
+      data: {
+        message: "Los campos de usuario, equipo, tipo, fecha y descripcion",
+      },
     });
   }
 
@@ -50,10 +74,17 @@ const register = async (req, res) => {
 
   try {
     const newMovement = await movement.save();
-    res.status(201).json(newMovement);
+    res.status(201).json({
+      data: {
+        newMovement,
+        message: "Movimiento registrado.",
+      },
+    });
   } catch (error) {
     return res.status(500).json({
-      message: error.message,
+      data: {
+        message: error.message,
+      },
     });
   }
 };

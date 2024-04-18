@@ -7,11 +7,24 @@ const showAll = async (req, res) => {
   try {
     const computers = await Computer.find();
     if (computers.length === 0) {
-      return res.status(204).json([]);
+      return res.status(204).json({
+        data: {
+          message: "No hay equipos para mostrar.",
+        },
+      });
     }
-    return res.json(computers);
+    return res.status(200).json({
+      data: {
+        computers,
+        message: "Lista de equipos registrados.",
+      },
+    });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({
+      data: {
+        message: error.message,
+      },
+    });
   }
 };
 
@@ -20,8 +33,10 @@ const register = async (req, res) => {
 
   if (!brand || !model || !serialNumber || !type || !userTI) {
     return res.status(400).json({
-      message:
-        "Los campos Marca, Modelo, Numero de Serie, usuario y tipo son obligatorios.",
+      data: {
+        message:
+          "Los campos Marca, Modelo, Numero de Serie, usuario y tipo son obligatorios.",
+      },
     });
   }
 
@@ -30,9 +45,9 @@ const register = async (req, res) => {
     model,
     serialNumber,
     type,
-    userId: "unassigned",
-    userName: "unassigned",
-    status: "available",
+    userId: "Sin asignar",
+    userName: "Sin asignar",
+    status: "activo",
     hostname: "MV-" + serialNumber,
   });
 
@@ -43,8 +58,9 @@ const register = async (req, res) => {
 
     if (computerAlreadyExist) {
       return res.status(409).json({
-        status: 409,
-        message: `Esta ${computer.type} ya esta registrada.`,
+        data: {
+          message: `Esta ${computer.type} ya esta registrada.`,
+        },
       });
     }
 
@@ -53,18 +69,18 @@ const register = async (req, res) => {
     const date = moment().format("DD/MM/YYYY HH:mm:ss");
     const userData = await User.findById(userTI);
     const description =
-      "Computer registered " +
+      "Equipo " +
       newComputer.serialNumber +
-      " on " +
+      " registrado el " +
       date +
-      " by user: " +
+      " por el usuario: " +
       userData.name +
       " .";
 
     const movement = new Movement({
       userTI,
       computer: newComputer._id,
-      type: "computer",
+      type: "Equipo",
       date: moment().unix(),
       description,
     });
@@ -72,13 +88,16 @@ const register = async (req, res) => {
     const newMovement = await movement.save();
 
     res.status(201).json({
-      status: 201,
-      computer: newComputer,
-      movement: newMovement,
+      data: {
+        computer: newComputer,
+        movement: newMovement,
+      },
     });
   } catch (error) {
     return res.status(500).json({
-      message: error.message,
+      data: {
+        message: error.message,
+      },
     });
   }
 };
@@ -89,7 +108,9 @@ const showOne = async (req, res) => {
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
-      message: "El ID del equipo no es valido.",
+      data: {
+        message: "El ID del equipo no es valido.",
+      },
     });
   }
 
@@ -97,16 +118,25 @@ const showOne = async (req, res) => {
     computer = await Computer.findById(id);
     if (!computer) {
       return res.status(404).json({
-        message: "El equipo no fue encontrado",
+        data: {
+          message: "El equipo no fue encontrado",
+        },
       });
     }
   } catch (error) {
     return res.status(500).json({
-      messaje: error.message,
+      data: {
+        messaje: error.message,
+      },
     });
   }
 
-  return res.status(200).json(computer);
+  return res.status(200).json({
+    data: {
+      computer,
+      message: "Informacion del equipo.",
+    },
+  });
 };
 
 const updatePut = async (req, res) => {
@@ -126,14 +156,18 @@ const updatePut = async (req, res) => {
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
-      message: "El ID del equipo no es valido.",
+      data: {
+        message: "El ID del equipo no es valido.",
+      },
     });
   }
   try {
     let computer = await Computer.findById(id);
     if (!computer) {
       return res.status(404).json({
-        message: "El equipo no fue encontrado",
+        data: {
+          message: "El equipo no fue encontrado",
+        },
       });
     }
 
@@ -151,21 +185,20 @@ const updatePut = async (req, res) => {
     const date = moment().format("DD/MM/YYYY HH:mm:ss");
 
     const userData = await User.findById(userTI);
-    console.log("userTI: " + userData);
 
     const description =
-      "Computer updated " +
+      "Equipo: " +
       updatedComputer.serialNumber +
-      " on " +
+      " actualizado el " +
       date +
-      " by user: " +
+      " por el usuario: " +
       userData.name +
       " .";
 
     const movement = new Movement({
       userTI,
       computer: updatedComputer._id,
-      type: "computer",
+      type: "Equipo",
       date,
       description,
     });
@@ -173,12 +206,16 @@ const updatePut = async (req, res) => {
     const newMovement = await movement.save();
 
     res.status(200).json({
-      computer: updatedComputer,
-      movement: newMovement,
+      data: {
+        computer: updatedComputer,
+        movement: newMovement,
+      },
     });
   } catch (error) {
     res.status(400).json({
-      message: error.message,
+      data: {
+        message: error.message,
+      },
     });
   }
 };
@@ -190,7 +227,9 @@ const updatePatch = async (req, res) => {
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
-      message: "El ID del equipo no es valido.",
+      data: {
+        message: "El ID del equipo no es valido.",
+      },
     });
   }
   if (
@@ -206,7 +245,9 @@ const updatePatch = async (req, res) => {
     !req.body.hostname
   ) {
     res.status(400).json({
-      message: "Al menos alguno de estos campos debe ser enviado.",
+      data: {
+        message: "Al menos alguno de estos campos debe ser enviado.",
+      },
     });
   }
 
@@ -214,7 +255,9 @@ const updatePatch = async (req, res) => {
     computer = await Computer.findById(id);
     if (!computer) {
       return res.status(404).json({
-        message: "El equipo no fue encontrado",
+        data: {
+          message: "El equipo no fue encontrado",
+        },
       });
     }
 
@@ -236,18 +279,18 @@ const updatePatch = async (req, res) => {
     const userData = await User.findById(userTI);
 
     const description =
-      "Computer updated " +
+      "Equipo: " +
       updatedComputer.serialNumber +
-      " on " +
+      " actualizado el " +
       date +
-      " by user: " +
+      " por el usuario: " +
       userData.name +
       " .";
 
     const movement = new Movement({
       userTI,
       computer: updatedComputer._id,
-      type: "computer",
+      type: "Equipo",
       date: moment().unix(),
       description,
     });
@@ -255,12 +298,16 @@ const updatePatch = async (req, res) => {
     const newMovement = await movement.save();
 
     res.status(200).json({
-      computer: updatedComputer,
-      movement: newMovement,
+      data: {
+        computer: updatedComputer,
+        movement: newMovement,
+      },
     });
   } catch (error) {
     return res.status(400).json({
-      message: error.message,
+      data: {
+        message: error.message,
+      },
     });
   }
 };
@@ -271,25 +318,33 @@ const deleteOne = async (req, res) => {
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
-      message: "El ID del equipo no es valido.",
+      data: {
+        message: "El ID del equipo no es valido.",
+      },
     });
   }
   try {
     computer = await Computer.findById(id);
     if (!computer) {
       return res.status(404).json({
-        message: "El equipo no fue encontrado",
+        data: {
+          message: "El equipo no fue encontrado",
+        },
       });
     }
     await computer.deleteOne({
       _id: computer._id,
     });
-    res.json({
-      message: `El equipo ${computer.serialNumber} fue eliminado correctamente.`,
+    res.status(200).json({
+      data: {
+        message: `El equipo ${computer.serialNumber} fue eliminado correctamente.`,
+      },
     });
   } catch (error) {
     res.status(500).json({
-      message: error.message,
+      data: {
+        message: error.message,
+      },
     });
   }
 };

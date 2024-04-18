@@ -195,8 +195,8 @@ const updatePut = async (req, res) => {
     res.status(200).json({
       data: {
         updatedUser,
-        message:
-      }
+        message: "El usuari fue actualizado con exito.",
+      },
     });
   } catch (error) {
     res.status(400).json({
@@ -215,7 +215,7 @@ const updatePatch = async (req, res) => {
     return res.status(404).json({
       data: {
         message: "El ID del usuario no es valido",
-      }
+      },
     });
   }
 
@@ -229,7 +229,7 @@ const updatePatch = async (req, res) => {
     res.status(400).json({
       data: {
         message: "Al menos alguno de estos campos debe ser enviado",
-      }
+      },
     });
   }
 
@@ -239,7 +239,7 @@ const updatePatch = async (req, res) => {
       return res.status(404).json({
         data: {
           message: "El usuario no fue encontrado",
-        }
+        },
       });
     }
 
@@ -253,14 +253,14 @@ const updatePatch = async (req, res) => {
     res.status(200).json({
       data: {
         updatedUser,
-        message: "El usuario se actualizo con exito."
-      }
+        message: "El usuario se actualizo con exito.",
+      },
     });
   } catch (error) {
     res.status(400).json({
       data: {
         message: error.message,
-      }
+      },
     });
   }
 };
@@ -274,7 +274,7 @@ const deleteOne = async (req, res) => {
       return res.status(404).json({
         data: {
           message: "El usuario no fue encontrado",
-        }
+        },
       });
     }
     await user.deleteOne({
@@ -283,13 +283,13 @@ const deleteOne = async (req, res) => {
     res.status(200).json({
       data: {
         message: `El usuario ${user.name} fue eliminado correctamente.`,
-      }
+      },
     });
   } catch (error) {
     res.status(500).json({
       data: {
         message: error.message,
-      }
+      },
     });
   }
 };

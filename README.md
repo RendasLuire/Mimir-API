@@ -9,3 +9,8 @@ MONGO_URL=mongodb://rendasluire:123456789@localhost:27017
 MONGO_USER=rendasluire
 MONGO_PASS=123456789
 MONGO_DB_NAME=TI
+
+## EndPoints
+
+### Users
+
