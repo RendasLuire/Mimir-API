@@ -10,6 +10,8 @@ router.post("/register", token.auth, computerController.register);
 
 router.get("/:id", token.auth, computerController.showOne);
 
+router.get("/filter/:type", token.auth, computerController.showOnlyType);
+
 router.put("/update/:id", token.auth, computerController.updatePut);
 
 router.patch("/update/:id", token.auth, computerController.updatePatch);

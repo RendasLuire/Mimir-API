@@ -7,7 +7,10 @@ const computerSchema = new mongoose.Schema({
   details: String,
   hostname: String,
   status: String,
-  annexed: String,
+  annexed: {
+    number: String,
+    endDate: Date,
+  },
   ubication: String,
   type: String,
   ip: String,

@@ -47,7 +47,10 @@ const register = async (req, res) => {
     details: "",
     hostname: "MV-" + serialNumber,
     status: "activo",
-    annexed: "Sin asignar",
+    annexed: {
+      number: "Sin asignar",
+      endDate: moment().add(1, "year").toDate(),
+    },
     ubication: "",
     type,
     ip: "",
@@ -158,6 +161,34 @@ const showOne = async (req, res) => {
   });
 };
 
+const showOnlyType = async (req, res) => {
+  const { type } = req.params;
+  try {
+    const computers = await Computer.find({
+      type: type,
+    });
+    if (computers.length === 0) {
+      return res.status(204).json({
+        data: {
+          message: "No hay equipos para mostrar.",
+        },
+      });
+    }
+    return res.status(200).json({
+      data: {
+        computers,
+        message: "Lista de equipos por tipo.",
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      data: {
+        message: error.message,
+      },
+    });
+  }
+};
+
 const updatePut = async (req, res) => {
   const {
     brand,
@@ -178,8 +209,6 @@ const updatePut = async (req, res) => {
     user,
     userTI,
   } = req.body;
-
-  console.log("Recibo: " + custom);
 
   const { id } = req.params;
 
@@ -213,20 +242,26 @@ const updatePut = async (req, res) => {
     computer.bussinesUnit = bussinesUnit || computer.bussinesUnit;
     computer.user = user || computer.user;
 
-    if (typeof custom !== "undefined" && custom !== null) {
+    if (typeof custom !== "undefined" && custom !== null && custom !== "") {
       computer.custom = custom;
     }
-    if (typeof headphones !== "undefined" && headphones !== null) {
+    if (
+      typeof headphones !== "undefined" &&
+      headphones !== null &&
+      headphones !== ""
+    ) {
       computer.headphones = headphones;
     }
-    if (typeof adaptVGA !== "undefined" && adaptVGA !== null) {
+    if (
+      typeof adaptVGA !== "undefined" &&
+      adaptVGA !== null &&
+      adaptVGA !== ""
+    ) {
       computer.adaptVGA = adaptVGA;
     }
-    if (typeof mouse !== "undefined" && mouse !== null) {
+    if (typeof mouse !== "undefined" && mouse !== null && mouse !== "") {
       computer.mouse = mouse;
     }
-
-    console.log("voy a guardar:" + computer.custom);
 
     const updatedComputer = await computer.save();
 
@@ -322,6 +357,7 @@ const updatePatch = async (req, res) => {
     computer.user = req.body.user || computer.user;
     computer.brand = req.body.brand || computer.brand;
     computer.model = req.body.model || computer.model;
+    computer.monitor = req.body.monitor || computer.monitor;
     computer.serialNumber = req.body.serialNumber || computer.serialNumber;
     computer.details = req.body.details || computer.details;
     computer.annexed = req.body.annexed || computer.annexed;
@@ -334,8 +370,6 @@ const updatePatch = async (req, res) => {
     computer.headphones = req.body.headphones || computer.headphones;
     computer.adaptVGA = req.body.adaptVGA || computer.adaptVGA;
     computer.mouse = req.body.mouse || computer.mouse;
-
-    console.log(computer);
 
     const updatedComputer = await computer.save();
 
@@ -418,6 +452,7 @@ export default {
   showAll,
   register,
   showOne,
+  showOnlyType,
   updatePut,
   updatePatch,
   deleteOne,
