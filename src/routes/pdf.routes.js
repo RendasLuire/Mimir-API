@@ -1,7 +1,8 @@
 import express from "express";
+import generateResponsiveCSM from "../controllers/pdfs.js";
 
 const router = express.Router();
 
-router.get("reports/responsiveCSM", generateResponsiveCSM);
+router.get("/responsiveCSM/:id", generateResponsiveCSM);
 
-module.exports = router;
+export default router;

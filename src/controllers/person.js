@@ -2,7 +2,7 @@ import moment from "moment";
 import Person from "../models/person.model.js";
 import Movement from "../models/movement.model.js";
 import User from "../models/user.model.js";
-import Computer from "../models/computer.model.js";
+import Device from "../models/device.model.js";
 
 const showAll = async (req, res) => {
   try {
@@ -47,8 +47,8 @@ const register = async (req, res) => {
     department,
     position,
     manager: {
-      managerId: "Sin asignar",
-      managerName: "Sin asignar",
+      id: "Sin asignar",
+      name: "Sin asignar",
     },
   });
 
@@ -143,7 +143,7 @@ const showAllFilter = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const computers = await Computer.find({
+    const computers = await Device.find({
       userId: id,
     });
 

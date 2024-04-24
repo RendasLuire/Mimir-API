@@ -1,12 +1,27 @@
 import mongoose from "mongoose";
 
 const personSchema = new mongoose.Schema({
-  name: String,
-  department: String,
-  position: String,
+  name: {
+    type: String,
+    require: true,
+  },
+  department: {
+    type: String,
+    require: true,
+  },
+  position: {
+    type: String,
+    require: true,
+  },
   manager: {
-    managerId: String,
-    managerName: String,
+    id: {
+      type: String,
+      default: "Sin asignar",
+    },
+    name: {
+      type: String,
+      default: "Sin asignar",
+    },
   },
 });
 

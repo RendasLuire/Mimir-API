@@ -27,9 +27,8 @@ const login = async (req, res) => {
 
   if (!nickname || !password) {
     return res.status(400).json({
-      data: {
-        message: "Los campos de nick y contraseña son obligatorios.",
-      },
+      data: {},
+      message: "Los campos de nick y contraseña son obligatorios.",
     });
   }
 
@@ -38,9 +37,8 @@ const login = async (req, res) => {
 
     if (!user) {
       return res.status(400).json({
-        data: {
-          message: "El usuario no existe.",
-        },
+        data: {},
+        message: "El usuario no existe.",
       });
     }
 
@@ -48,9 +46,8 @@ const login = async (req, res) => {
 
     if (!pwd) {
       return res.status(400).json({
-        data: {
-          message: "La contraseña es incorrecta.",
-        },
+        data: {},
+        message: "La contraseña es incorrecta.",
       });
     }
 
@@ -62,9 +59,9 @@ const login = async (req, res) => {
           _id: user._id,
           name: user.name,
         },
-        token,
-        message: "Login correcto.",
       },
+      token,
+      message: "Login correcto.",
     });
   } catch (error) {
     return res.status(500).json({
@@ -80,10 +77,9 @@ const register = async (req, res) => {
 
   if (!name || !nickname || !type || !password || !email) {
     return res.status(400).json({
-      data: {
-        message:
-          "Los campos de usuario, nick, tipo, contraseña y correo son obligatorios.",
-      },
+      data: {},
+      message:
+        "Los campos de usuario, nick, tipo, contraseña y correo son obligatorios.",
     });
   }
 
@@ -102,9 +98,8 @@ const register = async (req, res) => {
 
     if (userAlreadyExists) {
       return res.status(409).json({
-        data: {
-          message: "El usuario ya existe.",
-        },
+        data: {},
+        message: "El usuario ya existe.",
       });
     }
 
@@ -113,16 +108,13 @@ const register = async (req, res) => {
 
     const newUser = await user.save();
     res.status(201).json({
-      data: {
-        message: "Usuario creado con exito.",
-        newUser,
-      },
+      data: newUser,
+      message: "Usuario creado con exito.",
     });
   } catch (error) {
     res.status(500).json({
-      data: {
-        message: error.message,
-      },
+      data: {},
+      message: error.message,
     });
   }
 };
