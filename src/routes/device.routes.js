@@ -10,10 +10,6 @@ router.post("/", token.auth, deviceController.register);
 
 router.get("/:id", token.auth, deviceController.showOne);
 
-router.get("/filter/:type", token.auth, deviceController.showOnlyType);
-
-router.put("/update/:id", token.auth, deviceController.updatePut);
-
-router.patch("/update/:id", token.auth, deviceController.updatePatch);
+router.patch("/:id", token.auth, deviceController.updatePatch);
 
 export default router;

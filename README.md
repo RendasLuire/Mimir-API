@@ -142,13 +142,13 @@ headers: {
    "mouse": false,
    "__v": 0
    }
-	],
-	"pagination": {
+   ],
+   "pagination": {
   "totalItems": 3,
  "totalPages": 1,
  "currentPage": 1
-	},
-	"message": "Lista de dispositivos registrados."
+ },
+ "message": "Lista de dispositivos registrados."
 }
 ```
 
@@ -283,9 +283,67 @@ data:{},
 
 ---
 
+#### List all users
+
+**GET** /api/user
+
+This endpoint is for list all users.
+
+###### Request
+
+```JSON
+{
+ headers: {
+ "Authorization": "TOKEN"
+}
+}
+```
+
+##### Response <span style="color:green">200</span>
+
+```JSON
+{
+ "data": [
+  {
+   "_id": "66296cca8af925022ad4e0bb",
+   "name": "Andres Uriel Aguirre Ocampo",
+   "nickname": "aaguirre",
+   "profile": "Tecnico",
+   "password": "$2b$10$nHdGN9iXanviYHkp5t30sOHvXxV4/jBhB.RjHOEfvvdyetJIjPIDe",
+   "email": "aaguirre@maver.com.mx",
+   "__v": 0
+   },
+   {
+  "_id": "66296e30feb30140691dce3b",
+   "name": "prueba",
+   "nickname": "prueba",
+   "profile": "Tecnico",
+   "password": "$2b$10$UxBqgwa7aneJl7NKagow8eaDwb.wun8EDxU4TEmacu06O082MRRpC",
+   "email": "prueba@maver.com.mx",
+   "__v": 0
+   }
+],
+"pagination": {
+ "totalItems": 2,
+ "totalPages": 1,
+ "currentPage": 1
+},
+"message": "User list."
+}
+```
+
+##### Response <span style="color:green">204</span>
+
+```JSON
+{
+ "data": [],
+ "message": "No hay usuarios registrados.",
+}
+```
+
 #### Register a user
 
-**Post** /api/user
+**POST** /api/user
 
 This endpoint add a device to database.
 
@@ -371,5 +429,21 @@ body: {
 {
  "data": {},
    "message": "La contraseña es incorrecta."
+}
+```
+
+---
+
+#### Show One User
+
+**GET** /api/user/:id
+
+##### Request
+
+```JSON
+{
+ headers: {
+ "Authorization": "TOKEN"
+}
 }
 ```

@@ -3,17 +3,50 @@ import registerMovement from "../helpers/movement.helper.js";
 import User from "../models/user.model.js";
 
 const showAll = async (req, res) => {
-  const { page = 1, limit = 10 } = req.query;
+  const { type, page = 1, limit = 10, search } = req.query;
   const skip = (page - 1) * limit;
+
   try {
-    const devicesCount = await Device.countDocuments();
-    const devices = await Device.find().skip(skip).limit(Number(limit));
+    let devices;
+    let devicesCount;
+    let message;
+    let query = {};
+
+    if (type) {
+      query.type = type.toLowerCase();
+    }
+
+    if (search) {
+      const searchRegex = new RegExp(search, "i");
+      query.$or = [
+        { brand: searchRegex },
+        { model: searchRegex },
+        { serialNumber: searchRegex },
+        { hostname: searchRegex },
+        { details: searchRegex },
+        { status: searchRegex },
+        { "annexed.id": searchRegex },
+        { "annexed.number": searchRegex },
+        { ubication: searchRegex },
+        { type: searchRegex },
+        { ip: searchRegex },
+        { "user.name": searchRegex },
+        { "departament.name": searchRegex },
+        { "monitor.serialNumber": searchRegex },
+      ];
+    }
+
+    devices = await Device.find(query).skip(skip).limit(Number(limit));
+
+    devicesCount = await Device.countDocuments(query);
+
     if (devices.length === 0) {
       return res.status(204).json({
         data: [],
         message: "No hay dispositivos para mostrar.",
       });
     }
+
     const totalPages = Math.ceil(devicesCount / limit);
 
     return res.status(200).json({
@@ -27,9 +60,8 @@ const showAll = async (req, res) => {
     });
   } catch (error) {
     return res.status(500).json({
-      data: {
-        message: error.message,
-      },
+      data: {},
+      message: error.message,
     });
   }
 };
@@ -42,6 +74,13 @@ const register = async (req, res) => {
       data: {},
       message:
         "Los campos Marca, Modelo, Numero de Serie, usuario y tipo son obligatorios.",
+    });
+  }
+
+  if (!userTI.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(404).json({
+      data: {},
+      message: "El ID del dispositivo no es valido.",
     });
   }
 
@@ -78,9 +117,8 @@ const register = async (req, res) => {
 
     if (!newDevice) {
       res.status(400).json({
-        data: {
-          message: "Ocurrio algun problema al registrar el dispositivo.",
-        },
+        data: {},
+        message: "Ocurrio algun problema al registrar el dispositivo.",
       });
     }
 
@@ -110,11 +148,16 @@ const showOne = async (req, res) => {
   let device;
   const { id } = req.params;
 
+  if (!id) {
+    return res.status(400).json({
+      data: {},
+      message: "Es necesario el ID.",
+    });
+  }
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
-      data: {
-        message: "El ID del dispositivo no es valido.",
-      },
+      data: {},
+      message: "El ID del dispositivo no es valido.",
     });
   }
 
@@ -122,159 +165,19 @@ const showOne = async (req, res) => {
     device = await Device.findById(id);
     if (!device) {
       return res.status(404).json({
-        data: {
-          message: "El dispositivo no fue encontrado",
-        },
+        data: {},
+        message: "El dispositivo no fue encontrado",
       });
     }
-  } catch (error) {
-    return res.status(500).json({
-      data: {
-        messaje: error.message,
-      },
-    });
-  }
 
-  return res.status(200).json({
-    data: {
-      device,
-      message: "Informacion del dispositivo.",
-    },
-  });
-};
-
-const showOnlyType = async (req, res) => {
-  const { type } = req.params;
-  try {
-    const devices = await Device.find({
-      type: type,
-    });
-    if (devices.length === 0) {
-      return res.status(204).json({
-        data: {
-          message: "No hay dispositivos para mostrar.",
-        },
-      });
-    }
     return res.status(200).json({
-      data: {
-        devices,
-        message: "Lista de dispositivos por tipo.",
-      },
+      data: device,
+      message: "Informacion del dispositivo.",
     });
   } catch (error) {
     return res.status(500).json({
-      data: {
-        message: error.message,
-      },
-    });
-  }
-};
-
-const updatePut = async (req, res) => {
-  const {
-    brand,
-    model,
-    serialNumber,
-    details,
-    hostname,
-    status,
-    annexed,
-    ubication,
-    type,
-    ip,
-    custom,
-    bussinesUnit,
-    headphones,
-    adaptVGA,
-    mouse,
-    user,
-    userTI,
-  } = req.body;
-
-  const { id } = req.params;
-
-  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-    return res.status(404).json({
-      data: {
-        message: "El ID del dispositivo no es valido.",
-      },
-    });
-  }
-  try {
-    let device = await Device.findById(id);
-    if (!device) {
-      return res.status(404).json({
-        data: {
-          message: "El dispositivo no fue encontrado",
-        },
-      });
-    }
-
-    device.hostname = hostname || device.hostname;
-    device.brand = brand || device.brand;
-    device.model = model || device.model;
-    device.serialNumber = serialNumber || device.serialNumber;
-    device.details = details || device.details;
-    device.annexed = annexed || device.annexed;
-    device.ubication = ubication || device.ubication;
-    device.status = status || device.status;
-    device.type = type || device.type;
-    device.ip = ip || device.ip;
-    device.bussinesUnit = bussinesUnit || device.bussinesUnit;
-    device.user = user || device.user;
-
-    if (typeof custom !== "undefined" && custom !== null && custom !== "") {
-      device.custom = custom;
-    }
-    if (
-      typeof headphones !== "undefined" &&
-      headphones !== null &&
-      headphones !== ""
-    ) {
-      device.headphones = headphones;
-    }
-    if (
-      typeof adaptVGA !== "undefined" &&
-      adaptVGA !== null &&
-      adaptVGA !== ""
-    ) {
-      device.adaptVGA = adaptVGA;
-    }
-    if (typeof mouse !== "undefined" && mouse !== null && mouse !== "") {
-      device.mouse = mouse;
-    }
-
-    const updatedDevice = await device.save();
-
-    if (!updatedDevice) {
-      return res.status(400).json({
-        data: {
-          message: "El dispositivo no fue actualizado",
-        },
-      });
-    }
-
-    await registerMovement(
-      userTI,
-      updatedDevice.type,
-      updatedDevice.serialNumber,
-      updatedDevice._id,
-      "actualizada",
-      device,
-      updatedDevice
-    );
-
-    res.status(200).json({
-      data: {
-        computer: updatedDevice,
-      },
-    });
-  } catch (error) {
-    res.status(400).json({
-      data: {
-        message: error.message,
-      },
+      data: {},
+      messaje: error.message,
     });
   }
 };
@@ -284,13 +187,20 @@ const updatePatch = async (req, res) => {
   const { id } = req.params;
   const { userTI } = req.body;
 
-  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+  if (!id || !userTI) {
     return res.status(404).json({
-      data: {
-        message: "El ID del equipo no es valido.",
-      },
+      data: {},
+      message: "El ID del equipo no es valido.",
     });
   }
+
+  if (!id.match(/^[0-9a-fA-F]{24}$/) || !userTI.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(404).json({
+      data: {},
+      message: "El ID del equipo no es valido.",
+    });
+  }
+
   if (
     !req.body.brand &&
     !req.body.model &&
@@ -312,19 +222,26 @@ const updatePatch = async (req, res) => {
     !req.body.hostname
   ) {
     res.status(400).json({
-      data: {
-        message: "Al menos alguno de estos campos debe ser enviado.",
-      },
+      data: {},
+      message: "Al menos alguno de estos campos debe ser enviado.",
     });
   }
 
   try {
+    const internUser = await User.findById(userTI);
+
+    if (!internUser) {
+      return res.status(409).json({
+        data: {},
+        message: `Este usuario no existe.`,
+      });
+    }
+
     device = await Device.findById(id);
     if (!device) {
       return res.status(404).json({
-        data: {
-          message: "El equipo no fue encontrado",
-        },
+        data: {},
+        message: "El equipo no fue encontrado",
       });
     }
 
@@ -350,9 +267,8 @@ const updatePatch = async (req, res) => {
 
     if (!updatedDevice) {
       return res.status(400).json({
-        data: {
-          message: "El dispositivo no fue actualizado.",
-        },
+        data: {},
+        message: "El dispositivo no fue actualizado.",
       });
     }
 
@@ -367,16 +283,13 @@ const updatePatch = async (req, res) => {
     );
 
     res.status(200).json({
-      data: {
-        device: updatedDevice,
-        movement: newMovement,
-      },
+      data: updatedDevice,
+      message: "Usuario actualizado.",
     });
   } catch (error) {
     return res.status(500).json({
-      data: {
-        message: error.message,
-      },
+      data: {},
+      message: error.message,
     });
   }
 };
@@ -425,8 +338,6 @@ export default {
   showAll,
   register,
   showOne,
-  showOnlyType,
-  updatePut,
   updatePatch,
   assing,
   unassign,

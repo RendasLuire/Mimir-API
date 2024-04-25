@@ -1,5 +1,5 @@
 import express from "express";
-import generateResponsiveCSM from "../controllers/pdfs.js";
+import generateResponsiveCSM from "../controllers/pdf.controller.js";
 
 const router = express.Router();
 
