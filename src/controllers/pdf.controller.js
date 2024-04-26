@@ -60,7 +60,7 @@ const generateResponsiveCSM = async (req, res) => {
       snMon = "N/A";
     }
 
-    if (person.manager.id !== "unassigned") {
+    if (person.manager.id !== "Sin asignar") {
       boss = await Person.findById(person.manager.managerId);
       nameBoss = boss.name;
       posiBoss = boss.populate;
@@ -121,4 +121,81 @@ const generateResponsiveCSM = async (req, res) => {
   }
 };
 
-export default generateResponsiveCSM;
+const validationInfoResponsive = async (req, res) => {
+  const { id } = req.params;
+  let monitor;
+  let brandMon;
+  let modelMon;
+  let snMon;
+
+  if (!id) {
+    return res.status(404).json({
+      data: {},
+      message: "El ID del equipo es necesario.",
+    });
+  }
+
+  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(404).json({
+      data: {},
+      message: "El ID del equipo no es valido.",
+    });
+  }
+
+  try {
+    const device = await Device.findById(id);
+    if (!device) {
+      return res.status(404).json({
+        data: {},
+        message: "El equipo no existe.",
+      });
+    }
+
+    if (
+      !device.hostname ||
+      !device.serialNumber ||
+      !device.brand ||
+      !device.model ||
+      !device.annexed ||
+      !device.user ||
+      device.user.id == "Sin asignar" ||
+      !device.ubication
+    ) {
+      return res.status(400).json({
+        data: false,
+        message: "La informacion del equipo no esta completa.",
+      });
+    }
+
+    const person = await Person.findById(device.user.id);
+
+    if (!person.name || !person.department) {
+      return res.status(400).json({
+        data: false,
+        message: "La informacion del usuario no esta completa.",
+      });
+    }
+
+    if (
+      !person.manager ||
+      !person.manager.id ||
+      person.manager.id == "Sin asignar"
+    ) {
+      return res.status(400).json({
+        data: false,
+        message: "El usuario no tiene manager.",
+      });
+    }
+    return res.status(200).json({
+      data: true,
+      message: "La responsiva puede ser creada.",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      data: {},
+      message: error.message,
+    });
+  }
+};
+
+export default { generateResponsiveCSM, validationInfoResponsive };

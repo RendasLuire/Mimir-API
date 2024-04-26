@@ -12,4 +12,8 @@ router.get("/:id", token.auth, deviceController.showOne);
 
 router.patch("/:id", token.auth, deviceController.updatePatch);
 
+router.patch("/assing/:id", token.auth, deviceController.assing);
+
+router.patch("/unassing/:id", token.auth, deviceController.unassing);
+
 export default router;

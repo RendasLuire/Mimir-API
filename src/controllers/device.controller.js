@@ -1,6 +1,7 @@
 import Device from "../models/device.model.js";
 import registerMovement from "../helpers/movement.helper.js";
 import User from "../models/user.model.js";
+import Person from "../models/person.model.js";
 
 const showAll = async (req, res) => {
   const { type, page = 1, limit = 10, search } = req.query;
@@ -13,7 +14,7 @@ const showAll = async (req, res) => {
     let query = {};
 
     if (type) {
-      query.type = type.toLowerCase();
+      query.type = type;
     }
 
     if (search) {
@@ -284,7 +285,7 @@ const updatePatch = async (req, res) => {
 
     res.status(200).json({
       data: updatedDevice,
-      message: "Usuario actualizado.",
+      message: "Dispositivo actualizado.",
     });
   } catch (error) {
     return res.status(500).json({
@@ -295,7 +296,8 @@ const updatePatch = async (req, res) => {
 };
 
 const assing = async (req, res) => {
-  const { id, user, userTI } = req.body;
+  const { user, userTI } = req.body;
+  const { id } = req.params;
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
@@ -312,10 +314,96 @@ const assing = async (req, res) => {
       },
     });
   }
+
+  try {
+    const internUser = await User.findById(userTI);
+
+    if (!internUser) {
+      return res.status(409).json({
+        data: {},
+        message: `Este usuario no existe.`,
+      });
+    }
+
+    const device = await Device.findById(id);
+    if (!device) {
+      return res.status(404).json({
+        data: {},
+        message: "El equipo no fue encontrado",
+      });
+    }
+
+    const userData = await Person.findById(user);
+
+    if (!userData) {
+      return res.status(409).json({
+        data: {},
+        message: `Este usuario no existe.`,
+      });
+    }
+
+    device.user.id = userData._id;
+    device.user.name = userData.name;
+    device.departament.id = userData.departament;
+    device.departament.name = userData.departament;
+
+    if (device.monitor.id !== "Sin asignar") {
+      const monitor = await Device.findById(device.monitor.id);
+      monitor.user.id = userData._id;
+      monitor.user.name = userData.name;
+
+      const updatedMonitor = await monitor.save();
+      if (!updatedMonitor) {
+        return res.status(400).json({
+          data: {},
+          message: "El dispositivo no fue actualizado.",
+        });
+      }
+
+      await registerMovement(
+        userTI,
+        updatedMonitor.type,
+        updatedMonitor.serialNumber,
+        updatedMonitor._id,
+        "asignada",
+        monitor,
+        updatedMonitor
+      );
+    }
+
+    const updatedDevice = await device.save();
+    if (!updatedDevice) {
+      return res.status(400).json({
+        data: {},
+        message: "El dispositivo no fue actualizado.",
+      });
+    }
+
+    await registerMovement(
+      userTI,
+      updatedDevice.type,
+      updatedDevice.serialNumber,
+      updatedDevice._id,
+      "asignada",
+      device,
+      updatedDevice
+    );
+
+    res.status(200).json({
+      data: updatedDevice,
+      message: "Dispositivo asignado.",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      data: {},
+      message: error.message,
+    });
+  }
 };
 
-const unassign = async (req, res) => {
-  const { id, userTI } = req.body;
+const unassing = async (req, res) => {
+  const { userTI } = req.body;
+  const { id } = req.params;
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
@@ -332,6 +420,82 @@ const unassign = async (req, res) => {
       },
     });
   }
+
+  try {
+    const internUser = await User.findById(userTI);
+
+    if (!internUser) {
+      return res.status(409).json({
+        data: {},
+        message: `Este usuario no existe.`,
+      });
+    }
+
+    const device = await Device.findById(id);
+    if (!device) {
+      return res.status(404).json({
+        data: {},
+        message: "El equipo no fue encontrado",
+      });
+    }
+
+    device.user.id = "Sin asignar";
+    device.user.name = "Sin asignar";
+    device.departament.id = "Sin asignar";
+    device.departament.name = "Sin asignar";
+
+    if (device.monitor.id !== "Sin asignar") {
+      const monitor = await Device.findById(device.monitor.id);
+      monitor.user.id = "Sin asignar";
+      monitor.user.name = "Sin asignar";
+
+      const updatedMonitor = await monitor.save();
+      if (!updatedMonitor) {
+        return res.status(400).json({
+          data: {},
+          message: "El dispositivo no fue actualizado.",
+        });
+      }
+
+      await registerMovement(
+        userTI,
+        updatedMonitor.type,
+        updatedMonitor.serialNumber,
+        updatedMonitor._id,
+        "liberado",
+        monitor,
+        updatedMonitor
+      );
+    }
+
+    const updatedDevice = await device.save();
+    if (!updatedDevice) {
+      return res.status(400).json({
+        data: {},
+        message: "El dispositivo no fue actualizado.",
+      });
+    }
+
+    await registerMovement(
+      userTI,
+      updatedDevice.type,
+      updatedDevice.serialNumber,
+      updatedDevice._id,
+      "liberado",
+      device,
+      updatedDevice
+    );
+
+    res.status(200).json({
+      data: updatedDevice,
+      message: "Dispositivo liberado.",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      data: {},
+      message: error.message,
+    });
+  }
 };
 
 export default {
@@ -340,5 +504,5 @@ export default {
   showOne,
   updatePatch,
   assing,
-  unassign,
+  unassing,
 };
