@@ -1,23 +1,6 @@
 import { PageSizes, PDFDocument } from "pdf-lib";
 
-const responsiveCSM = async ({
-  date,
-  name,
-  brandPc,
-  modelPc,
-  snPc,
-  brandMon,
-  modelMon,
-  snMon,
-  annexed,
-  phisicRef,
-  unidBuss,
-  deptUser,
-  nameBoss,
-  posiBoss,
-  date2,
-  custom,
-}) => {
+const responsiveCSM = async ({ responsive }) => {
   const pdfDoc = await PDFDocument.create();
   const page = pdfDoc.addPage([612.0, 792.0]);
   const form = pdfDoc.getForm();
@@ -35,7 +18,7 @@ const responsiveCSM = async ({
     font: fontBold,
   });
 
-  page.drawText(`${date}`, {
+  page.drawText(`${responsive.date}`, {
     x: marginLeft + 185,
     y: lineSpacing * 49,
     size: fontSize,
@@ -43,7 +26,7 @@ const responsiveCSM = async ({
   });
 
   page.drawText(
-    `El departamento de Tecnologías de la Información hace entrega del siguiente equipo de cómputo en funcionamiento a ${name} con los siguientes datos para su control interno:`,
+    `El departamento de Tecnologías de la Información hace entrega del siguiente equipo de cómputo en funcionamiento a ${responsive.user.name} con los siguientes datos para su control interno:`,
     {
       x: marginLeft,
       y: lineSpacing * 47,
@@ -63,7 +46,7 @@ const responsiveCSM = async ({
   });
 
   page.drawText(
-    `Marca: ${brandPc} \nModelo: ${modelPc} \nNúmero de Serie: ${snPc}`,
+    `Marca: ${responsive.pc.brand} \nModelo: ${responsive.pc.model} \nNúmero de Serie: ${responsive.pc.serialNumber}`,
     {
       x: marginLeft,
       y: lineSpacing * 43,
@@ -108,7 +91,7 @@ const responsiveCSM = async ({
     size: fontSize,
   });
 
-  if (custom) {
+  if (responsive.custom) {
     PersonalField.check();
   } else {
     CompartidoField.check();
@@ -124,7 +107,7 @@ const responsiveCSM = async ({
     font: fontBold,
   });
   page.drawText(
-    `MARCA: ${brandMon} \nMODELO: ${modelMon} \nNumero de Serie: ${snMon}`,
+    `MARCA: ${responsive.monitor.brand} \nMODELO: ${responsive.monitor.model} \nNumero de Serie: ${responsive.monitor.serialNumber}`,
     {
       x: marginLeft,
       y: lineSpacing * 38,
@@ -140,13 +123,13 @@ const responsiveCSM = async ({
     size: fontSize,
     font: fontBold,
   });
-  page.drawText(`${annexed}`, {
+  page.drawText(`${responsive.annexed}`, {
     x: marginLeft + width / 2,
     y: lineSpacing * 38,
     lineHeight: lineSpacing,
     size: fontSize,
   });
-  page.drawText(`Referencia fisica: \n${phisicRef}`, {
+  page.drawText(`Referencia fisica: \n${responsive.phisicRef}`, {
     x: marginLeft + width / 2,
     y: lineSpacing * 37,
     lineHeight: lineSpacing,
@@ -168,7 +151,7 @@ const responsiveCSM = async ({
   );
 
   page.drawText(
-    `A partir de este momento yo ${name} soy el único responsable del equipo de cómputo asignado y de su buen uso, es mi responsabilidad notificar cualquier cambio de responsable, daño o problema con el mismo; correspondiendo únicamente al departamento de Tecnologías de la Información su mantenimiento.`,
+    `A partir de este momento yo ${responsive.user.name} soy el único responsable del equipo de cómputo asignado y de su buen uso, es mi responsabilidad notificar cualquier cambio de responsable, daño o problema con el mismo; correspondiendo únicamente al departamento de Tecnologías de la Información su mantenimiento.`,
     {
       x: marginLeft,
       y: lineSpacing * 28,
@@ -204,14 +187,14 @@ const responsiveCSM = async ({
     thickness: 1,
   });
 
-  page.drawText(`${name}`, {
+  page.drawText(`${responsive.user.name}`, {
     x: marginLeft + 5,
     y: lineSpacing * 15,
     size: fontSize,
     lineHeight: lineSpacing,
     font: fontBold,
   });
-  page.drawText(`${unidBuss} - ${deptUser}`, {
+  page.drawText(`${responsive.unidBuss} - ${responsive.user.department}`, {
     x: marginLeft + 5,
     y: lineSpacing * 14,
     size: fontSize,
@@ -232,7 +215,7 @@ const responsiveCSM = async ({
     maxWidth: marginRight - marginLeft,
   });
 
-  page.drawText(`${nameBoss} \n${posiBoss}`, {
+  page.drawText(`${responsive.boss.name} \n${responsive.boss.position}`, {
     x: marginLeft + width / 2,
     y: lineSpacing * 15,
     size: fontSize,
@@ -259,7 +242,7 @@ const responsiveCSM = async ({
     size: fontSize,
     lineHeight: lineSpacing,
   });
-  page.drawText(`${date2}`, {
+  page.drawText(`${responsive.date2}`, {
     x: marginRight - 200,
     y: lineSpacing * 4,
     size: fontSize - 1,

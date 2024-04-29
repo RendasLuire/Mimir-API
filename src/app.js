@@ -27,7 +27,7 @@ app.use("/api/device", deviceRoutes);
 app.use("/api/movements", movementRoutes);
 app.use("/api/persons", personRoutes);
 app.use("/storages", storageRoutes);
-app.use("/reports", pdfRoutes);
+app.use("/api/reports", pdfRoutes);
 
 const port = process.env.PORT || 3000;
 

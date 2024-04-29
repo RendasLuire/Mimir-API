@@ -16,6 +16,10 @@ router.get(
   personController.showAllDevicesAssigment
 );
 
-router.patch("/update/:id", token.auth, personController.updatePatch);
+router.patch("/:id", token.auth, personController.updatePatch);
+
+router.patch("/assing/:id", token.auth, personController.assing);
+
+router.patch("/unassing/:id", token.auth, personController.unassing);
 
 export default router;

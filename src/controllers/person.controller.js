@@ -4,12 +4,28 @@ import Device from "../models/device.model.js";
 import registerMovement from "../helpers/movement.helper.js";
 
 const showAll = async (req, res) => {
-  const { page = 1, limit = 10 } = req.query;
+  const { page = 1, limit = 10, search } = req.query;
   const skip = (page - 1) * limit;
 
   try {
-    const persons = await Person.find().skip(skip).limit(Number(limit));
-    const personsCount = await Person.countDocuments();
+    let persons;
+    let personsCount;
+    let query = {};
+
+    if (search) {
+      const searchRegex = new RegExp(search, "i");
+      query.$or = [
+        { name: searchRegex },
+        { department: searchRegex },
+        { position: searchRegex },
+        { "manager.id": searchRegex },
+        { "manager.name": searchRegex },
+      ];
+    }
+
+    persons = await Person.find(query).skip(skip).limit(Number(limit));
+    personsCount = await Person.countDocuments(query);
+
     if (persons.length === 0) {
       return res.status(204).json({
         data: [],
@@ -80,7 +96,7 @@ const register = async (req, res) => {
 
     await registerMovement(
       userTI,
-      newPerson.type,
+      "Usuario",
       newPerson.name,
       newPerson._id,
       "registrado",
@@ -113,9 +129,8 @@ const showOne = async (req, res) => {
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
-      data: {
-        message: "El ID de la persona no es valido.",
-      },
+      data: {},
+      message: "El ID de la persona no es valido.",
     });
   }
 
@@ -195,9 +210,8 @@ const updatePatch = async (req, res) => {
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
-      data: {
-        message: "El ID de la persona no es valido.",
-      },
+      data: {},
+      message: "El ID de la persona no es valido.",
     });
   }
 
@@ -247,7 +261,7 @@ const updatePatch = async (req, res) => {
 
     await registerMovement(
       userTI,
-      updatedPerson.type,
+      "Usuario",
       updatedPerson.serialNumber,
       updatedPerson._id,
       "actualizada",
@@ -267,10 +281,179 @@ const updatePatch = async (req, res) => {
   }
 };
 
+const assing = async (req, res) => {
+  const { manager, userTI } = req.body;
+  const { id } = req.params;
+
+  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(404).json({
+      data: {
+        message: "El ID del dispositivo no es valido.",
+      },
+    });
+  }
+
+  if (!id || !manager || !userTI) {
+    res.status(400).json({
+      data: {
+        message: "Al menos alguno de estos campos debe ser enviado.",
+      },
+    });
+  }
+
+  if (id == manager) {
+    res.status(400).json({
+      data: {
+        message: "No se puede asignar a si mismo.",
+      },
+    });
+  }
+
+  try {
+    const internUser = await User.findById(userTI);
+
+    if (!internUser) {
+      return res.status(409).json({
+        data: {},
+        message: `Este usuario no existe.`,
+      });
+    }
+
+    const person = await Person.findById(id);
+    if (!person) {
+      return res.status(404).json({
+        data: {},
+        message: "La persona no fue encontrado",
+      });
+    }
+
+    const managerData = await Person.findById(manager);
+
+    if (!managerData) {
+      return res.status(409).json({
+        data: {},
+        message: `Este usuario no existe.`,
+      });
+    }
+    const managerInfo = {
+      id: managerData._id,
+      name: managerData.name,
+    };
+
+    person.manager = managerInfo;
+
+    const updatedPerson = await person.save();
+
+    if (!updatedPerson) {
+      return res.status(400).json({
+        data: {},
+        message: "El dispositivo no fue actualizado.",
+      });
+    }
+
+    await registerMovement(
+      userTI,
+      "persona",
+      updatedPerson.name,
+      updatedPerson._id,
+      "asignada",
+      person,
+      updatedPerson
+    );
+
+    res.status(200).json({
+      data: updatedPerson,
+      message: "Persona asignado.",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      data: {},
+      message: error.message,
+    });
+  }
+};
+
+const unassing = async (req, res) => {
+  const { userTI } = req.body;
+  const { id } = req.params;
+
+  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(404).json({
+      data: {
+        message: "El ID del dispositivo no es valido.",
+      },
+    });
+  }
+
+  if (!id || !userTI) {
+    res.status(400).json({
+      data: {
+        message: "Al menos alguno de estos campos debe ser enviado.",
+      },
+    });
+  }
+
+  try {
+    const internUser = await User.findById(userTI);
+
+    if (!internUser) {
+      return res.status(409).json({
+        data: {},
+        message: `Este usuario no existe.`,
+      });
+    }
+
+    const person = await Person.findById(id);
+    if (!person) {
+      return res.status(404).json({
+        data: {},
+        message: "La persona no fue encontrado",
+      });
+    }
+
+    const manager = {
+      id: "Sin asignar",
+      name: "Sin asignar",
+    };
+
+    person.manager = manager;
+
+    const updatedPerson = await person.save();
+    if (!updatedPerson) {
+      return res.status(400).json({
+        data: {},
+        message: "El dispositivo no fue actualizado.",
+      });
+    }
+
+    await registerMovement(
+      userTI,
+      "persona",
+      updatedPerson.name,
+      updatedPerson._id,
+      "asignada",
+      person,
+      updatedPerson
+    );
+
+    res.status(200).json({
+      data: updatedPerson,
+      message: "Persona liberado.",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      data: {},
+      message: error.message,
+    });
+  }
+};
+
 export default {
   showAll,
   register,
   showOne,
   showAllDevicesAssigment,
   updatePatch,
+  assing,
+  unassing,
 };

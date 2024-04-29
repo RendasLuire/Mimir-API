@@ -4,15 +4,34 @@ import Person from "../models/person.model.js";
 import responsiveCSM from "../services/pdfService.js";
 
 const generateResponsiveCSM = async (req, res) => {
-  let device;
-  let person;
-  let boss;
-  let monitor;
-  let brandMon;
-  let modelMon;
-  let snMon;
-  let nameBoss;
-  let posiBoss;
+  moment.locale("es");
+
+  let responsive = {
+    pc: {
+      brand: "",
+      model: "",
+      serialNumber: "",
+    },
+    monitor: {
+      brand: "",
+      model: "",
+      serialNumber: "",
+    },
+    user: {
+      name: "",
+      department: "",
+    },
+    boss: {
+      name: "",
+      position: "",
+    },
+    unidBuss: "Maver CSM",
+    phisicRef: "",
+    annexed: "",
+    custom: false,
+    date: moment().format("L"),
+    date2: "Tlaquepaque, Jalisco a " + moment().format("LL"),
+  };
 
   const { id } = req.params;
 
@@ -30,92 +49,74 @@ const generateResponsiveCSM = async (req, res) => {
     });
   }
   try {
-    device = await Device.findById(id);
+    const device = await Device.findById(id);
     if (!device) {
       return res.status(404).json({
         data: {},
         message: "El equipo no existe.",
       });
     }
-    const brandPc = device.brand;
-    const modelPc = device.model;
-    const snPc = device.serialNumber;
-    const phisicRef = device.ubication;
-    const annexed = device.annexed.number;
-    const custom = device.custom;
 
-    person = await Person.findById(device.user.id);
-    const name = person.name;
-    const deptUser = person.department;
-    const unidBuss = "Maver CSM";
+    responsive.pc.brand = device.brand;
+    responsive.pc.model = device.model;
+    responsive.pc.serialNumber = device.serialNumber;
+    responsive.phisicRef = device.ubication;
+    responsive.annexed = device.annexed.number;
+    responsive.custom = device.custom;
+
+    const person = await Person.findById(device.user.id);
+
+    responsive.user.name = person.name;
+    responsive.user.department = person.department;
 
     if (device.monitor.id !== "Sin asignar") {
-      monitor = await Device.findById(device.monitor.id);
-      brandMon = monitor.brand || "N/A";
-      modelMon = monitor.model || "N/A";
-      snMon = monitor.serialNumber || "N/A";
+      const monitor = await Device.findById(device.monitor.id);
+      responsive.monitor.brand = monitor.brand || "N/A";
+      responsive.monitor.model = monitor.model || "N/A";
+      responsive.monitor.serialNumber = monitor.serialNumber || "N/A";
     } else {
-      brandMon = "N/A";
-      modelMon = "N/A";
-      snMon = "N/A";
+      responsive.monitor.brand = "N/A";
+      responsive.monitor.model = "N/A";
+      responsive.monitor.serialNumber = "N/A";
     }
 
     if (person.manager.id !== "Sin asignar") {
-      boss = await Person.findById(person.manager.managerId);
-      nameBoss = boss.name;
-      posiBoss = boss.populate;
+      const boss = await Person.findById(person.manager.id);
+      responsive.boss.name = boss.name;
+      responsive.boss.position = boss.position;
     }
 
-    moment.locale("es");
-    const date = moment().format("L");
-    const date2 = "Tlaquepaque, Jalisco a " + moment().format("LL");
+    let isValid = true;
 
-    if (
-      !name ||
-      !brandPc ||
-      !modelPc ||
-      !snPc ||
-      !brandMon ||
-      !modelMon ||
-      !snMon ||
-      !annexed ||
-      !phisicRef ||
-      !unidBuss ||
-      !deptUser ||
-      !nameBoss ||
-      !posiBoss ||
-      !date2 ||
-      !custom
-    ) {
-      return res.status(404).json({
+    Object.keys(responsive).forEach((key) => {
+      if (typeof responsive[key] === "object") {
+        Object.keys(responsive[key]).forEach((subKey) => {
+          if (responsive[key][subKey] === "") {
+            isValid = false;
+          }
+        });
+      } else {
+        if (responsive[key] === "") {
+          isValid = false;
+        }
+      }
+    });
+
+    if (isValid) {
+      const pdfBytes = await responsiveCSM({
+        responsive,
+      });
+      res.set("Content-Type", "application/pdf");
+      res.status(200).send(pdfBytes);
+    } else {
+      return res.status(400).json({
         data: {},
-        message: "No estan todos los datos necesarios.",
+        message: error.message,
       });
     }
-
-    const pdfBytes = await responsiveCSM({
-      date,
-      name,
-      brandPc,
-      modelPc,
-      snPc,
-      brandMon,
-      modelMon,
-      snMon,
-      annexed,
-      phisicRef,
-      unidBuss,
-      deptUser,
-      nameBoss,
-      posiBoss,
-      date2,
-      custom,
-    });
-    res.set("Content-Type", "application/pdf");
-    res.status(200).send(pdfBytes);
   } catch (error) {
     return res.status(500).json({
-      data: {},
+      data: responsive,
       message: error.message,
     });
   }
@@ -161,7 +162,7 @@ const validationInfoResponsive = async (req, res) => {
       device.user.id == "Sin asignar" ||
       !device.ubication
     ) {
-      return res.status(400).json({
+      return res.status(200).json({
         data: false,
         message: "La informacion del equipo no esta completa.",
       });
@@ -170,7 +171,7 @@ const validationInfoResponsive = async (req, res) => {
     const person = await Person.findById(device.user.id);
 
     if (!person.name || !person.department) {
-      return res.status(400).json({
+      return res.status(200).json({
         data: false,
         message: "La informacion del usuario no esta completa.",
       });
@@ -181,7 +182,7 @@ const validationInfoResponsive = async (req, res) => {
       !person.manager.id ||
       person.manager.id == "Sin asignar"
     ) {
-      return res.status(400).json({
+      return res.status(200).json({
         data: false,
         message: "El usuario no tiene manager.",
       });

@@ -10,7 +10,6 @@ const showAll = async (req, res) => {
   try {
     let devices;
     let devicesCount;
-    let message;
     let query = {};
 
     if (type) {
@@ -344,8 +343,8 @@ const assing = async (req, res) => {
 
     device.user.id = userData._id;
     device.user.name = userData.name;
-    device.departament.id = userData.departament;
-    device.departament.name = userData.departament;
+    device.departament.id = userData.department;
+    device.departament.name = userData.department;
 
     if (device.monitor.id !== "Sin asignar") {
       const monitor = await Device.findById(device.monitor.id);
