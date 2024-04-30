@@ -1,12 +1,31 @@
-import mongoose from 'mongoose'
+import moment from "moment";
+import mongoose from "mongoose";
 
-const annexedSchema = new mongoose.Schema(
+moment.locale("es-mx");
+
+const annexedSchema = new mongoose.Schema({
+  annexedNumber: {
+    type: String,
+    require: true,
+  },
+  startDate: {
+    type: Date,
+    default: moment(),
+  },
+  endDate: {
+    type: Date,
+    default: moment().add(3, "year"),
+  },
+  devices: [
     {
-        annexedNumber: String,
-        startDate: Date,
-        endDate: Date,
-        bill: String
-    }
-)
+      id: String,
+      serialNumber: String,
+      tax: Number,
+      unitValue: Number,
+      amount: Number,
+    },
+  ],
+  bill: String,
+});
 
-export default mongoose.model('Annexed', annexedSchema)
+export default mongoose.model("Annexed", annexedSchema);

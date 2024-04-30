@@ -37,10 +37,6 @@ const deviceSchema = new mongoose.Schema({
       type: String,
       default: "Sin asignar",
     },
-    endDate: {
-      type: Date,
-      default: moment().add(1, "year").toDate(),
-    },
   },
   ubication: {
     type: String,

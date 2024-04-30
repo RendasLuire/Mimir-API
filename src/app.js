@@ -22,7 +22,7 @@ mongoose.connect(process.env.MONGO_URL, { dbName: process.env.MONGO_DB_NAME });
 const db = mongoose.connection;
 
 app.use("/api/user", userRoutes);
-app.use("/annexeds", annexedRoutes);
+app.use("/api/annexeds", annexedRoutes);
 app.use("/api/device", deviceRoutes);
 app.use("/api/movements", movementRoutes);
 app.use("/api/persons", personRoutes);
