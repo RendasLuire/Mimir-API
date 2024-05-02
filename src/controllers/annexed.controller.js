@@ -2,7 +2,6 @@ import registerMovement from "../helpers/movement.helper.js";
 import Annexed from "../models/annexed.model.js";
 import User from "../models/user.model.js";
 import Device from "../models/device.model.js";
-import User from "../models/U.model.js";
 
 const showAll = async (req, res) => {
   const { page = 1, limit = 10, search } = req.query;
@@ -336,10 +335,60 @@ const updatePatch = async (req, res) => {
       });
     }
 
-    annexed.annexedNumber = annexedNumber || annexed.annexedNumber;
+    const annexedOld = annexed;
+
+    if (annexedNumber) {
+      annexed.annexedNumber = annexedNumber || annexed.annexedNumber;
+
+      if (annexed.devices && annexed.devices.length > 0) {
+        annexed.devices.forEach(async (device) => {
+          try {
+            const updatedDevice = await Device.findByIdAndUpdate(
+              device._id,
+              { $set: { "annexed.number": annexedNumber } },
+              { new: true }
+            );
+            if (!updatedDevice) {
+              console.log(
+                `No se pudo actualizar el dispositivo con ID ${device._id}`
+              );
+            }
+          } catch (error) {
+            console.error(
+              `Error al actualizar el dispositivo con ID ${device._id}: ${error}`
+            );
+          }
+        });
+      }
+    }
+
     annexed.startDate = startDate || annexed.startDate;
     annexed.endDate = endDate || annexed.endDate;
     annexed.bill = bill || annexed.bill;
+
+    const updatedAnnexed = await Annexed.save();
+
+    if (!updatedAnnexed) {
+      return res.status(400).json({
+        data: {},
+        message: "El anexo no fue actualizado.",
+      });
+    }
+
+    await registerMovement(
+      userTI,
+      "anexo",
+      updatedAnnexed.annexedNumber,
+      updatedAnnexed._id,
+      "actualizada",
+      annexedOld,
+      updatedAnnexed
+    );
+
+    res.status(200).json({
+      data: updatedAnnexed,
+      message: "Anexo actualizado.",
+    });
   } catch (error) {}
 };
 
@@ -348,4 +397,5 @@ export default {
   showOne,
   register,
   masiveRegister,
+  updatePatch,
 };
