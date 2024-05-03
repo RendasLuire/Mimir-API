@@ -193,18 +193,16 @@ const showDevicesGrp = async (req, res) => {
 
     const groupedDevices = devices.reduce((acc, device) => {
       if (!acc[device.typeDevice]) {
-        acc[device.typeDevice] = [];
+        acc[device.typeDevice] = {
+          typeDevice: device.typeDevice,
+          serialNumbers: [],
+        };
       }
-      acc[device.typeDevice].push(device);
+      acc[device.typeDevice].serialNumbers.push(device.serialNumber);
       return acc;
     }, {});
 
-    const groupedDevicesArray = Object.keys(groupedDevices).map(
-      (typeDevice) => ({
-        typeDevice,
-        devices: groupedDevices[typeDevice],
-      })
-    );
+    const groupedDevicesArray = Object.values(groupedDevices);
 
     return res.status(200).json({
       data: groupedDevicesArray,
