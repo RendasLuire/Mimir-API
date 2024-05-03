@@ -21,6 +21,7 @@ const annexedSchema = new mongoose.Schema({
       id: String,
       serialNumber: String,
       tax: Number,
+      typeDevice: String,
       unitValue: Number,
       amount: Number,
     },

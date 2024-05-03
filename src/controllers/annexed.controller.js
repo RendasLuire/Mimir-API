@@ -155,9 +155,72 @@ const showOne = async (req, res) => {
   }
 };
 
-const masiveRegister = async (req, res) => {
+const showDevicesGrp = async (req, res) => {
+  let annexed;
   const { id } = req.params;
+
+  if (!id) {
+    return res.status(400).json({
+      data: {},
+      message: "Es necesario el ID.",
+    });
+  }
+
+  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(404).json({
+      data: {},
+      message: "El ID del dispositivo no es valido.",
+    });
+  }
+
+  try {
+    annexed = await Annexed.findById(id);
+    if (!annexed) {
+      return res.status(404).json({
+        data: {},
+        message: "",
+      });
+    }
+
+    const { devices } = annexed;
+
+    if (devices.length === 0) {
+      return res.status(204).json({
+        data: [],
+        message: "No hay dispositivos registrados.",
+      });
+    }
+
+    const groupedDevices = devices.reduce((acc, device) => {
+      if (!acc[device.typeDevice]) {
+        acc[device.typeDevice] = [];
+      }
+      acc[device.typeDevice].push(device);
+      return acc;
+    }, {});
+
+    const groupedDevicesArray = Object.keys(groupedDevices).map(
+      (typeDevice) => ({
+        typeDevice,
+        devices: groupedDevices[typeDevice],
+      })
+    );
+
+    return res.status(200).json({
+      data: groupedDevicesArray,
+      message: "Informacion del anexo.",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      data: {},
+      messaje: error.message,
+    });
+  }
+};
+
+const masiveRegister = async (req, res) => {
   const {
+    userTI,
     brand,
     model,
     description,
@@ -166,12 +229,18 @@ const masiveRegister = async (req, res) => {
     unitValue,
     tax,
     amount,
-    userTI,
     bill,
   } = req.body;
+  const { id } = req.params;
+
+  let annexed,
+    user,
+    createdDevices = [],
+    existingDevices = [];
 
   if (
     !userTI ||
+    !id ||
     !brand ||
     !model ||
     !description ||
@@ -182,25 +251,32 @@ const masiveRegister = async (req, res) => {
     !amount ||
     !bill
   ) {
-    return res.status(400).json({
+    res.status(400).json({
       data: {},
-      message: "Los campos son obligatorios.",
+      message: "Los campos id, userTI son obligatorios.",
     });
   }
 
-  if (!userTI.match(/^[0-9a-fA-F]{24}$/)) {
-    return res.status(404).json({
+  if (
+    typeof brand !== "string" ||
+    typeof type !== "string" ||
+    typeof description !== "string" ||
+    typeof bill !== "string" ||
+    typeof model !== "string" ||
+    typeof amount !== "number" ||
+    typeof tax !== "number" ||
+    typeof unitValue !== "number"
+  ) {
+    res.status(400).json({
       data: {},
-      message: "El ID del dispositivo no es valido.",
+      message: "Los campos no tienen el formato correcto.",
     });
   }
 
-  const annexed = await Annexed.findById(id);
-
-  if (!annexed) {
+  if (!userTI.match(/^[0-9a-fA-F]{24}$/) || !id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
       data: {},
-      message: "El anexo no existe.",
+      message: "El ID del anexo o el usuario no es valido no es valido.",
     });
   }
 
@@ -211,86 +287,143 @@ const masiveRegister = async (req, res) => {
     });
   }
 
-  const createdDevices = [];
   const serialNumbersArray = serialNumber.split(", ");
-  for (const sn of serialNumbersArray) {
-    let device = await Device.findOne({ serialNumber: sn });
 
-    if (!device) {
-      device = new Device({
-        brand,
-        model,
-        annexed: {
-          id: id,
-          number: annexed.annexedNumber,
-        },
-        details: description,
-        type,
-        serialNumber: sn,
-        hostname: "MV-" + sn,
+  try {
+    annexed = await Annexed.findById(id);
+    user = await User.findById(userTI);
+
+    if (!annexed || !user) {
+      return res.status(404).json({
+        data: {},
+        message: "El anexo o el usuario no fue encontrado.",
+      });
+    }
+
+    for (const sn of serialNumbersArray) {
+      let deviceIndex = await Device.findOne({ serialNumber: sn });
+
+      if (!deviceIndex) {
+        const newDevice = new Device({
+          brand,
+          model,
+          annexed: {
+            id: annexed._id,
+            number: annexed.annexedNumber,
+          },
+          description,
+          type,
+          serialNumber: sn,
+        });
+        const createdDevice = await newDevice.save();
+
+        if (!createdDevice) {
+          res.status(400).json({
+            data: {},
+            message: "No se registro el dispositivo.",
+          });
+        }
+
+        await registerMovement(
+          userTI,
+          createdDevice.type,
+          createdDevice.serialNumber,
+          createdDevice._id,
+          "registrado",
+          null,
+          createdDevice
+        );
+
+        const deviceInfo = {
+          id: createdDevice._id,
+          serialNumber: createdDevice.serialNumber,
+          typeDevice: createdDevice.type,
+          tax,
+          unitValue,
+          amount,
+        };
+        createdDevices.push(deviceInfo);
+        existingDevices.push(deviceInfo);
+      } else {
+        const deviceOld = deviceIndex;
+        deviceIndex.annexed.id = annexed._id;
+        deviceIndex.annexed.number = annexed.annexedNumber;
+
+        const updatedDevice = await deviceIndex.save();
+
+        if (!updatedDevice) {
+          res.status(400).json({
+            data: {},
+            message: "No se actualizo el dispositivo.",
+          });
+        }
+
+        await registerMovement(
+          userTI,
+          updatedDevice.type,
+          updatedDevice.serialNumber,
+          updatedDevice._id,
+          "actualizado",
+          deviceOld,
+          updatedDevice
+        );
+
+        const deviceInfo = {
+          id: updatedDevice._id,
+          serialNumber: updatedDevice.serialNumber,
+          typeDevice: updatedDevice.type,
+          tax,
+          unitValue,
+          amount,
+        };
+        existingDevices.push(deviceInfo);
+      }
+
+      deviceIndex = {};
+    }
+
+    const annexedOld = annexed;
+
+    annexed.devices.push(
+      ...existingDevices.map((d) => ({
+        id: d._id,
+        serialNumber: d.serialNumber,
+        typeDevice: d.typeDevice,
         unitValue,
         tax,
         amount,
-        userTI,
-        bill,
+      }))
+    );
+
+    const updatedAnnexed = await annexed.save();
+
+    if (!updatedAnnexed) {
+      res.status(400).json({
+        data: {},
+        message: "No se actualizo el anexo.",
       });
-
-      await registerMovement(
-        userTI,
-        device.type,
-        device.serialNumber,
-        device._id,
-        "registrado",
-        null,
-        device
-      );
-
-      await device.save();
-      createdDevices.push(device);
-    } else {
-      const deviceOld = device;
-
-      device.brand = brand;
-      device.model = model;
-      device.details = description;
-      (device.annexed.id = annexed._id),
-        (device.annexed.number = annexed.annexedNumber),
-        (device.type = type);
-      device.unitValue = unitValue;
-      device.tax = tax;
-      device.amount = amount;
-      device.bill = bill;
-
-      await registerMovement(
-        userTI,
-        device.type,
-        device.serialNumber,
-        device._id,
-        "actualizada",
-        deviceOld,
-        device
-      );
-
-      await device.save();
-      createdDevices.push(device);
     }
+
+    await registerMovement(
+      userTI,
+      "Anexo",
+      updatedAnnexed.annexedNumber,
+      updatedAnnexed._id,
+      "actualizado",
+      annexedOld,
+      updatedAnnexed
+    );
+
+    res.status(200).json({
+      data: updatedAnnexed,
+      message: `Se crearon ${createdDevices.length} y se agregaron ${existingDevices.length} dispositivos correctamente.`,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      data: {},
+      messaje: error.message,
+    });
   }
-
-  annexed.devices.push(
-    ...createdDevices.map((d) => ({
-      id: d._id,
-      serialNumber: d.serialNumber,
-      unitValue,
-      tax,
-      amount,
-    }))
-  );
-  await annexed.save();
-
-  res.status(200).json({
-    message: "Equipos registrados exitosamente.",
-    data: createdDevices,
-  });
 };
 
 const updatePatch = async (req, res) => {
@@ -395,6 +528,7 @@ const updatePatch = async (req, res) => {
 export default {
   showAll,
   showOne,
+  showDevicesGrp,
   register,
   masiveRegister,
   updatePatch,
