@@ -4,7 +4,7 @@ import User from "../models/user.model.js";
 import Person from "../models/person.model.js";
 
 const showAll = async (req, res) => {
-  const { type, page = 1, limit = 10, search } = req.query;
+  const { typeDevice, page = 1, limit = 10, search } = req.query;
   const skip = (page - 1) * limit;
 
   try {
@@ -12,8 +12,8 @@ const showAll = async (req, res) => {
     let devicesCount;
     let query = {};
 
-    if (type) {
-      query.type = type;
+    if (typeDevice) {
+      query.typeDevice = typeDevice;
     }
 
     if (search) {
@@ -28,7 +28,7 @@ const showAll = async (req, res) => {
         { "annexed.id": searchRegex },
         { "annexed.number": searchRegex },
         { ubication: searchRegex },
-        { type: searchRegex },
+        { typeDevice: searchRegex },
         { ip: searchRegex },
         { "user.name": searchRegex },
         { "departament.name": searchRegex },
@@ -67,9 +67,9 @@ const showAll = async (req, res) => {
 };
 
 const register = async (req, res) => {
-  const { brand, model, serialNumber, type, userTI } = req.body;
+  const { brand, model, serialNumber, typeDevice, userTI } = req.body;
 
-  if (!brand || !model || !serialNumber || !type || !userTI) {
+  if (!brand || !model || !serialNumber || !typeDevice || !userTI) {
     return res.status(400).json({
       data: {},
       message:
@@ -89,7 +89,7 @@ const register = async (req, res) => {
     model,
     serialNumber,
     hostname: "MV-" + serialNumber,
-    type,
+    typeDevice,
   });
 
   try {
@@ -109,7 +109,7 @@ const register = async (req, res) => {
     if (deviceAlreadyExist) {
       return res.status(409).json({
         data: {},
-        message: `Este ${device.type} ya esta registrada.`,
+        message: `Este ${device.typeDevice} ya esta registrada.`,
       });
     }
 
@@ -124,7 +124,7 @@ const register = async (req, res) => {
 
     await registerMovement(
       userTI,
-      newDevice.type,
+      newDevice.typeDevice,
       newDevice.serialNumber,
       newDevice._id,
       "registrado",
@@ -209,7 +209,7 @@ const updatePatch = async (req, res) => {
     !req.body.status &&
     !req.body.annexed &&
     !req.body.ubication &&
-    !req.body.type &&
+    !req.body.typeDevice &&
     !req.body.ip &&
     !req.body.user &&
     !req.body.custom &&
@@ -255,7 +255,7 @@ const updatePatch = async (req, res) => {
     device.annexed = req.body.annexed || device.annexed;
     device.ubication = req.body.ubication || device.ubication;
     device.status = req.body.status || device.status;
-    device.type = req.body.type || device.type;
+    device.typeDevice = req.body.typeDevice || device.typeDevice;
     device.ip = req.body.ip || device.ip;
     device.custom = req.body.custom || device.custom;
     device.bussinesUnit = req.body.bussinesUnit || device.bussinesUnit;
@@ -274,7 +274,7 @@ const updatePatch = async (req, res) => {
 
     await registerMovement(
       userTI,
-      updatedDevice.type,
+      updatedDevice.typeDevice,
       updatedDevice.serialNumber,
       updatedDevice._id,
       "actualizada",
@@ -361,7 +361,7 @@ const assing = async (req, res) => {
 
       await registerMovement(
         userTI,
-        updatedMonitor.type,
+        updatedMonitor.typeDevice,
         updatedMonitor.serialNumber,
         updatedMonitor._id,
         "asignada",
@@ -380,7 +380,7 @@ const assing = async (req, res) => {
 
     await registerMovement(
       userTI,
-      updatedDevice.type,
+      updatedDevice.typeDevice,
       updatedDevice.serialNumber,
       updatedDevice._id,
       "asignada",
@@ -458,7 +458,7 @@ const unassing = async (req, res) => {
 
       await registerMovement(
         userTI,
-        updatedMonitor.type,
+        updatedMonitor.typeDevice,
         updatedMonitor.serialNumber,
         updatedMonitor._id,
         "liberado",
@@ -477,7 +477,7 @@ const unassing = async (req, res) => {
 
     await registerMovement(
       userTI,
-      updatedDevice.type,
+      updatedDevice.typeDevice,
       updatedDevice.serialNumber,
       updatedDevice._id,
       "liberado",
