@@ -222,7 +222,7 @@ const masiveRegister = async (req, res) => {
     brand,
     model,
     description,
-    type,
+    typeDevice,
     serialNumber,
     unitValue,
     tax,
@@ -242,7 +242,7 @@ const masiveRegister = async (req, res) => {
     !brand ||
     !model ||
     !description ||
-    !type ||
+    !typeDevice ||
     !serialNumber ||
     !unitValue ||
     !tax ||
@@ -250,14 +250,25 @@ const masiveRegister = async (req, res) => {
     !bill
   ) {
     res.status(400).json({
-      data: {},
+      data: {
+        userTI,
+        brand,
+        model,
+        description,
+        typeDevice,
+        serialNumber,
+        unitValue,
+        tax,
+        amount,
+        bill,
+      },
       message: "Los campos id, userTI son obligatorios.",
     });
   }
 
   if (
     typeof brand !== "string" ||
-    typeof type !== "string" ||
+    typeof typeDevice !== "string" ||
     typeof description !== "string" ||
     typeof bill !== "string" ||
     typeof model !== "string" ||
@@ -310,7 +321,7 @@ const masiveRegister = async (req, res) => {
             number: annexed.annexedNumber,
           },
           description,
-          type,
+          typeDevice,
           serialNumber: sn,
         });
         const createdDevice = await newDevice.save();
@@ -324,7 +335,7 @@ const masiveRegister = async (req, res) => {
 
         await registerMovement(
           userTI,
-          createdDevice.type,
+          createdDevice.typeDevice,
           createdDevice.serialNumber,
           createdDevice._id,
           "registrado",
@@ -335,7 +346,7 @@ const masiveRegister = async (req, res) => {
         const deviceInfo = {
           id: createdDevice._id,
           serialNumber: createdDevice.serialNumber,
-          typeDevice: createdDevice.type,
+          typeDevice: createdDevice.typeDevice,
           tax,
           unitValue,
           amount,
@@ -358,7 +369,7 @@ const masiveRegister = async (req, res) => {
 
         await registerMovement(
           userTI,
-          updatedDevice.type,
+          updatedDevice.typeDevice,
           updatedDevice.serialNumber,
           updatedDevice._id,
           "actualizado",
@@ -369,7 +380,7 @@ const masiveRegister = async (req, res) => {
         const deviceInfo = {
           id: updatedDevice._id,
           serialNumber: updatedDevice.serialNumber,
-          typeDevice: updatedDevice.type,
+          typeDevice: updatedDevice.typeDevice,
           tax,
           unitValue,
           amount,

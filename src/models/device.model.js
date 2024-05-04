@@ -42,7 +42,7 @@ const deviceSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
-  type: String,
+  typeDevice: String,
   ip: {
     type: String,
     default: "",
