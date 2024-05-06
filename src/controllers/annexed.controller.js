@@ -277,6 +277,13 @@ const masiveRegister = async (req, res) => {
     const serialNumbersArray = serialNumber.split(", ");
 
     for (const sn of serialNumbersArray) {
+      const deviceExists = annexedData.devices.some(
+        (device) => device.serialNumber === sn || device.id === sn
+      );
+      if (deviceExists) {
+        continue;
+      }
+
       const deviceData = await Device.findOne({ serialNumber: sn });
 
       if (!deviceData) {
@@ -302,6 +309,16 @@ const masiveRegister = async (req, res) => {
           });
         }
 
+        await registerMovement(
+          userTIData._id,
+          savedDevice.typeDevice,
+          savedDevice.serialNumber,
+          savedDevice._id,
+          "registrado",
+          null,
+          savedDevice
+        );
+
         const deviceDataFiltered = {
           id: savedDevice._id,
           serialNumber: savedDevice.serialNumber,
@@ -314,14 +331,76 @@ const masiveRegister = async (req, res) => {
         devicesCreated.push(deviceDataFiltered);
       } else {
         console.log("Ese equipo si esta en la base de datos.");
+
+        const deviceDataOld = deviceData;
+
+        deviceData.annexed.id = annexedData._id;
+        deviceData.annexed.name = annexedData.annexedNumber;
+
+        const savedDevice = await deviceData.save();
+        if (!savedDevice) {
+          res.status(400).json({
+            data: deviceData,
+            message: "Ocurrio un problema al guardar este equipo.",
+          });
+        }
+
+        await registerMovement(
+          userTI,
+          savedDevice.typeDevice,
+          savedDevice.serialNumber,
+          savedDevice._id,
+          "actualizada",
+          deviceDataOld,
+          savedDevice
+        );
+
+        const deviceDataFiltered = {
+          id: savedDevice._id,
+          serialNumber: savedDevice.serialNumber,
+          typeDevice: savedDevice.typeDevice,
+          tax,
+          unitValue,
+          amount,
+        };
+
+        devicesUpdated.push(deviceDataFiltered);
       }
     }
 
+    const annexedDataOld = annexedData;
+
+    annexedData.devices.push(...devicesCreated, ...devicesUpdated);
+
+    const annexedUpdated = await annexedData.save();
+
+    if (!annexedUpdated) {
+      res.status(400).json({
+        data: annexedData,
+        message: "Ocurrio un problema al guardar este anexo.",
+      });
+    }
+
+    await registerMovement(
+      userTI,
+      "anexo",
+      annexedUpdated.annexedNumber,
+      annexedUpdated._id,
+      "actualizada",
+      annexedDataOld,
+      annexedUpdated
+    );
+
     res.status(200).json({
-      data: annexedData,
-      message: "Todo joya.",
+      data: annexedUpdated,
+      message: `Se agregaron ${devicesCreated} y se actualizaron ${devicesUpdated}.`,
     });
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({
+      data: {},
+      message: error,
+    });
+  }
 };
 
 const updatePatch = async (req, res) => {
