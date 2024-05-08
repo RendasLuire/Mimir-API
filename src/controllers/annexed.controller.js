@@ -244,7 +244,7 @@ const masiveRegister = async (req, res) => {
     !amount ||
     !id
   ) {
-    res.status(401).json({
+    return res.status(401).json({
       data: {},
       message: "Los datos enviados no estan completos.",
     });
@@ -260,21 +260,24 @@ const masiveRegister = async (req, res) => {
   try {
     const userTIData = await User.findById(userTI);
     if (!userTIData) {
-      res.status(400).json({
+      return res.status(400).json({
         data: {},
         message: "El usuario de TI no existe.",
       });
     }
 
     const annexedData = await Annexed.findById(id);
+
     if (!annexedData) {
-      res.status(400).json({
+      return res.status(400).json({
         data: {},
         message: "El anexo no existe.",
       });
     }
 
     const serialNumbersArray = serialNumber.split(", ");
+
+    console.log(!annexedData);
 
     for (const sn of serialNumbersArray) {
       const deviceExists = annexedData.devices.some(
@@ -287,14 +290,13 @@ const masiveRegister = async (req, res) => {
       const deviceData = await Device.findOne({ serialNumber: sn });
 
       if (!deviceData) {
-        console.log("Ese equipo no esta en la base de datos");
-
         const deviceToSave = new Device({
           brand,
           model,
           description,
           typeDevice,
           serialNumber: sn,
+          hostname: "MV-" + sn,
           annexed: {
             id: annexedData._id,
             number: annexedData.annexedNumber,
@@ -303,7 +305,7 @@ const masiveRegister = async (req, res) => {
 
         const savedDevice = await deviceToSave.save();
         if (!savedDevice) {
-          res.status(400).json({
+          return res.status(400).json({
             data: deviceToSave,
             message: "Ocurrio un problema al guardar este equipo.",
           });
@@ -330,8 +332,6 @@ const masiveRegister = async (req, res) => {
 
         devicesCreated.push(deviceDataFiltered);
       } else {
-        console.log("Ese equipo si esta en la base de datos.");
-
         const deviceDataOld = deviceData;
 
         deviceData.annexed.id = annexedData._id;
@@ -339,7 +339,7 @@ const masiveRegister = async (req, res) => {
 
         const savedDevice = await deviceData.save();
         if (!savedDevice) {
-          res.status(400).json({
+          return res.status(400).json({
             data: deviceData,
             message: "Ocurrio un problema al guardar este equipo.",
           });
@@ -375,7 +375,7 @@ const masiveRegister = async (req, res) => {
     const annexedUpdated = await annexedData.save();
 
     if (!annexedUpdated) {
-      res.status(400).json({
+      return res.status(400).json({
         data: annexedData,
         message: "Ocurrio un problema al guardar este anexo.",
       });
@@ -391,12 +391,13 @@ const masiveRegister = async (req, res) => {
       annexedUpdated
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       data: annexedUpdated,
       message: `Se agregaron ${devicesCreated} y se actualizaron ${devicesUpdated}.`,
     });
   } catch (error) {
-    res.status(500).json({
+    console.log(error);
+    return res.status(500).json({
       data: {},
       message: error,
     });
