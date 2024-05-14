@@ -22,12 +22,10 @@ const generateResponsiveCSM = async (req, res) => {
   const { id } = req.params;
 
   if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
-    return res
-      .status(404)
-      .json({
-        data: {},
-        message: "El ID del equipo no es válido o es necesario.",
-      });
+    return res.status(404).json({
+      data: {},
+      message: "El ID del equipo no es válido o es necesario.",
+    });
   }
 
   try {
@@ -72,12 +70,10 @@ const generateResponsiveCSM = async (req, res) => {
       res.set("Content-Type", "application/pdf");
       return res.status(200).send(pdfBytes);
     } else {
-      return res
-        .status(400)
-        .json({
-          data: {},
-          message: "Información incompleta en el responsivo.",
-        });
+      return res.status(400).json({
+        data: {},
+        message: "Información incompleta en el responsivo.",
+      });
     }
   } catch (error) {
     return res.status(500).json({ data: {}, message: error.message });
@@ -118,12 +114,10 @@ const validationInfoResponsive = async (req, res) => {
   const { id } = req.params;
 
   if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
-    return res
-      .status(404)
-      .json({
-        data: {},
-        message: "El ID del equipo no es válido o es necesario.",
-      });
+    return res.status(404).json({
+      data: false,
+      message: "El ID del equipo no es válido o es necesario.",
+    });
   }
 
   try {
@@ -131,8 +125,13 @@ const validationInfoResponsive = async (req, res) => {
     if (!device)
       return res
         .status(404)
-        .json({ data: {}, message: "El equipo no existe." });
+        .json({ data: false, message: "El equipo no existe." });
 
+    if (device.user.id === "Sin asignar") {
+      return res
+        .status(200)
+        .json({ data: false, message: "El equipo no esta asignado." });
+    }
     const person = await Person.findById(device.user.id);
 
     const isComplete = [
