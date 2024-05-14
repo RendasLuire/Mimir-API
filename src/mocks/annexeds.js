@@ -20,6 +20,14 @@ const annexeds = [
         unitValue: 1,
         amount: 1,
       },
+      {
+        id: "6642cc6ec7408875e2156117",
+        serialNumber: "22222222",
+        tax: 1,
+        typeDevice: "Impresora",
+        unitValue: 1,
+        amount: 1,
+      },
     ],
   },
 ];

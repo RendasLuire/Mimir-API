@@ -4,7 +4,7 @@ const devices = [
     brand: "HP",
     model: "Cerebro de la NASA",
     serialNumber: "00000000000",
-    hostname: "Skynet",
+    hostname: "Skynet-1",
     details: "Vamos a la dominacion mundial.",
     status: "Activo",
     annexed: {
@@ -37,8 +37,7 @@ const devices = [
     brand: "HP",
     serialNumber: "111111111",
     model: "Ojos de la NASA",
-    serialNumber: "00000000000",
-    hostname: "Skynet",
+    hostname: "Skynet-2",
     details: "Vamos a la dominacion mundial.",
     status: "Activo",
     annexed: {
@@ -47,6 +46,26 @@ const devices = [
     },
     ubication: "TI",
     typeDevice: "Monitor",
+    ip: "N/A",
+    user: {
+      id: "664273fd41d5e9eee8345724",
+      name: "Sara Conor",
+    },
+  },
+  {
+    _id: "6642cc6ec7408875e2156117",
+    brand: "HP",
+    serialNumber: "22222222",
+    model: "Boca de la NASA",
+    hostname: "Skynet-3",
+    details: "Vamos a la dominacion mundial.",
+    status: "Activo",
+    annexed: {
+      id: "664273c15f54ca6fde19d5c7",
+      number: "Propio",
+    },
+    ubication: "TI",
+    typeDevice: "Impresora",
     ip: "N/A",
     user: {
       id: "664273fd41d5e9eee8345724",

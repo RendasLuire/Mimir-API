@@ -1,6 +1,34 @@
-import { PageSizes, PDFDocument } from "pdf-lib";
+import { PDFDocument } from "pdf-lib";
 
-const responsiveCSM = async ({ responsive }) => {
+const drawTextBlock = (page, text, options) => {
+  page.drawText(text, {
+    x: options.x,
+    y: options.y,
+    size: options.size || 10,
+    font: options.font || options.fontBold,
+    maxWidth: options.maxWidth,
+    lineHeight: options.lineHeight || 15,
+    wordBreaks: [" "],
+  });
+};
+
+const createCheckboxField = (form, name, page, x, y, fontSize) => {
+  const field = form.createCheckBox(name);
+  field.addToPage(page, {
+    x: x,
+    y: y,
+    width: fontSize,
+    height: fontSize,
+  });
+  page.drawText(name, {
+    x: x + 12,
+    y: y,
+    size: fontSize,
+  });
+  return field;
+};
+
+const generatePDF = async (responsive, isPrinter = false) => {
   const pdfDoc = await PDFDocument.create();
   const page = pdfDoc.addPage([612.0, 792.0]);
   const form = pdfDoc.getForm();
@@ -11,267 +39,199 @@ const responsiveCSM = async ({ responsive }) => {
   const marginRight = 527;
   const lineSpacing = 15;
   const fontBold = await pdfDoc.embedFont("Helvetica-Bold");
-  page.drawText("PNO-SIT-01-F02 CARTA RESPONSIVA DE EQUIPO DE CÓMPUTO", {
-    x: marginLeft + 38,
-    y: lineSpacing * 50,
-    size: titleFontSize,
-    font: fontBold,
-  });
+  const yPos = (lines) => lineSpacing * lines;
 
-  page.drawText(`${responsive.date}`, {
+  page.drawText(
+    `PNO-SIT-01-F02 CARTA RESPONSIVA DE ${
+      isPrinter ? "Impresora" : "EQUIPO DE CÓMPUTO"
+    }`,
+    {
+      x: marginLeft + 38,
+      y: yPos(50),
+      size: titleFontSize,
+      font: fontBold,
+    }
+  );
+
+  drawTextBlock(page, `${responsive.date}`, {
     x: marginLeft + 185,
-    y: lineSpacing * 49,
-    size: fontSize,
-    font: fontBold,
+    y: yPos(49),
+    fontBold,
   });
 
-  page.drawText(
+  drawTextBlock(
+    page,
     `El departamento de Tecnologías de la Información hace entrega del siguiente equipo de cómputo en funcionamiento a ${responsive.user.name} con los siguientes datos para su control interno:`,
-    {
-      x: marginLeft,
-      y: lineSpacing * 47,
-      size: fontSize,
-      maxWidth: marginRight - marginLeft,
-      lineHeight: lineSpacing,
-      wordBreaks: [" "],
-    }
+    { x: marginLeft, y: yPos(47), maxWidth: marginRight - marginLeft }
   );
-  page.drawText("GABINETE / PORTATIL", {
+
+  drawTextBlock(page, "GABINETE / PORTATIL", {
     x: marginLeft,
-    y: lineSpacing * 44,
-    lineHeight: lineSpacing,
-    maxWidth: marginRight - marginLeft,
-    size: fontSize,
-    font: fontBold,
+    y: yPos(44),
+    fontBold,
   });
 
-  page.drawText(
-    `Marca: ${responsive.pc.brand} \nModelo: ${responsive.pc.model} \nNúmero de Serie: ${responsive.pc.serialNumber}`,
-    {
-      x: marginLeft,
-      y: lineSpacing * 43,
-      lineHeight: lineSpacing,
-      maxWidth: marginRight - marginLeft,
-      size: fontSize,
-    }
+  drawTextBlock(
+    page,
+    `Marca: ${responsive.pc.brand}\nModelo: ${responsive.pc.model}\nNúmero de Serie: ${responsive.pc.serialNumber}`,
+    { x: marginLeft, y: yPos(43) }
   );
-  page.drawText("USO:", {
+
+  drawTextBlock(page, "USO:", {
     x: marginLeft + width / 2,
-    y: lineSpacing * 44,
-    maxWidth: marginRight - marginLeft,
-    size: fontSize,
-    font: fontBold,
+    y: yPos(44),
+    fontBold,
   });
 
-  const PersonalField = form.createCheckBox("Personal");
-  PersonalField.addToPage(page, {
-    x: marginLeft + width / 2,
-    y: lineSpacing * 43,
-    maxWidth: marginRight - marginLeft,
-    width: fontSize,
-    height: fontSize,
-  });
-  page.drawText("Personal", {
-    x: 12 + (marginLeft + width / 2),
-    y: lineSpacing * 43,
-    maxWidth: marginRight - marginLeft,
-    size: fontSize,
-  });
-  const CompartidoField = form.createCheckBox("Compartido");
-  CompartidoField.addToPage(page, {
-    x: marginLeft + width / 2,
-    y: lineSpacing * 42,
-    maxWidth: marginRight - marginLeft,
-    width: fontSize,
-    height: fontSize,
-  });
-  page.drawText("Compartido", {
-    x: 12 + (marginLeft + width / 2),
-    y: lineSpacing * 42,
-    size: fontSize,
-  });
+  const PersonalField = createCheckboxField(
+    form,
+    "Personal",
+    page,
+    marginLeft + width / 2,
+    yPos(43),
+    fontSize
+  );
+  const CompartidoField = createCheckboxField(
+    form,
+    "Compartido",
+    page,
+    marginLeft + width / 2,
+    yPos(42),
+    fontSize
+  );
 
-  if (responsive.custom) {
-    PersonalField.check();
-  } else {
-    CompartidoField.check();
-  }
+  responsive.custom ? PersonalField.check() : CompartidoField.check();
   PersonalField.enableReadOnly();
   CompartidoField.enableReadOnly();
 
-  page.drawText("MONITOR", {
-    x: marginLeft,
-    y: lineSpacing * 39,
-    size: fontSize,
-    lineHeight: lineSpacing,
-    font: fontBold,
-  });
-  page.drawText(
-    `MARCA: ${responsive.monitor.brand} \nMODELO: ${responsive.monitor.model} \nNumero de Serie: ${responsive.monitor.serialNumber}`,
-    {
-      x: marginLeft,
-      y: lineSpacing * 38,
-      size: fontSize,
-      lineHeight: lineSpacing,
-    }
+  drawTextBlock(page, "MONITOR", { x: marginLeft, y: yPos(39), fontBold });
+
+  drawTextBlock(
+    page,
+    `MARCA: ${responsive.monitor.brand}\nMODELO: ${responsive.monitor.model}\nNumero de Serie: ${responsive.monitor.serialNumber}`,
+    { x: marginLeft, y: yPos(38) }
   );
 
-  page.drawText("ANEXO:", {
+  drawTextBlock(page, "ANEXO:", {
     x: marginLeft + width / 2,
-    y: lineSpacing * 39,
-    lineHeight: lineSpacing,
-    size: fontSize,
-    font: fontBold,
+    y: yPos(39),
+    fontBold,
   });
-  page.drawText(`${responsive.annexed}`, {
+  drawTextBlock(page, `${responsive.annexed}`, {
     x: marginLeft + width / 2,
-    y: lineSpacing * 38,
-    lineHeight: lineSpacing,
-    size: fontSize,
+    y: yPos(38),
   });
-  page.drawText(`Referencia fisica: \n${responsive.phisicRef}`, {
+  drawTextBlock(page, `Referencia fisica:\n${responsive.phisicRef}`, {
     x: marginLeft + width / 2,
-    y: lineSpacing * 37,
-    lineHeight: lineSpacing,
-    size: fontSize,
+    y: yPos(37),
     maxWidth: marginRight - (marginLeft + width / 2),
-    wordBreaks: [" "],
   });
 
-  page.drawText(
+  drawTextBlock(
+    page,
     `Al firmar esta carta, manifiesto conocer el contenido y alcance de mis responsabilidades descritas en el "Reglamento de uso de correo Interno y Externo", las “Políticas de Uso de Dispositivos de Información” y el “Contrato de confidencialidad de la información”, para el uso de equipo de cómputo.`,
-    {
-      x: marginLeft,
-      y: lineSpacing * 33,
-      size: fontSize,
-      maxWidth: marginRight - marginLeft,
-      lineHeight: lineSpacing,
-      wordBreaks: [" "],
-    }
+    { x: marginLeft, y: yPos(33), maxWidth: marginRight - marginLeft }
   );
 
-  page.drawText(
+  drawTextBlock(
+    page,
     `A partir de este momento yo ${responsive.user.name} soy el único responsable del equipo de cómputo asignado y de su buen uso, es mi responsabilidad notificar cualquier cambio de responsable, daño o problema con el mismo; correspondiendo únicamente al departamento de Tecnologías de la Información su mantenimiento.`,
-    {
-      x: marginLeft,
-      y: lineSpacing * 28,
-      size: fontSize,
-      maxWidth: marginRight - marginLeft,
-      lineHeight: lineSpacing,
-      wordBreaks: [" "],
-    }
+    { x: marginLeft, y: yPos(28), maxWidth: marginRight - marginLeft }
   );
 
-  page.drawText(
+  drawTextBlock(
+    page,
     "Por último, reconozco que en caso de daño por el mal uso, robo o hurto me obligare a pagar el equipo o el deducible del mismo.",
-    {
-      x: marginLeft,
-      y: lineSpacing * 23,
-      size: fontSize,
-      maxWidth: marginRight - marginLeft,
-      lineHeight: lineSpacing,
-      wordBreaks: [" "],
-    }
+    { x: marginLeft, y: yPos(23), maxWidth: marginRight - marginLeft }
   );
 
-  page.drawText("Usuario responsable del equipo", {
+  drawTextBlock(page, "Usuario responsable del equipo", {
     x: marginLeft + 10,
-    y: lineSpacing * 19,
-    size: fontSize,
-    font: fontBold,
+    y: yPos(19),
+    fontBold,
   });
 
   page.drawLine({
-    start: { x: marginLeft, y: lineSpacing * 16 },
-    end: { x: marginLeft + 150, y: lineSpacing * 16 },
+    start: { x: marginLeft, y: yPos(16) },
+    end: { x: marginLeft + 150, y: yPos(16) },
     thickness: 1,
   });
 
-  page.drawText(`${responsive.user.name}`, {
+  drawTextBlock(page, `${responsive.user.name}`, {
     x: marginLeft + 5,
-    y: lineSpacing * 15,
-    size: fontSize,
-    lineHeight: lineSpacing,
-    font: fontBold,
+    y: yPos(15),
+    fontBold,
   });
-  page.drawText(`${responsive.unidBuss} - ${responsive.user.department}`, {
-    x: marginLeft + 5,
-    y: lineSpacing * 14,
-    size: fontSize,
-    lineHeight: lineSpacing,
-  });
+  drawTextBlock(
+    page,
+    `${responsive.unidBuss} - ${responsive.user.department}`,
+    { x: marginLeft + 5, y: yPos(14) }
+  );
 
-  page.drawText("Gerente o director responsable", {
+  drawTextBlock(page, "Gerente o director responsable", {
     x: marginLeft + width / 2,
-    y: lineSpacing * 19,
-    size: fontSize,
-    font: fontBold,
+    y: yPos(19),
+    fontBold,
   });
 
   page.drawLine({
-    start: { x: marginLeft + width / 2, y: lineSpacing * 16 },
-    end: { x: marginLeft + width / 2 + 150, y: lineSpacing * 16 },
+    start: { x: marginLeft + width / 2, y: yPos(16) },
+    end: { x: marginLeft + width / 2 + 150, y: yPos(16) },
     thickness: 1,
-    maxWidth: marginRight - marginLeft,
   });
 
-  page.drawText(`${responsive.boss.name} \n${responsive.boss.position}`, {
+  drawTextBlock(page, `${responsive.boss.name}\n${responsive.boss.position}`, {
     x: marginLeft + width / 2,
-    y: lineSpacing * 15,
-    size: fontSize,
-    lineHeight: lineSpacing,
+    y: yPos(15),
     maxWidth: marginRight - (marginLeft + width / 2),
-    wordBreaks: [" "],
   });
-  page.drawText("Enterado", {
+
+  drawTextBlock(page, "Enterado", {
     x: marginLeft + 50,
-    y: lineSpacing * 11,
-    size: fontSize,
-    font: fontBold,
+    y: yPos(11),
+    fontBold,
   });
 
   page.drawLine({
-    start: { x: marginLeft, y: lineSpacing * 9 },
-    end: { x: marginLeft + 150, y: lineSpacing * 9 },
+    start: { x: marginLeft, y: yPos(9) },
+    end: { x: marginLeft + 150, y: yPos(9) },
     thickness: 1,
   });
 
-  page.drawText("Tecnologías de la Información", {
+  drawTextBlock(page, "Tecnologías de la Información", {
     x: marginLeft + 5,
-    y: lineSpacing * 8,
-    size: fontSize,
-    lineHeight: lineSpacing,
+    y: yPos(8),
   });
-  page.drawText(`${responsive.date2}`, {
+
+  drawTextBlock(page, `${responsive.date2}`, {
     x: marginRight - 200,
-    y: lineSpacing * 4,
+    y: yPos(4),
     size: fontSize - 1,
-    lineHeight: lineSpacing,
-    maxWidth: marginRight - (marginRight - 200),
-    wordBreaks: [" "],
   });
-  page.drawText("PNO-SIT-01-F02", {
+
+  drawTextBlock(page, "PNO-SIT-01-F02", {
     x: marginLeft,
-    y: lineSpacing * 2,
+    y: yPos(2),
     size: fontSize - 1,
-    lineHeight: lineSpacing,
   });
-  page.drawText("Versión 03", {
+  drawTextBlock(page, "Versión 03", {
     x: width / 2,
-    y: lineSpacing * 2,
+    y: yPos(2),
     size: fontSize - 1,
-    lineHeight: lineSpacing,
   });
-  page.drawText("Página 1 de 1", {
+  drawTextBlock(page, "Página 1 de 1", {
     x: marginRight - 80,
-    y: lineSpacing * 2,
+    y: yPos(2),
     size: fontSize - 1,
-    lineHeight: lineSpacing,
-    maxWidth: marginRight - (marginRight - 80),
-    wordBreaks: [" "],
   });
+
   const pdfBytes = await pdfDoc.save();
   return Buffer.from(pdfBytes);
 };
 
-export default responsiveCSM;
+const responsiveCSM = async ({ responsive }) => generatePDF(responsive, false);
+
+const responsivePrinterCSM = async ({ responsive }) =>
+  generatePDF(responsive, true);
+
+export default { responsiveCSM, responsivePrinterCSM };
