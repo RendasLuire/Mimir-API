@@ -4,9 +4,10 @@ import mongoose from "mongoose";
 moment.locale("es-mx");
 
 const annexedSchema = new mongoose.Schema({
-  annexedNumber: {
+  number: {
     type: String,
     require: true,
+    unique: true,
   },
   startDate: {
     type: Date,
@@ -18,15 +19,24 @@ const annexedSchema = new mongoose.Schema({
   },
   devices: [
     {
-      id: String,
-      serialNumber: String,
-      tax: Number,
-      typeDevice: String,
-      unitValue: Number,
-      amount: Number,
+      id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Device",
+      },
+      serialNumber: {
+        type: String,
+        require: true,
+      },
+      typeDevice: {
+        type: String,
+        require: true,
+      },
     },
   ],
-  bill: String,
+  bill: {
+    type: String,
+    default: "",
+  },
 });
 
 export default mongoose.model("Annexed", annexedSchema);

@@ -1,32 +1,23 @@
 const annexeds = [
   {
     _id: "664273c15f54ca6fde19d5c7",
-    annexedNumber: "Propio",
+    number: "Propio",
     bill: "00000",
     devices: [
       {
-        id: "66427878fb890aadaaac6f52",
+        _id: "66427878fb890aadaaac6f52",
         serialNumber: "00000000000",
-        tax: 1,
-        typeDevice: "Computer",
-        unitValue: 1,
-        amount: 1,
+        typeDevice: "Computadora",
       },
       {
-        id: "66427493f69c19d5815a4d05",
+        _id: "66427493f69c19d5815a4d05",
         serialNumber: "111111111",
-        tax: 1,
         typeDevice: "Monitor",
-        unitValue: 1,
-        amount: 1,
       },
       {
-        id: "6642cc6ec7408875e2156117",
+        _id: "6642cc6ec7408875e2156117",
         serialNumber: "22222222",
-        tax: 1,
         typeDevice: "Impresora",
-        unitValue: 1,
-        amount: 1,
       },
     ],
   },

@@ -42,8 +42,10 @@ const generatePDF = async (responsive, isPrinter = false) => {
   const yPos = (lines) => lineSpacing * lines;
 
   page.drawText(
-    `PNO-SIT-01-F02 CARTA RESPONSIVA DE ${
-      isPrinter ? "Impresora" : "EQUIPO DE CÓMPUTO"
+    `${
+      isPrinter
+        ? "PNO-SIT-01-F04 CARTA RESPONSIVA DE IMPRESORA"
+        : "PNO-SIT-01-F02 CARTA RESPONSIVA DE EQUIPO DE CÓMPUTO"
     }`,
     {
       x: marginLeft + 38,
@@ -65,7 +67,7 @@ const generatePDF = async (responsive, isPrinter = false) => {
     { x: marginLeft, y: yPos(47), maxWidth: marginRight - marginLeft }
   );
 
-  drawTextBlock(page, "GABINETE / PORTATIL", {
+  drawTextBlock(page, `${isPrinter ? "IMPRESORA" : "GABINETE / PORTATIL"}`, {
     x: marginLeft,
     y: yPos(44),
     fontBold,
@@ -77,40 +79,42 @@ const generatePDF = async (responsive, isPrinter = false) => {
     { x: marginLeft, y: yPos(43) }
   );
 
-  drawTextBlock(page, "USO:", {
-    x: marginLeft + width / 2,
-    y: yPos(44),
-    fontBold,
-  });
+  if (!isPrinter) {
+    drawTextBlock(page, "USO:", {
+      x: marginLeft + width / 2,
+      y: yPos(44),
+      fontBold,
+    });
 
-  const PersonalField = createCheckboxField(
-    form,
-    "Personal",
-    page,
-    marginLeft + width / 2,
-    yPos(43),
-    fontSize
-  );
-  const CompartidoField = createCheckboxField(
-    form,
-    "Compartido",
-    page,
-    marginLeft + width / 2,
-    yPos(42),
-    fontSize
-  );
+    const PersonalField = createCheckboxField(
+      form,
+      "Personal",
+      page,
+      marginLeft + width / 2,
+      yPos(43),
+      fontSize
+    );
+    const CompartidoField = createCheckboxField(
+      form,
+      "Compartido",
+      page,
+      marginLeft + width / 2,
+      yPos(42),
+      fontSize
+    );
 
-  responsive.custom ? PersonalField.check() : CompartidoField.check();
-  PersonalField.enableReadOnly();
-  CompartidoField.enableReadOnly();
+    responsive.custom ? PersonalField.check() : CompartidoField.check();
+    PersonalField.enableReadOnly();
+    CompartidoField.enableReadOnly();
 
-  drawTextBlock(page, "MONITOR", { x: marginLeft, y: yPos(39), fontBold });
+    drawTextBlock(page, "MONITOR", { x: marginLeft, y: yPos(39), fontBold });
 
-  drawTextBlock(
-    page,
-    `MARCA: ${responsive.monitor.brand}\nMODELO: ${responsive.monitor.model}\nNumero de Serie: ${responsive.monitor.serialNumber}`,
-    { x: marginLeft, y: yPos(38) }
-  );
+    drawTextBlock(
+      page,
+      `MARCA: ${responsive.monitor.brand}\nMODELO: ${responsive.monitor.model}\nNumero de Serie: ${responsive.monitor.serialNumber}`,
+      { x: marginLeft, y: yPos(38) }
+    );
+  }
 
   drawTextBlock(page, "ANEXO:", {
     x: marginLeft + width / 2,
@@ -209,12 +213,12 @@ const generatePDF = async (responsive, isPrinter = false) => {
     size: fontSize - 1,
   });
 
-  drawTextBlock(page, "PNO-SIT-01-F02", {
+  drawTextBlock(page, `${isPrinter ? "PNO-SIT-01-F04" : "PNO-SIT-01-F02"}`, {
     x: marginLeft,
     y: yPos(2),
     size: fontSize - 1,
   });
-  drawTextBlock(page, "Versión 03", {
+  drawTextBlock(page, `${isPrinter ? "Versión 02" : "Versión 03"}`, {
     x: width / 2,
     y: yPos(2),
     size: fontSize - 1,

@@ -42,7 +42,7 @@ const showAll = async (req, res) => {
         totalPages,
         currenPage: Number(page),
       },
-      message: "Lista de anexos registrado.",
+      message: "Lista de anexos registrados.",
     });
   } catch (error) {
     return res.status(500).json({
@@ -53,9 +53,9 @@ const showAll = async (req, res) => {
 };
 
 const register = async (req, res) => {
-  const { annexedNumber, startDate, endDate, bill, userTI } = req.body;
+  const { number, startDate, endDate, bill, userTI } = req.body;
 
-  if (!annexedNumber || !userTI || !bill) {
+  if (!number || !userTI || !bill) {
     return res.status(400).json({
       data: {},
       message: "Los campos son obligatorios.",
@@ -70,7 +70,7 @@ const register = async (req, res) => {
   }
 
   const annexed = new Annexed({
-    annexedNumber,
+    number,
     startDate,
     endDate,
     bill,
@@ -96,8 +96,8 @@ const register = async (req, res) => {
 
     await registerMovement(
       userTI,
-      "annexo",
-      newAnnexed.annexedNumber,
+      "Annexo",
+      newAnnexed.number,
       newAnnexed._id,
       "registrado",
       null,
@@ -219,17 +219,8 @@ const showDevicesGrp = async (req, res) => {
 const masiveRegister = async (req, res) => {
   let devicesCreated = [];
   let devicesUpdated = [];
-  const {
-    userTI,
-    brand,
-    model,
-    description,
-    typeDevice,
-    serialNumber,
-    unitValue,
-    tax,
-    amount,
-  } = req.body;
+  const { userTI, brand, model, description, typeDevice, serialNumber } =
+    req.body;
   const { id } = req.params;
 
   if (
@@ -239,9 +230,6 @@ const masiveRegister = async (req, res) => {
     !description ||
     !typeDevice ||
     !serialNumber ||
-    !unitValue ||
-    !tax ||
-    !amount ||
     !id
   ) {
     return res.status(401).json({
@@ -277,8 +265,6 @@ const masiveRegister = async (req, res) => {
 
     const serialNumbersArray = serialNumber.split(", ");
 
-    console.log(!annexedData);
-
     for (const sn of serialNumbersArray) {
       const deviceExists = annexedData.devices.some(
         (device) => device.serialNumber === sn || device.id === sn
@@ -298,8 +284,8 @@ const masiveRegister = async (req, res) => {
           serialNumber: sn,
           hostname: "MV-" + sn,
           annexed: {
-            id: annexedData._id,
-            number: annexedData.annexedNumber,
+            _id: annexedData._id,
+            number: annexedData.number,
           },
         });
 
@@ -322,20 +308,17 @@ const masiveRegister = async (req, res) => {
         );
 
         const deviceDataFiltered = {
-          id: savedDevice._id,
+          _id: savedDevice._id,
           serialNumber: savedDevice.serialNumber,
           typeDevice: savedDevice.typeDevice,
-          tax,
-          unitValue,
-          amount,
         };
 
         devicesCreated.push(deviceDataFiltered);
       } else {
         const deviceDataOld = deviceData;
 
-        deviceData.annexed.id = annexedData._id;
-        deviceData.annexed.name = annexedData.annexedNumber;
+        deviceData.annexed._id = annexedData._id;
+        deviceData.annexed.name = annexedData.number;
 
         const savedDevice = await deviceData.save();
         if (!savedDevice) {
@@ -356,12 +339,9 @@ const masiveRegister = async (req, res) => {
         );
 
         const deviceDataFiltered = {
-          id: savedDevice._id,
+          _id: savedDevice._id,
           serialNumber: savedDevice.serialNumber,
           typeDevice: savedDevice.typeDevice,
-          tax,
-          unitValue,
-          amount,
         };
 
         devicesUpdated.push(deviceDataFiltered);
@@ -383,7 +363,7 @@ const masiveRegister = async (req, res) => {
 
     await registerMovement(
       userTI,
-      "anexo",
+      "Anexo",
       annexedUpdated.annexedNumber,
       annexedUpdated._id,
       "actualizada",
@@ -406,7 +386,7 @@ const masiveRegister = async (req, res) => {
 
 const updatePatch = async (req, res) => {
   const { id } = req.params;
-  const { annexedNumber, startDate, endDate, bill, userTI } = req.body;
+  const { number, startDate, endDate, bill, userTI } = req.body;
 
   if (!id || !userTI) {
     return res.status(400).json({
@@ -422,7 +402,7 @@ const updatePatch = async (req, res) => {
     });
   }
 
-  if (!annexedNumber && !startDate && !endDate && !bill) {
+  if (!number && !startDate && !endDate && !bill) {
     return res.status(400).json({
       data: {},
       message: "Es necesario ingresar algun dato.",
@@ -448,18 +428,16 @@ const updatePatch = async (req, res) => {
 
     const annexedOld = annexed;
 
-    if (annexedNumber) {
-      annexed.annexedNumber = annexedNumber || annexed.annexedNumber;
+    if (number) {
+      annexed.number = number || annexed.number;
 
       if (annexed.devices && annexed.devices.length > 0) {
         annexed.devices.forEach(async (device) => {
           try {
             const deviceObj = await Device.findById(device._id);
-            deviceObj.annexed.number = annexedNumber;
+            deviceObj.annexed.number = number;
             const updatedDevice = await deviceObj.save();
-            /*const updatedDevice = await Device.findByIdAndUpdate(device._id, {
-              "annexed.number": annexedNumber,
-            });*/
+
             if (!updatedDevice) {
               console.log(
                 `No se pudo actualizar el dispositivo con ID ${device._id}`
@@ -489,8 +467,8 @@ const updatePatch = async (req, res) => {
 
     await registerMovement(
       userTI,
-      "anexo",
-      updatedAnnexed.annexedNumber,
+      "Anexo",
+      updatedAnnexed.number,
       updatedAnnexed._id,
       "actualizada",
       annexedOld,
