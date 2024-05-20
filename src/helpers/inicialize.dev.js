@@ -10,13 +10,11 @@ import personMock from "../mocks/persons.js";
 
 const clearDataBase = async () => {
   try {
-    console.log("Limpiando base de datos...");
     await User.deleteMany();
     await Device.deleteMany();
     await Annexed.deleteMany();
     await Movement.deleteMany();
     await Person.deleteMany();
-    console.log("Base de datos limpia.");
   } catch (error) {
     console.log("Error al limpiar el entorno: ", error);
   }
@@ -24,8 +22,8 @@ const clearDataBase = async () => {
 
 const createUserAdmin = async () => {
   try {
-    console.log("Creando usuario admin...");
     const user = new User({
+      _id: "66427240408251f1eeecf939",
       name: "Admin",
       nickname: "admin",
       type: "admin",
@@ -37,8 +35,6 @@ const createUserAdmin = async () => {
     user.password = pwd;
 
     await user.save();
-
-    console.log("Usuario admin creado.");
   } catch (error) {
     console.log("Error al limpiar el entorno: ", error);
   }
@@ -46,7 +42,6 @@ const createUserAdmin = async () => {
 
 const chargeDemoData = async () => {
   try {
-    console.log("Cargando informacion demo...");
     for (const item of deviceMock) {
       const newDevice = new Device(item);
       await newDevice.save();
@@ -59,13 +54,12 @@ const chargeDemoData = async () => {
       const newPerson = new Person(item);
       await newPerson.save();
     }
-    console.log("Informacion Demo cargada.");
   } catch (error) {
     console.log("Error al limpiar el entorno: ", error);
   }
 };
 
-const inicializeDataBaseDev = async () => {
+export const inicializeDataBaseDev = async () => {
   try {
     await clearDataBase();
 
@@ -77,4 +71,16 @@ const inicializeDataBaseDev = async () => {
   }
 };
 
-export default inicializeDataBaseDev;
+export const inicializeDataBaseTest = async () => {
+  try {
+    await clearDataBase();
+
+    await createUserAdmin();
+
+    await chargeDemoData();
+  } catch (error) {
+    console.log("Error al inicializar el entorno: ", error);
+  }
+};
+
+export default { inicializeDataBaseDev, inicializeDataBaseTest };

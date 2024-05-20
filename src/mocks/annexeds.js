@@ -21,6 +21,12 @@ const annexeds = [
       },
     ],
   },
+  {
+    _id: "664273c15f54ca6fde19d5c9",
+    number: "Propio2",
+    bill: "00000",
+    devices: [],
+  },
 ];
 
 export default annexeds;

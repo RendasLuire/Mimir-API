@@ -9,11 +9,21 @@
     "dev": "set NODE_ENV=development && nodemon src/app.js",
     "start": "set NODE_ENV=production && node src/app.js"
   },
+  "jest": {
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    }
+  },
   "keywords": [],
   "author": "Uriel Aguirre",
   "license": "ISC",
   "devDependencies": {
-    "nodemon": "^3.1.0"
+    "@babel/core": "^7.24.5",
+    "@babel/preset-env": "^7.24.5",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.0",
+    "supertest": "^7.0.0"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
