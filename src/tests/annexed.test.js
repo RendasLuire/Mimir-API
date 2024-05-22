@@ -173,40 +173,148 @@ describe("GET /api/annexeds/group/:id", () => {
   });
 });
 
-describe("POST /annexeds/:id/devices", () => {
-  it("should register or update devices in bulk", async () => {
+describe("PATCH /api/annexeds/:id", () => {
+  it("shoult return a 200 when annexed get updated", async () => {
+    const newData = {
+      number: "666",
+      userTI: "66427240408251f1eeecf939",
+    };
+    const statusExpected = 200;
+    const annexedId = "664273c15f54ca6fde19d5c9";
+
     const res = await request(app)
-      .post(`/annexeds/${validAnnexedId}/devices`)
-      .send({
-        userTI: validUserId,
-        brand: "Brand",
-        model: "Model",
-        description: "Description",
-        typeDevice: "Type",
-        serialNumber: "SN1, SN2",
-      });
-    expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty("data");
+      .patch(`/api/annexeds/${annexedId}`)
+      .send(newData)
+      .set("Authorization", token);
+
+    expect(res.status).toBe(statusExpected);
   });
 
-  it("should return 401 for missing required fields", async () => {
+  it("should return 400 when data is empty", async () => {
+    const newData = {
+      userTI: "66427240408251f1eeecf939",
+    };
+    const statusExpected = 400;
+    const annexedId = "664273c15f54ca6fde19d5c9";
+
     const res = await request(app)
-      .post(`/annexeds/${validAnnexedId}/devices`)
-      .send({
-        userTI: validUserId,
-      });
-    expect(res.status).toBe(401);
+      .patch(`/api/annexeds/${annexedId}`)
+      .send(newData)
+      .set("Authorization", token);
+
+    expect(res.status).toBe(statusExpected);
   });
 
-  it("should return 404 for invalid ID format", async () => {
-    const res = await request(app).post("/annexeds/invalidId/devices").send({
-      userTI: validUserId,
-      brand: "Brand",
-      model: "Model",
-      description: "Description",
-      typeDevice: "Type",
-      serialNumber: "SN1, SN2",
-    });
-    expect(res.status).toBe(404);
+  it("should return 404 when annexed not found", async () => {
+    const newData = {
+      number: "666",
+      userTI: "66427240408251f1eeecf939",
+    };
+    const statusExpected = 404;
+    const annexedId = "664273c15f54ca6fde19d5c6";
+
+    const res = await request(app)
+      .patch(`/api/annexeds/${annexedId}`)
+      .send(newData)
+      .set("Authorization", token);
+
+    expect(res.status).toBe(statusExpected);
+  });
+
+  it("should return 404 when id is invalid", async () => {
+    const newData = {
+      number: "666",
+      userTI: "66427240408251f1eeecf939",
+    };
+    const statusExpected = 404;
+    const annexedId = "11111";
+
+    const res = await request(app)
+      .patch(`/api/annexeds/${annexedId}`)
+      .send(newData)
+      .set("Authorization", token);
+
+    expect(res.status).toBe(statusExpected);
+  });
+});
+
+describe("PATCH /api/annexeds/masive/:id", () => {
+  it("should return 200 when data was charged", async () => {
+    const statusExpected = 200;
+    const annexedId = "664273c15f54ca6fde19d5c9";
+    const newDevices = {
+      userTI: "66427240408251f1eeecf939",
+      brand: "HP",
+      model: "algo",
+      description: "tiene mucho",
+      typeDevice: "computadora",
+      serialNumber: "aaaaa1111, bbb22222",
+    };
+
+    const res = await request(app)
+      .patch(`/api/annexeds/masive/${annexedId}`)
+      .send(newDevices)
+      .set("Authorization", token);
+
+    expect(res.status).toBe(statusExpected);
+  });
+
+  it("should return 401 when data is not complete", async () => {
+    const statusExpected = 401;
+    const annexedId = "664273c15f54ca6fde19d5c9";
+    const newDevices = {
+      userTI: "66427240408251f1eeecf939",
+      brand: "HP",
+      model: "algo",
+      description: "tiene mucho",
+      typeDevice: "computadora",
+    };
+
+    const res = await request(app)
+      .patch(`/api/annexeds/masive/${annexedId}`)
+      .send(newDevices)
+      .set("Authorization", token);
+
+    expect(res.status).toBe(statusExpected);
+  });
+
+  it("sould return 404 when id is not valid", async () => {
+    const statusExpected = 404;
+    const annexedId = "11111";
+    const newDevices = {
+      userTI: "66427240408251f1eeecf939",
+      brand: "HP",
+      model: "algo",
+      description: "tiene mucho",
+      typeDevice: "computadora",
+      serialNumber: "aaaaa1111, bbb22222",
+    };
+
+    const res = await request(app)
+      .patch(`/api/annexeds/masive/${annexedId}`)
+      .send(newDevices)
+      .set("Authorization", token);
+
+    expect(res.status).toBe(statusExpected);
+  });
+
+  it("sould return 400 when userTI not found", async () => {
+    const statusExpected = 400;
+    const annexedId = "664273c15f54ca6fde19d5c9";
+    const newDevices = {
+      userTI: "66427240408251f1eeecf938",
+      brand: "HP",
+      model: "algo",
+      description: "tiene mucho",
+      typeDevice: "computadora",
+      serialNumber: "aaaaa1111, bbb22222",
+    };
+
+    const res = await request(app)
+      .patch(`/api/annexeds/masive/${annexedId}`)
+      .send(newDevices)
+      .set("Authorization", token);
+
+    expect(res.status).toBe(statusExpected);
   });
 });
