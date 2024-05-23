@@ -40,11 +40,11 @@ describe("GET /api/annexeds/", () => {
 describe("POST /api/annexeds/", () => {
   it("should register a new annexed", async () => {
     const newAnnexed = {
-      number: "1234",
+      number: "12345",
       startDate: "2023-01-01",
       endDate: "2023-12-31",
       bill: "100",
-      userTI: "66427240408251f1eeecf939",
+      userTI: "664f9386bc497ea1293420ca",
     };
     const statusExpected = 201;
 
@@ -177,7 +177,7 @@ describe("PATCH /api/annexeds/:id", () => {
   it("shoult return a 200 when annexed get updated", async () => {
     const newData = {
       number: "666",
-      userTI: "66427240408251f1eeecf939",
+      userTI: "664f9386bc497ea1293420ca",
     };
     const statusExpected = 200;
     const annexedId = "664273c15f54ca6fde19d5c9";
@@ -192,7 +192,7 @@ describe("PATCH /api/annexeds/:id", () => {
 
   it("should return 400 when data is empty", async () => {
     const newData = {
-      userTI: "66427240408251f1eeecf939",
+      userTI: "664f9386bc497ea1293420ca",
     };
     const statusExpected = 400;
     const annexedId = "664273c15f54ca6fde19d5c9";
@@ -208,7 +208,7 @@ describe("PATCH /api/annexeds/:id", () => {
   it("should return 404 when annexed not found", async () => {
     const newData = {
       number: "666",
-      userTI: "66427240408251f1eeecf939",
+      userTI: "664f9386bc497ea1293420ca",
     };
     const statusExpected = 404;
     const annexedId = "664273c15f54ca6fde19d5c6";
@@ -224,7 +224,7 @@ describe("PATCH /api/annexeds/:id", () => {
   it("should return 404 when id is invalid", async () => {
     const newData = {
       number: "666",
-      userTI: "66427240408251f1eeecf939",
+      userTI: "664f9386bc497ea1293420ca",
     };
     const statusExpected = 404;
     const annexedId = "11111";
@@ -243,7 +243,7 @@ describe("PATCH /api/annexeds/masive/:id", () => {
     const statusExpected = 200;
     const annexedId = "664273c15f54ca6fde19d5c9";
     const newDevices = {
-      userTI: "66427240408251f1eeecf939",
+      userTI: "664f9386bc497ea1293420ca",
       brand: "HP",
       model: "algo",
       description: "tiene mucho",
@@ -263,7 +263,7 @@ describe("PATCH /api/annexeds/masive/:id", () => {
     const statusExpected = 401;
     const annexedId = "664273c15f54ca6fde19d5c9";
     const newDevices = {
-      userTI: "66427240408251f1eeecf939",
+      userTI: "664f9386bc497ea1293420ca",
       brand: "HP",
       model: "algo",
       description: "tiene mucho",
@@ -282,7 +282,7 @@ describe("PATCH /api/annexeds/masive/:id", () => {
     const statusExpected = 404;
     const annexedId = "11111";
     const newDevices = {
-      userTI: "66427240408251f1eeecf939",
+      userTI: "664f9386bc497ea1293420ca",
       brand: "HP",
       model: "algo",
       description: "tiene mucho",

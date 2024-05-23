@@ -49,10 +49,9 @@ if (process.env.NODE_ENV.trim() == "development") {
 
 //Crear un usuario inicial
 
-app.listen(port, () => {
-  if (process.env.NODE_ENV.trim() !== "test") {
-    console.log(`Servidor iniciado en el puerto ${port}`);
-  }
-});
+if (process.env.NODE_ENV.trim() !== "test") {
+  console.log(`Servidor iniciado en el puerto ${port}`);
+  app.listen(port, () => {});
+}
 
 export default app;

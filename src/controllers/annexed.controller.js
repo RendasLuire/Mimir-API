@@ -73,7 +73,7 @@ const register = async (req, res) => {
     number,
     startDate,
     endDate,
-    bill,
+    bill: bill.toLowerCase(),
   });
 
   try {
@@ -277,15 +277,15 @@ const masiveRegister = async (req, res) => {
 
       if (!deviceData) {
         const deviceToSave = new Device({
-          brand,
-          model,
-          description,
-          typeDevice,
-          serialNumber: sn,
-          hostname: "MV-" + sn,
+          brand: brand.toLowerCase(),
+          model: model.toLowerCase(),
+          description: description.toLowerCase(),
+          typeDevice: typeDevice.toLowerCase(),
+          serialNumber: sn.toLowerCase(),
+          hostname: "MV-" + sn.toLowerCase(),
           annexed: {
             _id: annexedData._id,
-            number: annexedData.number,
+            number: annexedData.number.toLowerCase(),
           },
         });
 
@@ -309,8 +309,8 @@ const masiveRegister = async (req, res) => {
 
         const deviceDataFiltered = {
           _id: savedDevice._id,
-          serialNumber: savedDevice.serialNumber,
-          typeDevice: savedDevice.typeDevice,
+          serialNumber: savedDevice.serialNumber.toLowerCase(),
+          typeDevice: savedDevice.typeDevice.toLowerCase(),
         };
 
         devicesCreated.push(deviceDataFiltered);
@@ -318,7 +318,7 @@ const masiveRegister = async (req, res) => {
         const deviceDataOld = deviceData;
 
         deviceData.annexed._id = annexedData._id;
-        deviceData.annexed.name = annexedData.number;
+        deviceData.annexed.name = annexedData.number.toLowerCase();
 
         const savedDevice = await deviceData.save();
         if (!savedDevice) {
@@ -340,8 +340,8 @@ const masiveRegister = async (req, res) => {
 
         const deviceDataFiltered = {
           _id: savedDevice._id,
-          serialNumber: savedDevice.serialNumber,
-          typeDevice: savedDevice.typeDevice,
+          serialNumber: savedDevice.serialNumber.toLowerCase(),
+          typeDevice: savedDevice.typeDevice.toLowerCase(),
         };
 
         devicesUpdated.push(deviceDataFiltered);
@@ -429,13 +429,13 @@ const updatePatch = async (req, res) => {
     const annexedOld = annexed;
 
     if (number) {
-      annexed.number = number || annexed.number;
+      annexed.number = number.toLowerCase() || annexed.number;
 
       if (annexed.devices && annexed.devices.length > 0) {
         annexed.devices.forEach(async (device) => {
           try {
             const deviceObj = await Device.findById(device._id);
-            deviceObj.annexed.number = number;
+            deviceObj.annexed.number = number.toLowerCase();
             const updatedDevice = await deviceObj.save();
 
             if (!updatedDevice) {

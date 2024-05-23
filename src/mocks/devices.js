@@ -1,20 +1,19 @@
 const devices = [
   {
-    _id: "66427878fb890aadaaac6f52",
+    _id: "664fa55a6fd77dcabdf18028",
     brand: "HP",
     model: "Cerebro de la NASA",
     serialNumber: "00000000000",
     hostname: "Skynet-1",
     details: "Vamos a la dominacion mundial.",
-    status: "Activo",
+    status: "available",
     annexed: {
       id: "664273c15f54ca6fde19d5c7",
       number: "Propio",
     },
-    ubication: "TI",
     typeDevice: "Computadora",
     ip: "000.000.000.0",
-    user: {
+    person: {
       id: "664273fd41d5e9eee8345724",
       name: "Sara Conor",
     },
@@ -33,7 +32,7 @@ const devices = [
     mouse: false,
   },
   {
-    _id: "66427493f69c19d5815a4d05",
+    _id: "664fa589a41f67d1fa8df27f",
     brand: "HP",
     serialNumber: "111111111",
     model: "Ojos de la NASA",
@@ -44,16 +43,15 @@ const devices = [
       id: "664273c15f54ca6fde19d5c7",
       number: "Propio",
     },
-    ubication: "TI",
     typeDevice: "Monitor",
     ip: "N/A",
-    user: {
+    person: {
       id: "664273fd41d5e9eee8345724",
       name: "Sara Conor",
     },
   },
   {
-    _id: "6642cc6ec7408875e2156117",
+    _id: "664fa59e8bfe052015d23235",
     brand: "HP",
     serialNumber: "22222222",
     model: "Boca de la NASA",
@@ -64,10 +62,9 @@ const devices = [
       id: "664273c15f54ca6fde19d5c7",
       number: "Propio",
     },
-    ubication: "TI",
     typeDevice: "Impresora",
     ip: "N/A",
-    user: {
+    person: {
       id: "664273fd41d5e9eee8345724",
       name: "Sara Conor",
     },

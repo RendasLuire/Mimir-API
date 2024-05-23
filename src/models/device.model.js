@@ -1,7 +1,4 @@
-import moment from "moment";
 import mongoose from "mongoose";
-
-moment.locale("es-mx");
 
 const deviceSchema = new mongoose.Schema({
   brand: {
@@ -26,35 +23,42 @@ const deviceSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    default: "Activo",
+    default: "available",
   },
   annexed: {
     id: {
-      type: String,
-      default: "Sin asignar",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Annexed",
     },
     number: {
       type: String,
-      default: "Sin asignar",
+      default: "unassigned",
     },
   },
   ubication: {
-    type: String,
-    default: "",
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Storage",
   },
-  typeDevice: String,
+  typeDevice: {
+    type: String,
+    require: true,
+  },
   ip: {
     type: String,
     default: "",
   },
-  user: {
+  mac: {
+    type: String,
+    default: "",
+  },
+  person: {
     id: {
-      type: String,
-      default: "Sin asignar",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Person",
     },
     name: {
       type: String,
-      default: "Sin asignar",
+      default: "unassigned",
     },
   },
   custom: {
@@ -63,26 +67,26 @@ const deviceSchema = new mongoose.Schema({
   },
   bussinesUnit: {
     type: String,
-    default: "",
+    default: "unassigned",
   },
   departament: {
     id: {
-      type: String,
-      default: "Sin asignar",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Department",
     },
     name: {
       type: String,
-      default: "Sin asignar",
+      default: "unassigned",
     },
   },
   monitor: {
     id: {
-      type: String,
-      default: "Sin asignar",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Device",
     },
     serialNumber: {
       type: String,
-      default: "Sin asignar",
+      default: "unassigned",
     },
   },
   headphones: {

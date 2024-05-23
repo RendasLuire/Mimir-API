@@ -23,7 +23,7 @@ const clearDataBase = async () => {
 const createUserAdmin = async () => {
   try {
     const user = new User({
-      _id: "66427240408251f1eeecf939",
+      _id: "664f9386bc497ea1293420ca",
       name: "Admin",
       nickname: "admin",
       type: "admin",
@@ -36,7 +36,7 @@ const createUserAdmin = async () => {
 
     await user.save();
   } catch (error) {
-    console.log("Error al limpiar el entorno: ", error);
+    console.log("Error al crear usuario admin: ", error);
   }
 };
 
@@ -55,7 +55,7 @@ const chargeDemoData = async () => {
       await newPerson.save();
     }
   } catch (error) {
-    console.log("Error al limpiar el entorno: ", error);
+    console.log("Error al cargar la informacion: ", error);
   }
 };
 

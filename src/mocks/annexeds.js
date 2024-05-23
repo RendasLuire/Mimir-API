@@ -2,7 +2,7 @@ const annexeds = [
   {
     _id: "664273c15f54ca6fde19d5c7",
     number: "Propio",
-    bill: "00000",
+    bill: "aaaaaa",
     devices: [
       {
         _id: "66427878fb890aadaaac6f52",
@@ -23,8 +23,8 @@ const annexeds = [
   },
   {
     _id: "664273c15f54ca6fde19d5c9",
-    number: "Propio2",
-    bill: "00000",
+    number: "11111",
+    bill: "aaaaa",
     devices: [],
   },
 ];
