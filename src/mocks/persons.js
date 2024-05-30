@@ -2,7 +2,10 @@ const persons = [
   {
     _id: "664273fd41d5e9eee8345724",
     name: "Sara Conor",
-    department: "TI",
+    department: {
+      id: "66561963e855da3f10bb5d82",
+      name: "TI",
+    },
     position: "JEFA",
     manager: {
       id: "66427aef9a8792d1b57cb2f0",
@@ -12,7 +15,10 @@ const persons = [
   {
     _id: "66427aef9a8792d1b57cb2f0",
     name: "Dios",
-    department: "mundo",
+    department: {
+      id: "66561963e855da3f10bb5d82",
+      name: "TI",
+    },
     position: "Patron",
   },
 ];

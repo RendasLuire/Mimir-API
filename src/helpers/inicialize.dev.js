@@ -3,10 +3,12 @@ import Movement from "../models/movement.model.js";
 import Person from "../models/person.model.js";
 import Device from "../models/device.model.js";
 import User from "../models/user.model.js";
+import Setting from "../models/setting.model.js";
 import bcrypt from "bcrypt";
 import deviceMock from "../mocks/devices.js";
 import annexedMock from "../mocks/annexeds.js";
 import personMock from "../mocks/persons.js";
+import settingMock from "../mocks/settings.js";
 
 const clearDataBase = async () => {
   try {
@@ -15,6 +17,7 @@ const clearDataBase = async () => {
     await Annexed.deleteMany();
     await Movement.deleteMany();
     await Person.deleteMany();
+    await Setting.deleteMany();
   } catch (error) {
     console.log("Error al limpiar el entorno: ", error);
   }
@@ -53,6 +56,10 @@ const chargeDemoData = async () => {
     for (const item of personMock) {
       const newPerson = new Person(item);
       await newPerson.save();
+    }
+    for (const item of settingMock) {
+      const newSetting = new Setting(item);
+      await newSetting.save();
     }
   } catch (error) {
     console.log("Error al cargar la informacion: ", error);

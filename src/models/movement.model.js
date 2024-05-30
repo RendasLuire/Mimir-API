@@ -1,16 +1,18 @@
 import moment from "moment";
-import Mongoose from "mongoose";
+import mongoose from "mongoose";
 
 moment.locale("es-mx");
 
-const movementSchema = new Mongoose.Schema({
+const movementSchema = new mongoose.Schema({
   userTI: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     require: true,
+    ref: "User",
   },
   device: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     require: true,
+    ref: "Device",
   },
   type: {
     type: String,
@@ -20,9 +22,12 @@ const movementSchema = new Mongoose.Schema({
     type: Date,
     default: moment(),
   },
-  description: String,
+  description: {
+    type: String,
+    require: true,
+  },
   objectOld: Object,
   objectNew: Object,
 });
 
-export default Mongoose.model("Movement", movementSchema);
+export default mongoose.model("Movement", movementSchema);

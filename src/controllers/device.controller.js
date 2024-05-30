@@ -67,9 +67,9 @@ const showAll = async (req, res) => {
 };
 
 const register = async (req, res) => {
-  const { brand, model, serialNumber, typeDevice, userTI } = req.body;
+  const { brand, model, serialNumber, typeDevice, user } = req.body;
 
-  if (!brand || !model || !serialNumber || !typeDevice || !userTI) {
+  if (!brand || !model || !serialNumber || !typeDevice || !user) {
     return res.status(400).json({
       data: {},
       message:
@@ -77,7 +77,7 @@ const register = async (req, res) => {
     });
   }
 
-  if (!userTI.match(/^[0-9a-fA-F]{24}$/)) {
+  if (!user.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
       data: {},
       message: "El ID del dispositivo no es valido.",
@@ -97,7 +97,7 @@ const register = async (req, res) => {
       serialNumber: device.serialNumber,
     });
 
-    const internUser = await User.findById(userTI);
+    const internUser = await User.findById(user);
 
     if (!internUser) {
       return res.status(409).json({
@@ -123,7 +123,7 @@ const register = async (req, res) => {
     }
 
     await registerMovement(
-      userTI,
+      user,
       newDevice.typeDevice,
       newDevice.serialNumber,
       newDevice._id,
@@ -185,16 +185,16 @@ const showOne = async (req, res) => {
 const updatePatch = async (req, res) => {
   let device;
   const { id } = req.params;
-  const { userTI } = req.body;
+  const { user } = req.body;
 
-  if (!id || !userTI) {
+  if (!id || !user) {
     return res.status(404).json({
       data: {},
       message: "El ID del equipo no es valido.",
     });
   }
 
-  if (!id.match(/^[0-9a-fA-F]{24}$/) || !userTI.match(/^[0-9a-fA-F]{24}$/)) {
+  if (!id.match(/^[0-9a-fA-F]{24}$/) || !user.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
       data: {},
       message: "El ID del equipo no es valido.",
@@ -205,21 +205,22 @@ const updatePatch = async (req, res) => {
     !req.body.brand &&
     !req.body.model &&
     !req.body.serialNumber &&
-    !req.body.details &&
+    !req.body.hostname &&
     !req.body.status &&
+    !req.body.details &&
     !req.body.annexed &&
     !req.body.ubication &&
     !req.body.typeDevice &&
     !req.body.ip &&
-    !req.body.user &&
+    !req.body.mac &&
+    !req.body.person &&
     !req.body.custom &&
     !req.body.bussinesUnit &&
     !req.body.departament &&
     !req.body.monitor &&
     !req.body.headphones &&
     !req.body.adaptVGA &&
-    !req.body.mouse &&
-    !req.body.hostname
+    !req.body.mouse
   ) {
     res.status(400).json({
       data: {},
@@ -228,7 +229,7 @@ const updatePatch = async (req, res) => {
   }
 
   try {
-    const internUser = await User.findById(userTI);
+    const internUser = await User.findById(user);
 
     if (!internUser) {
       return res.status(409).json({
@@ -245,20 +246,24 @@ const updatePatch = async (req, res) => {
       });
     }
 
-    device.hostname = req.body.hostname || device.hostname;
-    device.user = req.body.user || device.user;
+    const oldDevice = device;
+
     device.brand = req.body.brand || device.brand;
     device.model = req.body.model || device.model;
-    device.monitor = req.body.monitor || device.monitor;
     device.serialNumber = req.body.serialNumber || device.serialNumber;
+    device.hostname = req.body.hostname || device.hostname;
     device.details = req.body.details || device.details;
+    device.status = req.body.status || device.status;
     device.annexed = req.body.annexed || device.annexed;
     device.ubication = req.body.ubication || device.ubication;
-    device.status = req.body.status || device.status;
     device.typeDevice = req.body.typeDevice || device.typeDevice;
     device.ip = req.body.ip || device.ip;
+    device.mac = req.body.mac || device.mac;
+    device.person = req.body.person || device.person;
     device.custom = req.body.custom || device.custom;
     device.bussinesUnit = req.body.bussinesUnit || device.bussinesUnit;
+    device.departament = req.body.departament || device.departament;
+    device.monitor = req.body.monitor || device.monitor;
     device.headphones = req.body.headphones || device.headphones;
     device.adaptVGA = req.body.adaptVGA || device.adaptVGA;
     device.mouse = req.body.mouse || device.mouse;
@@ -273,13 +278,13 @@ const updatePatch = async (req, res) => {
     }
 
     await registerMovement(
-      userTI,
+      user,
       updatedDevice.typeDevice,
       updatedDevice.serialNumber,
       updatedDevice._id,
       "actualizada",
       device,
-      updatedDevice
+      oldDevice
     );
 
     res.status(200).json({
@@ -295,7 +300,7 @@ const updatePatch = async (req, res) => {
 };
 
 const assing = async (req, res) => {
-  const { user, userTI } = req.body;
+  const { user, person } = req.body;
   const { id } = req.params;
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
@@ -306,7 +311,7 @@ const assing = async (req, res) => {
     });
   }
 
-  if (!id || !user || !userTI) {
+  if (!id || !user || !person) {
     res.status(400).json({
       data: {
         message: "Al menos alguno de estos campos debe ser enviado.",
@@ -315,7 +320,7 @@ const assing = async (req, res) => {
   }
 
   try {
-    const internUser = await User.findById(userTI);
+    const internUser = await User.findById(user);
 
     if (!internUser) {
       return res.status(409).json({
@@ -332,7 +337,7 @@ const assing = async (req, res) => {
       });
     }
 
-    const userData = await Person.findById(user);
+    const userData = await Person.findById(person);
 
     if (!userData) {
       return res.status(409).json({
@@ -341,15 +346,16 @@ const assing = async (req, res) => {
       });
     }
 
-    device.user.id = userData._id;
-    device.user.name = userData.name;
-    device.departament.id = userData.department;
-    device.departament.name = userData.department;
+    device.person.id = userData._id;
+    device.person.name = userData.name;
+    device.departament.id = userData.department.id;
+    device.departament.name = userData.department.name;
 
-    if (device.monitor.id !== "Sin asignar") {
+    if (device.monitor.serialNumber !== "unassigned") {
       const monitor = await Device.findById(device.monitor.id);
-      monitor.user.id = userData._id;
-      monitor.user.name = userData.name;
+      console.log(monitor);
+      monitor.person.id = userData._id;
+      monitor.person.name = userData.name;
 
       const updatedMonitor = await monitor.save();
       if (!updatedMonitor) {
@@ -360,7 +366,7 @@ const assing = async (req, res) => {
       }
 
       await registerMovement(
-        userTI,
+        user,
         updatedMonitor.typeDevice,
         updatedMonitor.serialNumber,
         updatedMonitor._id,
@@ -379,7 +385,7 @@ const assing = async (req, res) => {
     }
 
     await registerMovement(
-      userTI,
+      user,
       updatedDevice.typeDevice,
       updatedDevice.serialNumber,
       updatedDevice._id,
@@ -401,7 +407,7 @@ const assing = async (req, res) => {
 };
 
 const unassing = async (req, res) => {
-  const { userTI } = req.body;
+  const { user } = req.body;
   const { id } = req.params;
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
@@ -412,7 +418,7 @@ const unassing = async (req, res) => {
     });
   }
 
-  if (!id || !userTI) {
+  if (!id || !user) {
     res.status(400).json({
       data: {
         message: "Al menos alguno de estos campos debe ser enviado.",
@@ -421,7 +427,7 @@ const unassing = async (req, res) => {
   }
 
   try {
-    const internUser = await User.findById(userTI);
+    const internUser = await User.findById(user);
 
     if (!internUser) {
       return res.status(409).json({
@@ -438,15 +444,15 @@ const unassing = async (req, res) => {
       });
     }
 
-    device.user.id = "Sin asignar";
-    device.user.name = "Sin asignar";
-    device.departament.id = "Sin asignar";
-    device.departament.name = "Sin asignar";
+    device.user.id = null;
+    device.user.name = "unassigned";
+    device.departament.id = null;
+    device.departament.name = "unassigned";
 
-    if (device.monitor.id !== "Sin asignar") {
+    if (device.monitor.id !== "unassigned") {
       const monitor = await Device.findById(device.monitor.id);
-      monitor.user.id = "Sin asignar";
-      monitor.user.name = "Sin asignar";
+      monitor.user.id = null;
+      monitor.user.name = "unassigned";
 
       const updatedMonitor = await monitor.save();
       if (!updatedMonitor) {
@@ -457,7 +463,7 @@ const unassing = async (req, res) => {
       }
 
       await registerMovement(
-        userTI,
+        user,
         updatedMonitor.typeDevice,
         updatedMonitor.serialNumber,
         updatedMonitor._id,
@@ -476,7 +482,7 @@ const unassing = async (req, res) => {
     }
 
     await registerMovement(
-      userTI,
+      user,
       updatedDevice.typeDevice,
       updatedDevice.serialNumber,
       updatedDevice._id,

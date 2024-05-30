@@ -127,12 +127,12 @@ const validationInfoResponsive = async (req, res) => {
         .status(404)
         .json({ data: false, message: "El equipo no existe." });
 
-    if (device.user.id === "Sin asignar") {
+    if (device.person.id === "available") {
       return res
         .status(200)
         .json({ data: false, message: "El equipo no esta asignado." });
     }
-    const person = await Person.findById(device.user.id);
+    const person = await Person.findById(device.person.id);
 
     const isComplete = [
       device.hostname,
@@ -140,11 +140,11 @@ const validationInfoResponsive = async (req, res) => {
       device.brand,
       device.model,
       device.annexed,
-      device.user?.id !== "Sin asignar",
+      device.person?.id !== "available",
       device.ubication,
       person.name,
       person.department,
-      person.manager?.id !== "Sin asignar",
+      person.manager?.id !== "available",
     ].every(Boolean);
 
     return res.status(200).json({
@@ -154,7 +154,7 @@ const validationInfoResponsive = async (req, res) => {
         : "La información del equipo o usuario no está completa.",
     });
   } catch (error) {
-    return res.status(500).json({ data: {}, message: error.message });
+    return res.status(500).json({ data: false, message: error.message });
   }
 };
 

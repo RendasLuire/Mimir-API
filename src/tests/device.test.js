@@ -58,7 +58,7 @@ describe("POST /api/device/", () => {
         id: "664273fd41d5e9eee8345724",
         name: "Sara Conor",
       },
-      userTI: "664f9386bc497ea1293420ca",
+      user: "664f9386bc497ea1293420ca",
     };
 
     const res = await request(app)
@@ -152,6 +152,85 @@ describe("GET /api/device/:id", () => {
     expect(res.status).toBe(statusExpected);
   });
 });
-describe("PATCH /api/device/:id", () => {});
-describe("PATCH /api/device/assing/:id", () => {});
-describe("PATCH /api/device/assing/:id", () => {});
+describe("PATCH /api/device/:id", () => {
+  it("should update a device", async () => {
+    const statusExpected = 200;
+    const validDeviceId = "664fa59e8bfe052015d23235";
+    const dataToDevice = {
+      serialNumber: "050505",
+      user: "664f9386bc497ea1293420ca",
+    };
+
+    const res = await request(app)
+      .patch(`/api/device/${validDeviceId}`)
+      .send(dataToDevice)
+      .set("Authorization", token);
+
+    expect(res.status).toBe(statusExpected);
+  });
+
+  it("should return 404 if device not found", async () => {
+    const statusExpected = 404;
+    const validDeviceId = "11111";
+    const dataToDevice = {
+      serialNumber: "050505",
+      user: "664f9386bc497ea1293420ca",
+    };
+
+    const res = await request(app)
+      .patch(`/api/device/${validDeviceId}`)
+      .send(dataToDevice)
+      .set("Authorization", token);
+
+    expect(res.status).toBe(statusExpected);
+  });
+});
+describe("PATCH /api/device/assing/:id", () => {
+  it("should assign a device to a person", async () => {
+    const statusExpected = 200;
+    const validDeviceId = "664fa59e8bfe052015d23235";
+    const dataToSend = {
+      user: "664f9386bc497ea1293420ca",
+      person: "664273fd41d5e9eee8345724",
+    };
+
+    const res = await request(app)
+      .patch(`/api/device/assing/${validDeviceId}`)
+      .send(dataToSend)
+      .set("Authorization", token);
+
+    expect(res.status).toBe(statusExpected);
+  });
+
+  it("should return 400 a device to a person", async () => {
+    const statusExpected = 400;
+    const validDeviceId = "664fa59e8bfe052015d23235";
+    const dataToSend = {
+      user: "664f9386bc497ea1293420ca",
+    };
+
+    const res = await request(app)
+      .patch(`/api/device/assing/${validDeviceId}`)
+      .send(dataToSend)
+      .set("Authorization", token);
+
+    expect(res.status).toBe(statusExpected);
+  });
+});
+
+describe("PATCH /api/device/unassing/:id", () => {
+  it("should assign a device to a person", async () => {
+    const statusExpected = 200;
+    const validDeviceId = "664fa59e8bfe052015d23235";
+    const dataToSend = {
+      user: "664f9386bc497ea1293420ca",
+    };
+
+    const res = await request(app)
+      .patch(`/api/device/unassing/${validDeviceId}`)
+      .send(dataToSend)
+      .set("Authorization", token);
+
+    expect(statusExpected).toBe(statusExpected);
+  });
+});

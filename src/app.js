@@ -13,6 +13,7 @@ import movementRoutes from "./routes/movement.routes.js";
 import personRoutes from "./routes/person.routes.js";
 import storageRoutes from "./routes/storage.routes.js";
 import pdfRoutes from "./routes/pdf.routes.js";
+import settingRoutes from "./routes/setting.routes.js";
 import { inicializeDataBaseDev } from "./helpers/inicialize.dev.js";
 
 const app = express();
@@ -41,6 +42,7 @@ app.use("/api/movements", movementRoutes);
 app.use("/api/persons", personRoutes);
 app.use("/storages", storageRoutes);
 app.use("/api/reports", pdfRoutes);
+app.use("/api/settings", settingRoutes);
 
 if (process.env.NODE_ENV.trim() == "development") {
   console.log("Cargando Informacion....");

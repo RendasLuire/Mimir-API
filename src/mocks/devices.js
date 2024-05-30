@@ -11,7 +11,7 @@ const devices = [
       id: "664273c15f54ca6fde19d5c7",
       number: "Propio",
     },
-    typeDevice: "Computadora",
+    typeDevice: "computer",
     ip: "000.000.000.0",
     person: {
       id: "664273fd41d5e9eee8345724",
@@ -32,18 +32,18 @@ const devices = [
     mouse: false,
   },
   {
-    _id: "664fa589a41f67d1fa8df27f",
+    _id: "66427493f69c19d5815a4d05",
     brand: "HP",
     serialNumber: "111111111",
     model: "Ojos de la NASA",
     hostname: "Skynet-2",
     details: "Vamos a la dominacion mundial.",
-    status: "Activo",
+    status: "available",
     annexed: {
       id: "664273c15f54ca6fde19d5c7",
       number: "Propio",
     },
-    typeDevice: "Monitor",
+    typeDevice: "monitor",
     ip: "N/A",
     person: {
       id: "664273fd41d5e9eee8345724",
@@ -57,12 +57,12 @@ const devices = [
     model: "Boca de la NASA",
     hostname: "Skynet-3",
     details: "Vamos a la dominacion mundial.",
-    status: "Activo",
+    status: "available",
     annexed: {
       id: "664273c15f54ca6fde19d5c7",
       number: "Propio",
     },
-    typeDevice: "Impresora",
+    typeDevice: "printer",
     ip: "N/A",
     person: {
       id: "664273fd41d5e9eee8345724",
