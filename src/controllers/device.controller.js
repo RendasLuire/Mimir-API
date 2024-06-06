@@ -187,12 +187,15 @@ const updatePatch = async (req, res) => {
   const { id } = req.params;
   const { user } = req.body;
 
+  console.log("1");
+
   if (!id || !user) {
     return res.status(404).json({
       data: {},
       message: "El ID del equipo no es valido.",
     });
   }
+  console.log("2");
 
   if (!id.match(/^[0-9a-fA-F]{24}$/) || !user.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
@@ -200,6 +203,8 @@ const updatePatch = async (req, res) => {
       message: "El ID del equipo no es valido.",
     });
   }
+
+  console.log("3");
 
   if (
     !req.body.brand &&
@@ -210,6 +215,7 @@ const updatePatch = async (req, res) => {
     !req.body.details &&
     !req.body.annexed &&
     !req.body.ubication &&
+    !req.body.phisicRef &&
     !req.body.typeDevice &&
     !req.body.ip &&
     !req.body.mac &&
@@ -228,8 +234,12 @@ const updatePatch = async (req, res) => {
     });
   }
 
+  console.log("4");
+
   try {
     const internUser = await User.findById(user);
+
+    console.log("5");
 
     if (!internUser) {
       return res.status(409).json({
@@ -238,13 +248,19 @@ const updatePatch = async (req, res) => {
       });
     }
 
+    console.log("6");
+
     device = await Device.findById(id);
+
+    console.log("7");
     if (!device) {
       return res.status(404).json({
         data: {},
         message: "El equipo no fue encontrado",
       });
     }
+
+    console.log("8");
 
     const oldDevice = device;
 
@@ -268,7 +284,13 @@ const updatePatch = async (req, res) => {
     device.adaptVGA = req.body.adaptVGA || device.adaptVGA;
     device.mouse = req.body.mouse || device.mouse;
 
+    console.log("9");
+
+    console.log(device);
+
     const updatedDevice = await device.save();
+
+    console.log("10");
 
     if (!updatedDevice) {
       return res.status(400).json({
@@ -276,6 +298,8 @@ const updatePatch = async (req, res) => {
         message: "El dispositivo no fue actualizado.",
       });
     }
+
+    console.log("11");
 
     await registerMovement(
       user,
@@ -286,6 +310,8 @@ const updatePatch = async (req, res) => {
       device,
       oldDevice
     );
+
+    console.log("12");
 
     res.status(200).json({
       data: updatedDevice,

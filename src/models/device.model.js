@@ -46,6 +46,10 @@ const deviceSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Storage",
   },
+  phisicRef: {
+    type: String,
+    default: "",
+  },
   typeDevice: {
     type: String,
     require: true,

@@ -63,7 +63,11 @@ const generatePDF = async (responsive, isPrinter = false) => {
 
   drawTextBlock(
     page,
-    `El departamento de Tecnologías de la Información hace entrega del siguiente equipo de cómputo en funcionamiento a ${responsive.user.name} con los siguientes datos para su control interno:`,
+    `El departamento de Tecnologías de la Información hace entrega del siguiente ${
+      isPrinter ? "equipo de impresión" : "equipo de cómputo"
+    } en funcionamiento a ${
+      responsive.user.name
+    } con los siguientes datos para su control interno:`,
     { x: marginLeft, y: yPos(47), maxWidth: marginRight - marginLeft }
   );
 
@@ -139,7 +143,11 @@ const generatePDF = async (responsive, isPrinter = false) => {
 
   drawTextBlock(
     page,
-    `A partir de este momento yo ${responsive.user.name} soy el único responsable del equipo de cómputo asignado y de su buen uso, es mi responsabilidad notificar cualquier cambio de responsable, daño o problema con el mismo; correspondiendo únicamente al departamento de Tecnologías de la Información su mantenimiento.`,
+    `A partir de este momento yo ${
+      responsive.user.name
+    } soy el único responsable del equipo de ${
+      isPrinter ? "impresión" : "cómputo"
+    } asignado y de su buen uso, es mi responsabilidad notificar cualquier cambio de responsable, daño o problema con el mismo; correspondiendo únicamente al departamento de Tecnologías de la Información su mantenimiento.`,
     { x: marginLeft, y: yPos(28), maxWidth: marginRight - marginLeft }
   );
 
