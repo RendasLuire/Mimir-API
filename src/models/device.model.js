@@ -1,4 +1,7 @@
+import moment from "moment";
 import mongoose from "mongoose";
+
+moment.locale("es-mx");
 
 const deviceSchema = new mongoose.Schema({
   brand: {
@@ -107,6 +110,48 @@ const deviceSchema = new mongoose.Schema({
       set: (value) => value.toLowerCase(),
     },
   },
+  comments: [
+    {
+      idUser: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      nameUser: {
+        type: String,
+        require: true,
+        set: (value) => value.toLowerCase(),
+      },
+      dateCreation: {
+        type: Date,
+        default: moment(),
+      },
+      content: {
+        type: String,
+        require: true,
+        set: (value) => value.toLowerCase(),
+      },
+    },
+  ],
+  movements: [
+    {
+      idUser: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      typeMovement: {
+        type: String,
+        require: true,
+      },
+      dateCreation: {
+        type: Date,
+        default: moment(),
+      },
+      description: {
+        type: String,
+        require: true,
+      },
+    },
+  ],
   headphones: {
     type: Boolean,
     default: false,
@@ -136,6 +181,11 @@ deviceSchema.pre("save", function (next) {
   this.bussinesUnit = this.bussinesUnit.toLowerCase();
   this.departament.name = this.departament.name.toLowerCase();
   this.monitor.serialNumber = this.monitor.serialNumber.toLowerCase();
+
+  this.comments.forEach((comment) => {
+    this.comments.nameUser = this.comments.nameUser.toLowerCase();
+    this.comments.content = this.comments.content.toLowerCase();
+  });
 
   next();
 });
