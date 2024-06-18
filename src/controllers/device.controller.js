@@ -25,17 +25,16 @@ const showAll = async (req, res) => {
         { hostname: searchRegex },
         { details: searchRegex },
         { status: searchRegex },
-        { "annexed.id": searchRegex },
         { "annexed.number": searchRegex },
-        { ubication: searchRegex },
+        { phisicRef: searchRegex },
         { typeDevice: searchRegex },
         { ip: searchRegex },
-        { "user.name": searchRegex },
+        { mac: searchRegex },
+        { "person.name": searchRegex },
         { "departament.name": searchRegex },
         { "monitor.serialNumber": searchRegex },
       ];
     }
-
     devices = await Device.find(query).skip(skip).limit(Number(limit));
 
     devicesCount = await Device.countDocuments(query);
@@ -379,7 +378,6 @@ const assing = async (req, res) => {
 
     if (device.monitor.serialNumber !== "unassigned") {
       const monitor = await Device.findById(device.monitor.id);
-      console.log(monitor);
       monitor.person.id = userData._id;
       monitor.person.name = userData.name;
 
