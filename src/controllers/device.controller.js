@@ -186,15 +186,12 @@ const updatePatch = async (req, res) => {
   const { id } = req.params;
   const { user } = req.body;
 
-  console.log("1");
-
   if (!id || !user) {
     return res.status(404).json({
       data: {},
       message: "El ID del equipo no es valido.",
     });
   }
-  console.log("2");
 
   if (!id.match(/^[0-9a-fA-F]{24}$/) || !user.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
@@ -203,8 +200,6 @@ const updatePatch = async (req, res) => {
     });
   }
 
-  console.log("3");
-
   if (
     !req.body.brand &&
     !req.body.model &&
@@ -212,7 +207,7 @@ const updatePatch = async (req, res) => {
     !req.body.hostname &&
     !req.body.status &&
     !req.body.details &&
-    !req.body.annexed &&
+    !req.body.annexed.number &&
     !req.body.ubication &&
     !req.body.phisicRef &&
     !req.body.typeDevice &&
@@ -233,12 +228,8 @@ const updatePatch = async (req, res) => {
     });
   }
 
-  console.log("4");
-
   try {
     const internUser = await User.findById(user);
-
-    console.log("5");
 
     if (!internUser) {
       return res.status(409).json({
@@ -247,19 +238,13 @@ const updatePatch = async (req, res) => {
       });
     }
 
-    console.log("6");
-
     device = await Device.findById(id);
-
-    console.log("7");
     if (!device) {
       return res.status(404).json({
         data: {},
         message: "El equipo no fue encontrado",
       });
     }
-
-    console.log("8");
 
     const oldDevice = device;
 
@@ -269,27 +254,25 @@ const updatePatch = async (req, res) => {
     device.hostname = req.body.hostname || device.hostname;
     device.details = req.body.details || device.details;
     device.status = req.body.status || device.status;
-    device.annexed = req.body.annexed || device.annexed;
+    device.annexed.number = req.body.annexed.number || device.annexed.number;
+    device.annexed.id = req.body.annexed.id || device.annexed.id;
     device.ubication = req.body.ubication || device.ubication;
+    device.phisicRef = req.body.phisicRef || device.phisicRef;
     device.typeDevice = req.body.typeDevice || device.typeDevice;
     device.ip = req.body.ip || device.ip;
     device.mac = req.body.mac || device.mac;
     device.person = req.body.person || device.person;
-    device.custom = req.body.custom || device.custom;
+    device.custom = req.body.custom;
     device.bussinesUnit = req.body.bussinesUnit || device.bussinesUnit;
     device.departament = req.body.departament || device.departament;
-    device.monitor = req.body.monitor || device.monitor;
-    device.headphones = req.body.headphones || device.headphones;
-    device.adaptVGA = req.body.adaptVGA || device.adaptVGA;
-    device.mouse = req.body.mouse || device.mouse;
-
-    console.log("9");
+    device.monitor = req.body.monitor;
+    device.headphones = req.body.headphones;
+    device.adaptVGA = req.body.adaptVGA;
+    device.mouse = req.body.mouse;
 
     console.log(device);
 
     const updatedDevice = await device.save();
-
-    console.log("10");
 
     if (!updatedDevice) {
       return res.status(400).json({
@@ -297,8 +280,6 @@ const updatePatch = async (req, res) => {
         message: "El dispositivo no fue actualizado.",
       });
     }
-
-    console.log("11");
 
     await registerMovement(
       user,
@@ -309,8 +290,6 @@ const updatePatch = async (req, res) => {
       device,
       oldDevice
     );
-
-    console.log("12");
 
     res.status(200).json({
       data: updatedDevice,
@@ -423,6 +402,7 @@ const assing = async (req, res) => {
       message: "Dispositivo asignado.",
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       data: {},
       message: error.message,

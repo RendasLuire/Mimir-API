@@ -66,7 +66,7 @@ const generatePDF = async (responsive, isPrinter = false) => {
     `El departamento de Tecnologías de la Información hace entrega del siguiente ${
       isPrinter ? "equipo de impresión" : "equipo de cómputo"
     } en funcionamiento a ${
-      responsive.user.name
+      responsive.person.name
     } con los siguientes datos para su control interno:`,
     { x: marginLeft, y: yPos(47), maxWidth: marginRight - marginLeft }
   );
@@ -129,22 +129,29 @@ const generatePDF = async (responsive, isPrinter = false) => {
     x: marginLeft + width / 2,
     y: yPos(38),
   });
-  drawTextBlock(page, `Referencia fisica:\n${responsive.phisicRef}`, {
+  drawTextBlock(page, "Referencia fisica:", {
     x: marginLeft + width / 2,
     y: yPos(37),
+    fontBold,
+  });
+  drawTextBlock(page, `${responsive.phisicRef}`, {
+    x: marginLeft + width / 2,
+    y: yPos(36),
     maxWidth: marginRight - (marginLeft + width / 2),
   });
 
   drawTextBlock(
     page,
-    `Al firmar esta carta, manifiesto conocer el contenido y alcance de mis responsabilidades descritas en el "Reglamento de uso de correo Interno y Externo", las “Políticas de Uso de Dispositivos de Información” y el “Contrato de confidencialidad de la información”, para el uso de equipo de cómputo.`,
+    `Al firmar esta carta, manifiesto conocer el contenido y alcance de mis responsabilidades descritas en el "Reglamento de uso de correo Interno y Externo", las “Políticas de Uso de Dispositivos de Información” y el “Contrato de confidencialidad de la información”, para el uso de equipo de ${
+      isPrinter ? "impresión" : "cómputo"
+    }.`,
     { x: marginLeft, y: yPos(33), maxWidth: marginRight - marginLeft }
   );
 
   drawTextBlock(
     page,
     `A partir de este momento yo ${
-      responsive.user.name
+      responsive.person.name
     } soy el único responsable del equipo de ${
       isPrinter ? "impresión" : "cómputo"
     } asignado y de su buen uso, es mi responsabilidad notificar cualquier cambio de responsable, daño o problema con el mismo; correspondiendo únicamente al departamento de Tecnologías de la Información su mantenimiento.`,
@@ -169,14 +176,14 @@ const generatePDF = async (responsive, isPrinter = false) => {
     thickness: 1,
   });
 
-  drawTextBlock(page, `${responsive.user.name}`, {
+  drawTextBlock(page, `${responsive.person.name}`, {
     x: marginLeft + 5,
     y: yPos(15),
     fontBold,
   });
   drawTextBlock(
     page,
-    `${responsive.unidBuss} - ${responsive.user.department}`,
+    `${responsive.unidBuss} - ${responsive.person.department}`,
     { x: marginLeft + 5, y: yPos(14) }
   );
 

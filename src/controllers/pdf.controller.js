@@ -9,7 +9,7 @@ const generateResponsiveCSM = async (req, res) => {
   const initialResponsive = {
     pc: { brand: "", model: "", serialNumber: "" },
     monitor: { brand: "N/A", model: "N/A", serialNumber: "N/A" },
-    user: { name: "", department: "" },
+    person: { name: "", department: "" },
     boss: { name: "", position: "" },
     unidBuss: "Maver CSM",
     phisicRef: "",
@@ -35,9 +35,9 @@ const generateResponsiveCSM = async (req, res) => {
         .status(404)
         .json({ data: {}, message: "El equipo no existe." });
 
-    const person = await Person.findById(device.user.id);
+    const person = await Person.findById(device.person.id);
     const boss =
-      device.user.id !== "Sin asignar"
+      device.person.id !== "Sin asignar"
         ? await Person.findById(person.manager.id)
         : {};
 
@@ -48,18 +48,22 @@ const generateResponsiveCSM = async (req, res) => {
         model: device.model,
         serialNumber: device.serialNumber,
       },
-      phisicRef: device.ubication,
+      phisicRef: device.phisicRef,
       annexed: device.annexed.number,
       custom: device.custom,
-      user: { name: person.name, department: person.department },
+      person: { name: person.name, department: person.department.name },
       boss: { name: boss.name || "", position: boss.position || "" },
       monitor:
-        device.monitor.id !== "Sin asignar"
+        device.monitor.serialNumber !== "unassigned"
           ? await getMonitorDetails(device.monitor.id)
           : initialResponsive.monitor,
     };
 
+    console.log(responsive);
+
     const isValid = validateResponsive(responsive);
+
+    console.log(responsive);
 
     if (isValid) {
       const pdfBytes = await generatePdf(
@@ -67,6 +71,7 @@ const generateResponsiveCSM = async (req, res) => {
         device.typeDevice,
         responsive.unidBuss
       );
+
       res.set("Content-Type", "application/pdf");
       return res.status(200).send(pdfBytes);
     } else {
@@ -90,6 +95,7 @@ const validateResponsive = (responsive) => {
 };
 
 const getMonitorDetails = async (monitorId) => {
+  console.log("hola: " + monitorId);
   const monitor = await Device.findById(monitorId);
   return {
     brand: monitor.brand || "N/A",
@@ -99,11 +105,11 @@ const getMonitorDetails = async (monitorId) => {
 };
 
 const generatePdf = async (responsive, typeDevice, unidBuss) => {
-  if (typeDevice === "Impresora" && unidBuss === "Maver CSM") {
+  if (typeDevice === "printer" && unidBuss === "Maver CSM") {
     return await responsiveService.responsivePrinterCSM({ responsive });
   } else if (unidBuss === "Maver CSM") {
     return await responsiveService.responsiveCSM({ responsive });
-  } else if (typeDevice === "Impresora" && unidBuss === "Maver") {
+  } else if (typeDevice === "printer" && unidBuss === "Maver") {
     return await responsiveService.responsivePrinterAlamo({ responsive });
   } else if (unidBuss === "Maver") {
     return await responsiveService.responsiveAlamo({ responsive });
@@ -139,12 +145,12 @@ const validationInfoResponsive = async (req, res) => {
       device.serialNumber,
       device.brand,
       device.model,
-      device.annexed,
-      device.person?.id !== "available",
-      device.ubication,
+      device.annexed.number,
+      device.person.name,
+      device.phisicRef,
       person.name,
-      person.department,
-      person.manager?.id !== "available",
+      person.department.name,
+      person.manager.name,
     ].every(Boolean);
 
     return res.status(200).json({
