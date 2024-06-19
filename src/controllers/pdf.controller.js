@@ -95,7 +95,6 @@ const validateResponsive = (responsive) => {
 };
 
 const getMonitorDetails = async (monitorId) => {
-  console.log("hola: " + monitorId);
   const monitor = await Device.findById(monitorId);
   return {
     brand: monitor.brand || "N/A",

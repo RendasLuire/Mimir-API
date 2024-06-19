@@ -90,4 +90,22 @@ export const inicializeDataBaseTest = async () => {
   }
 };
 
+export const inicializeDataBaseProd = async () => {
+  try {
+    const countUsers = await User.countDocuments();
+
+    console.log(countUsers);
+
+    if (countUsers < 1) {
+      await createUserAdmin();
+      for (const item of settingMock) {
+        const newSetting = new Setting(item);
+        await newSetting.save();
+      }
+    }
+  } catch (error) {
+    console.log("Error al inicializar el entorno: ", error);
+  }
+};
+
 export default { inicializeDataBaseDev, inicializeDataBaseTest };

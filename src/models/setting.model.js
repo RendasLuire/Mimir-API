@@ -3,31 +3,41 @@ import mongoose from "mongoose";
 const settingSchema = new mongoose.Schema({
   name: {
     type: String,
-    require: true,
+    required: [true, "Name is required"],
     unique: true,
-    set: (info) => info.toLowerCase(),
+    set: (info) => info?.toLowerCase() ?? "",
   },
   options: [
     {
       label: {
         type: String,
-        require: true,
+        required: [true, "Label is required"],
+        set: (value) => value?.toLowerCase() ?? "",
       },
       value: {
         type: String,
-        require: true,
+        required: [true, "Value is required"],
+        set: (value) => value?.toLowerCase() ?? "",
       },
     },
   ],
 });
 
 settingSchema.pre("save", function (next) {
-  this.name = this.name.toLowerCase();
+  if (this.name) {
+    this.name = this.name.toLowerCase();
+  }
 
-  this.options.forEach((option) => {
-    option.label = option.label.toLowerCase();
-    option.value = option.value.toLowerCase();
-  });
+  if (this.options && this.options.length > 0) {
+    this.options.forEach((option) => {
+      if (option.label) {
+        option.label = option.label.toLowerCase();
+      }
+      if (option.value) {
+        option.value = option.value.toLowerCase();
+      }
+    });
+  }
 
   next();
 });

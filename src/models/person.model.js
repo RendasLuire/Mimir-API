@@ -3,8 +3,8 @@ import mongoose from "mongoose";
 const personSchema = new mongoose.Schema({
   name: {
     type: String,
-    require: true,
-    set: (value) => value.toLowerCase(),
+    required: [true, "Name is required"],
+    set: (value) => value?.toLowerCase() ?? "",
   },
   department: {
     id: {
@@ -12,14 +12,14 @@ const personSchema = new mongoose.Schema({
     },
     name: {
       type: String,
-      require: true,
-      set: (value) => value.toLowerCase(),
+      required: [true, "Department name is required"],
+      set: (value) => value?.toLowerCase() ?? "",
     },
   },
   position: {
     type: String,
-    require: true,
-    set: (value) => value.toLowerCase(),
+    required: [true, "Position is required"],
+    set: (value) => value?.toLowerCase() ?? "",
   },
   manager: {
     id: {
@@ -28,16 +28,24 @@ const personSchema = new mongoose.Schema({
     name: {
       type: String,
       default: "unassigned",
-      set: (value) => value.toLowerCase(),
+      set: (value) => value?.toLowerCase() ?? "unassigned",
     },
   },
 });
 
 personSchema.pre("save", function (next) {
-  this.name = this.name.toLowerCase();
-  this.department.name = this.department.name.toLowerCase();
-  this.position = this.position.toLowerCase();
-  this.manager.name = this.manager.name.toLowerCase();
+  if (this.name) {
+    this.name = this.name.toLowerCase();
+  }
+  if (this.department.name) {
+    this.department.name = this.department.name.toLowerCase();
+  }
+  if (this.position) {
+    this.position = this.position.toLowerCase();
+  }
+  if (this.manager.name) {
+    this.manager.name = this.manager.name.toLowerCase();
+  }
 
   next();
 });

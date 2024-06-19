@@ -6,33 +6,33 @@ moment.locale("es-mx");
 const deviceSchema = new mongoose.Schema({
   brand: {
     type: String,
-    require: true,
-    set: (value) => value.toLowerCase(),
+    required: [true, "Brand is required"],
+    set: (value) => value?.toLowerCase() ?? "",
   },
   model: {
     type: String,
-    require: true,
-    set: (value) => value.toLowerCase(),
+    required: [true, "Model is required"],
+    set: (value) => value?.toLowerCase() ?? "",
   },
   serialNumber: {
     type: String,
-    require: true,
-    set: (value) => value.toLowerCase(),
+    required: [true, "Serial number is required"],
+    set: (value) => value?.toLowerCase() ?? "",
   },
   hostname: {
     type: String,
-    require: true,
-    set: (value) => value.toLowerCase(),
+    required: [true, "Hostname is required"],
+    set: (value) => value?.toLowerCase() ?? "",
   },
   details: {
     type: String,
     default: "",
-    set: (value) => value.toLowerCase(),
+    set: (value) => value?.toLowerCase() ?? "",
   },
   status: {
     type: String,
     default: "available",
-    set: (value) => value.toLowerCase(),
+    set: (value) => value?.toLowerCase() ?? "available",
   },
   annexed: {
     id: {
@@ -42,7 +42,7 @@ const deviceSchema = new mongoose.Schema({
     number: {
       type: String,
       default: "unassigned",
-      set: (value) => value.toLowerCase(),
+      set: (value) => value?.toLowerCase() ?? "unassigned",
     },
   },
   ubication: {
@@ -55,18 +55,18 @@ const deviceSchema = new mongoose.Schema({
   },
   typeDevice: {
     type: String,
-    require: true,
-    set: (value) => value.toLowerCase(),
+    required: [true, "Type of device is required"],
+    set: (value) => value?.toLowerCase() ?? "",
   },
   ip: {
     type: String,
     default: "",
-    set: (value) => value.toLowerCase(),
+    set: (value) => value?.toLowerCase() ?? "",
   },
   mac: {
     type: String,
     default: "",
-    set: (value) => value.toLowerCase(),
+    set: (value) => value?.toLowerCase() ?? "",
   },
   person: {
     id: {
@@ -76,7 +76,7 @@ const deviceSchema = new mongoose.Schema({
     name: {
       type: String,
       default: "unassigned",
-      set: (value) => value.toLowerCase(),
+      set: (value) => value?.toLowerCase() ?? "unassigned",
     },
   },
   custom: {
@@ -86,7 +86,7 @@ const deviceSchema = new mongoose.Schema({
   bussinesUnit: {
     type: String,
     default: "unassigned",
-    set: (value) => value.toLowerCase(),
+    set: (value) => value?.toLowerCase() ?? "unassigned",
   },
   departament: {
     id: {
@@ -96,7 +96,7 @@ const deviceSchema = new mongoose.Schema({
     name: {
       type: String,
       default: "unassigned",
-      set: (value) => value.toLowerCase(),
+      set: (value) => value?.toLowerCase() ?? "unassigned",
     },
   },
   monitor: {
@@ -107,7 +107,7 @@ const deviceSchema = new mongoose.Schema({
     serialNumber: {
       type: String,
       default: "unassigned",
-      set: (value) => value.toLowerCase(),
+      set: (value) => value?.toLowerCase() ?? "unassigned",
     },
   },
   comments: [
@@ -118,8 +118,8 @@ const deviceSchema = new mongoose.Schema({
       },
       nameUser: {
         type: String,
-        require: true,
-        set: (value) => value.toLowerCase(),
+        required: [true, "User name is required"],
+        set: (value) => value?.toLowerCase() ?? "",
       },
       dateCreation: {
         type: Date,
@@ -127,8 +127,8 @@ const deviceSchema = new mongoose.Schema({
       },
       content: {
         type: String,
-        require: true,
-        set: (value) => value.toLowerCase(),
+        required: [true, "Content is required"],
+        set: (value) => value?.toLowerCase() ?? "",
       },
     },
   ],
@@ -140,7 +140,7 @@ const deviceSchema = new mongoose.Schema({
       },
       typeMovement: {
         type: String,
-        require: true,
+        required: [true, "Type of movement is required"],
       },
       dateCreation: {
         type: Date,
@@ -148,7 +148,7 @@ const deviceSchema = new mongoose.Schema({
       },
       description: {
         type: String,
-        require: true,
+        required: [true, "Description is required"],
       },
     },
   ],
@@ -167,25 +167,59 @@ const deviceSchema = new mongoose.Schema({
 });
 
 deviceSchema.pre("save", function (next) {
-  this.brand = this.brand.toLowerCase();
-  this.model = this.model.toLowerCase();
-  this.serialNumber = this.serialNumber.toLowerCase();
-  this.hostname = this.hostname.toLowerCase();
-  this.details = this.details.toLowerCase();
-  this.status = this.status.toLowerCase();
-  this.annexed.number = this.annexed.number.toLowerCase();
-  this.typeDevice = this.typeDevice.toLowerCase();
-  this.ip = this.ip.toLowerCase();
-  this.mac = this.mac.toLowerCase();
-  this.person.name = this.person.name.toLowerCase();
-  this.bussinesUnit = this.bussinesUnit.toLowerCase();
-  this.departament.name = this.departament.name.toLowerCase();
-  this.monitor.serialNumber = this.monitor.serialNumber.toLowerCase();
+  if (this.brand) {
+    this.brand = this.brand.toLowerCase();
+  }
+  if (this.model) {
+    this.model = this.model.toLowerCase();
+  }
+  if (this.serialNumber) {
+    this.serialNumber = this.serialNumber.toLowerCase();
+  }
+  if (this.hostname) {
+    this.hostname = this.hostname.toLowerCase();
+  }
+  if (this.details !== undefined) {
+    this.details = this.details.toLowerCase();
+  }
+  if (this.status) {
+    this.status = this.status.toLowerCase();
+  }
+  if (this.annexed.number) {
+    this.annexed.number = this.annexed.number.toLowerCase();
+  }
+  if (this.typeDevice) {
+    this.typeDevice = this.typeDevice.toLowerCase();
+  }
+  if (this.ip) {
+    this.ip = this.ip.toLowerCase();
+  }
+  if (this.mac) {
+    this.mac = this.mac.toLowerCase();
+  }
+  if (this.person.name) {
+    this.person.name = this.person.name.toLowerCase();
+  }
+  if (this.bussinesUnit) {
+    this.bussinesUnit = this.bussinesUnit.toLowerCase();
+  }
+  if (this.departament.name) {
+    this.departament.name = this.departament.name.toLowerCase();
+  }
+  if (this.monitor.serialNumber) {
+    this.monitor.serialNumber = this.monitor.serialNumber.toLowerCase();
+  }
 
-  this.comments.forEach((comment) => {
-    this.comments.nameUser = this.comments.nameUser.toLowerCase();
-    this.comments.content = this.comments.content.toLowerCase();
-  });
+  if (this.comments && this.comments.length > 0) {
+    this.comments.forEach((comment) => {
+      if (comment.nameUser) {
+        comment.nameUser = comment.nameUser.toLowerCase();
+      }
+      if (comment.content) {
+        comment.content = comment.content.toLowerCase();
+      }
+    });
+  }
 
   next();
 });

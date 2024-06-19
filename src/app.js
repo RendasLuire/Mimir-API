@@ -14,7 +14,10 @@ import personRoutes from "./routes/person.routes.js";
 import storageRoutes from "./routes/storage.routes.js";
 import pdfRoutes from "./routes/pdf.routes.js";
 import settingRoutes from "./routes/setting.routes.js";
-import { inicializeDataBaseDev } from "./helpers/inicialize.dev.js";
+import {
+  inicializeDataBaseDev,
+  inicializeDataBaseProd,
+} from "./helpers/inicialize.dev.js";
 
 const app = express();
 app.use(cors());
@@ -47,6 +50,10 @@ app.use("/api/settings", settingRoutes);
 if (process.env.NODE_ENV.trim() == "development") {
   console.log("Cargando Informacion....");
   inicializeDataBaseDev();
+}
+if (process.env.NODE_ENV.trim() == "production") {
+  console.log("Cargando Informacion....");
+  inicializeDataBaseProd();
 }
 
 //Crear un usuario inicial

@@ -6,17 +6,17 @@ moment.locale("es-mx");
 const annexedSchema = new mongoose.Schema({
   number: {
     type: String,
-    require: true,
+    required: [true, "Number is required"],
     unique: true,
-    set: (value) => value.toLowerCase(),
+    set: (value) => value?.toLowerCase() ?? "",
   },
   startDate: {
     type: Date,
-    default: moment(),
+    default: moment,
   },
   endDate: {
     type: Date,
-    default: moment().add(3, "year"),
+    default: () => moment().add(3, "years"),
   },
   devices: [
     {
@@ -26,31 +26,41 @@ const annexedSchema = new mongoose.Schema({
       },
       serialNumber: {
         type: String,
-        require: true,
-        set: (value) => value.toLowerCase(),
+        required: [true, "Serial number is required"],
+        set: (value) => value?.toLowerCase() ?? "",
       },
       typeDevice: {
         type: String,
-        require: true,
-        set: (value) => value.toLowerCase(),
+        required: [true, "Type of device is required"],
+        set: (value) => value?.toLowerCase() ?? "",
       },
     },
   ],
   bill: {
     type: String,
     default: "",
-    set: (value) => value.toLowerCase(),
+    set: (value) => value?.toLowerCase() ?? "",
   },
 });
 
 annexedSchema.pre("save", function (next) {
-  this.number = this.number.toLowerCase();
-  this.bill = this.bill.toLowerCase();
+  if (this.number) {
+    this.number = this.number.toLowerCase();
+  }
+  if (this.bill !== undefined) {
+    this.bill = this.bill.toLowerCase();
+  }
 
-  this.devices.forEach((device) => {
-    device.serialNumber = device.serialNumber.toLowerCase();
-    device.typeDevice = device.typeDevice.toLowerCase();
-  });
+  if (this.devices && this.devices.length > 0) {
+    this.devices.forEach((device) => {
+      if (device.serialNumber) {
+        device.serialNumber = device.serialNumber.toLowerCase();
+      }
+      if (device.typeDevice) {
+        device.typeDevice = device.typeDevice.toLowerCase();
+      }
+    });
+  }
 
   next();
 });

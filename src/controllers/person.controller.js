@@ -53,31 +53,31 @@ const showAll = async (req, res) => {
 };
 
 const register = async (req, res) => {
-  const { name, department, position, userTI } = req.body;
+  const { name, department, position, user } = req.body;
 
-  if (!name || !department || !position || !userTI) {
+  if (!name || !department || !position || !user) {
     return res.status(400).json({
-      data: {},
+      data: { name, department, position, user },
       message:
         "Los campos Nombre, Departamento, Posicion y usuario son obligatorios.",
     });
   }
 
-  if (!userTI.match(/^[0-9a-fA-F]{24}$/)) {
+  if (!user.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
       data: {},
       message: "El ID del usuario no es valido.",
     });
   }
 
+  let departmentInfo = {
+    name: department,
+  };
+
   const person = new Person({
     name,
-    department,
+    departmentInfo,
     position,
-    manager: {
-      id: "Sin asignar",
-      name: "Sin asignar",
-    },
   });
 
   try {
@@ -95,7 +95,7 @@ const register = async (req, res) => {
     const newPerson = await person.save();
 
     await registerMovement(
-      userTI,
+      user,
       "Usuario",
       newPerson.name,
       newPerson._id,
@@ -201,9 +201,9 @@ const showAllDevicesAssigment = async (req, res) => {
 const updatePatch = async (req, res) => {
   let person;
   const { id } = req.params;
-  const { userTI } = req.body;
+  const { user } = req.body;
 
-  if (!id || !userTI) {
+  if (!id || !user) {
     return res.status(404).json({
       data: {},
       message: "El ID del equipo no es valido.",
@@ -230,7 +230,7 @@ const updatePatch = async (req, res) => {
   }
 
   try {
-    const internUser = await User.findById(userTI);
+    const internUser = await User.findById(user);
 
     if (!internUser) {
       return res.status(409).json({
@@ -262,7 +262,7 @@ const updatePatch = async (req, res) => {
     }
 
     await registerMovement(
-      userTI,
+      user,
       "Usuario",
       updatedPerson.serialNumber,
       updatedPerson._id,
@@ -284,7 +284,7 @@ const updatePatch = async (req, res) => {
 };
 
 const assing = async (req, res) => {
-  const { manager, userTI } = req.body;
+  const { manager, user } = req.body;
   const { id } = req.params;
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
@@ -295,7 +295,7 @@ const assing = async (req, res) => {
     });
   }
 
-  if (!id || !manager || !userTI) {
+  if (!id || !manager || !user) {
     res.status(400).json({
       data: {
         message: "Al menos alguno de estos campos debe ser enviado.",
@@ -312,7 +312,7 @@ const assing = async (req, res) => {
   }
 
   try {
-    const internUser = await User.findById(userTI);
+    const internUser = await User.findById(user);
 
     if (!internUser) {
       return res.status(409).json({
@@ -354,7 +354,7 @@ const assing = async (req, res) => {
     }
 
     await registerMovement(
-      userTI,
+      user,
       "persona",
       updatedPerson.name,
       updatedPerson._id,
@@ -376,7 +376,7 @@ const assing = async (req, res) => {
 };
 
 const unassing = async (req, res) => {
-  const { userTI } = req.body;
+  const { user } = req.body;
   const { id } = req.params;
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
@@ -387,7 +387,7 @@ const unassing = async (req, res) => {
     });
   }
 
-  if (!id || !userTI) {
+  if (!id || !user) {
     res.status(400).json({
       data: {
         message: "Al menos alguno de estos campos debe ser enviado.",
@@ -396,7 +396,7 @@ const unassing = async (req, res) => {
   }
 
   try {
-    const internUser = await User.findById(userTI);
+    const internUser = await User.findById(user);
 
     if (!internUser) {
       return res.status(409).json({
@@ -429,7 +429,7 @@ const unassing = async (req, res) => {
     }
 
     await registerMovement(
-      userTI,
+      user,
       "persona",
       updatedPerson.name,
       updatedPerson._id,
