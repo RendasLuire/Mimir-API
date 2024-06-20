@@ -354,11 +354,13 @@ const assing = async (req, res) => {
     device.person.name = userData.name;
     device.departament.id = userData.department.id;
     device.departament.name = userData.department.name;
+    device.status = "assigned";
 
     if (device.monitor.serialNumber !== "unassigned") {
       const monitor = await Device.findById(device.monitor.id);
       monitor.person.id = userData._id;
       monitor.person.name = userData.name;
+      monitor.status = "assigned";
 
       const updatedMonitor = await monitor.save();
       if (!updatedMonitor) {
@@ -452,11 +454,13 @@ const unassing = async (req, res) => {
     device.user.name = "unassigned";
     device.departament.id = null;
     device.departament.name = "unassigned";
+    device.status = "available";
 
     if (device.monitor.id !== "unassigned") {
       const monitor = await Device.findById(device.monitor.id);
       monitor.user.id = null;
       monitor.user.name = "unassigned";
+      monitor.status = "available";
 
       const updatedMonitor = await monitor.save();
       if (!updatedMonitor) {
@@ -507,6 +511,124 @@ const unassing = async (req, res) => {
   }
 };
 
+const assingMonitor = async (req, res) => {
+  const { user, monitorId } = req.body;
+  const { id } = req.params;
+
+  if (!monitorId || !id || !user) {
+    return res.status(404).json({
+      data: {
+        monitor: monitorId,
+        device: id,
+        user,
+      },
+      message: "La informacion no esta completa.",
+    });
+  }
+
+  if (
+    !id.match(/^[0-9a-fA-F]{24}$/) ||
+    !monitorId.match(/^[0-9a-fA-F]{24}$/) ||
+    !user.match(/^[0-9a-fA-F]{24}$/)
+  ) {
+    return res.status(404).json({
+      data: {
+        message: "El ID del dispositivo no es valido.",
+      },
+    });
+  }
+
+  try {
+    const device = await Device.findById(id);
+
+    if (!device) {
+      return res.status(404).json({
+        data: id,
+        message: "El dispositivo no fue encontrado.",
+      });
+    }
+
+    const monitor = await Device.findById(monitorId);
+
+    if (!monitor) {
+      return res.status(404).json({
+        data: monitor,
+        message: "El monitor no fue encontrado.",
+      });
+    }
+
+    if (monitor.typeDevice !== "monitor") {
+      return res.status(404).json({
+        data: monitor,
+        message: "Solo se pueden asignar monitores.",
+      });
+    }
+
+    device.monitor.id = monitor._id;
+    device.monitor.serialNumber = monitor.serialNumber;
+
+    await device.save();
+
+    monitor.person.id = device.person.id;
+    monitor.person.name = device.person.name;
+    monitor.status = "assigned";
+
+    await monitor.save();
+
+    return res.status(200).json({
+      data: device,
+      message: "El monitor fue asignado.",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      data: {},
+      message: "Server Error: " + error,
+    });
+  }
+};
+
+const unassingMonitor = async (req, res) => {
+  const { user } = req.body;
+  const { id } = req.params;
+
+  if (!id.match(/^[0-9a-fA-F]{24}$/) || !user.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(404).json({
+      data: {
+        message: "El ID del dispositivo no es valido.",
+      },
+    });
+  }
+
+  try {
+    const device = await Device.findById(id);
+
+    if (!device) {
+      return res.status(404).json({
+        data: id,
+        message: "No se encontro el dispositivo.",
+      });
+    }
+
+    const monitor = await Device.findById(device.monitor.id);
+
+    if (!monitor) {
+      return res.status(404).json({
+        data: device.monitor,
+        message: "No se encuentra el monitor.",
+      });
+    }
+
+    monitor.person.id = null;
+    monitor.person.name = "unassigned";
+    monitor.status = "available";
+
+    await monitor.save();
+
+    device.monitor.id = null;
+    device.monitor.serialNumber = "unassigned";
+  } catch (error) {}
+};
+
 export default {
   showAll,
   register,
@@ -514,4 +636,6 @@ export default {
   updatePatch,
   assing,
   unassing,
+  assingMonitor,
+  unassingMonitor,
 };

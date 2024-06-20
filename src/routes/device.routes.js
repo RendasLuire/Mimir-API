@@ -16,4 +16,12 @@ router.patch("/assing/:id", token.auth, deviceController.assing);
 
 router.patch("/unassing/:id", token.auth, deviceController.unassing);
 
+router.patch("/assingMonitor/:id", token.auth, deviceController.assingMonitor);
+
+router.patch(
+  "/unassingMonitor/:id",
+  token.auth,
+  deviceController.unassingMonitor
+);
+
 export default router;
