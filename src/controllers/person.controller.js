@@ -18,7 +18,6 @@ const showAll = async (req, res) => {
         { name: searchRegex },
         { department: searchRegex },
         { position: searchRegex },
-        { "manager.id": searchRegex },
         { "manager.name": searchRegex },
       ];
     }

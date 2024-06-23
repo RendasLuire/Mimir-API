@@ -1,7 +1,7 @@
 const persons = [
   {
     _id: "664273fd41d5e9eee8345724",
-    name: "Sara Conor",
+    name: "Andres Uriel Aguirre Ocampo",
     department: {
       id: "66561963e855da3f10bb5d82",
       name: "TI",

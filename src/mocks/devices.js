@@ -15,7 +15,7 @@ const devices = [
     ip: "000.000.000.0",
     person: {
       id: "664273fd41d5e9eee8345724",
-      name: "Sara Conor",
+      name: "Andres Uriel Aguirre Ocampo",
     },
     custom: true,
     bussinesUnit: "Mundo",
@@ -47,7 +47,7 @@ const devices = [
     ip: "N/A",
     person: {
       id: "664273fd41d5e9eee8345724",
-      name: "Sara Conor",
+      name: "Andres Uriel Aguirre Ocampo",
     },
   },
   {
@@ -66,7 +66,7 @@ const devices = [
     ip: "N/A",
     person: {
       id: "664273fd41d5e9eee8345724",
-      name: "Sara Conor",
+      name: "Andres Uriel Aguirre Ocampo",
     },
   },
 ];
