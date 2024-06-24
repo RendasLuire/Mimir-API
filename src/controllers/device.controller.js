@@ -207,7 +207,7 @@ const updatePatch = async (req, res) => {
     !req.body.hostname &&
     !req.body.status &&
     !req.body.details &&
-    !req.body.annexed.number &&
+    !req.body.annexed?.number &&
     !req.body.ubication &&
     !req.body.phisicRef &&
     !req.body.typeDevice &&
@@ -254,8 +254,7 @@ const updatePatch = async (req, res) => {
     device.hostname = req.body.hostname || device.hostname;
     device.details = req.body.details || device.details;
     device.status = req.body.status || device.status;
-    device.annexed.number = req.body.annexed.number || device.annexed.number;
-    device.annexed.id = req.body.annexed.id || device.annexed.id;
+    device.annexed.number = req.body.annexed?.number || device.annexed?.number;
     device.ubication = req.body.ubication || device.ubication;
     device.phisicRef = req.body.phisicRef || device.phisicRef;
     device.typeDevice = req.body.typeDevice || device.typeDevice;
@@ -269,8 +268,6 @@ const updatePatch = async (req, res) => {
     device.headphones = req.body.headphones;
     device.adaptVGA = req.body.adaptVGA;
     device.mouse = req.body.mouse;
-
-    console.log(device);
 
     const updatedDevice = await device.save();
 

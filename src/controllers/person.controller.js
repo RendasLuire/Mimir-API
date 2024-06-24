@@ -73,13 +73,13 @@ const register = async (req, res) => {
     name: department,
   };
 
-  const person = new Person({
-    name,
-    departmentInfo,
-    position,
-  });
-
   try {
+    const person = new Person({
+      name,
+      department: departmentInfo,
+      position,
+    });
+
     const personAlreadyExist = await Person.findOne({
       name: person.name,
     });
@@ -295,7 +295,7 @@ const assing = async (req, res) => {
   }
 
   if (!id || !manager || !user) {
-    res.status(400).json({
+    return res.status(400).json({
       data: {
         message: "Al menos alguno de estos campos debe ser enviado.",
       },
@@ -303,7 +303,7 @@ const assing = async (req, res) => {
   }
 
   if (id == manager) {
-    res.status(400).json({
+    return res.status(400).json({
       data: {
         message: "No se puede asignar a si mismo.",
       },
@@ -362,7 +362,7 @@ const assing = async (req, res) => {
       updatedPerson
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       data: updatedPerson,
       message: "Persona asignado.",
     });

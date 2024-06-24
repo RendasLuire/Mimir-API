@@ -11,7 +11,7 @@ const devices = [
       id: "664273c15f54ca6fde19d5c7",
       number: "Propio",
     },
-    typeDevice: "computer",
+    typeDevice: "computadora",
     ip: "000.000.000.0",
     person: {
       id: "664273fd41d5e9eee8345724",

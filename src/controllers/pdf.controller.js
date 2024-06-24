@@ -3,6 +3,12 @@ import Device from "../models/device.model.js";
 import Person from "../models/person.model.js";
 import responsiveService from "../services/pdfService.js";
 
+function capitalizeFirstLetterOfEachWord(str) {
+  return str.replace(/\b\w/g, function (char) {
+    return char.toUpperCase();
+  });
+}
+
 const generateResponsiveCSM = async (req, res) => {
   moment.locale("es");
 
@@ -51,21 +57,27 @@ const generateResponsiveCSM = async (req, res) => {
       phisicRef: device.phisicRef,
       annexed: device.annexed.number,
       custom: device.custom,
-      person: { name: person.name, department: person.department.name },
-      boss: { name: boss.name || "", position: boss.position || "" },
+      person: {
+        name: capitalizeFirstLetterOfEachWord(person.name),
+        department: person.department.name,
+      },
+      boss: {
+        name: capitalizeFirstLetterOfEachWord(boss.name) || "",
+        position: boss.position || "",
+      },
       monitor:
         device.monitor.serialNumber !== "unassigned"
           ? await getMonitorDetails(device.monitor.id)
           : initialResponsive.monitor,
     };
 
-    console.log(responsive);
-
     const isValid = validateResponsive(responsive);
 
-    console.log(responsive);
-
     if (isValid) {
+      responsive.annexed =
+        responsive.annexed && responsive.annexed !== "unassigned"
+          ? responsive.annexed
+          : "";
       const pdfBytes = await generatePdf(
         responsive,
         device.typeDevice,
