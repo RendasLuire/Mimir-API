@@ -24,4 +24,6 @@ router.patch(
   deviceController.unassingMonitor
 );
 
+router.get("/monitors", token.auth, deviceController.ShowMonitors);
+
 export default router;

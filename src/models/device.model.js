@@ -48,7 +48,7 @@ const deviceSchema = new mongoose.Schema({
     },
     number: {
       type: String,
-      default: "unassigned",
+      default: "disponible",
       set: (value) => value?.toLowerCase() ?? "disponible",
     },
   },

@@ -206,8 +206,8 @@ const updatePatch = async (req, res) => {
     !req.body.model &&
     !req.body.serialNumber &&
     !req.body.hostname &&
-    !req.body.status.value &&
-    !req.body.status.label &&
+    !req.body.status?.value &&
+    !req.body.status?.label &&
     !req.body.details &&
     !req.body.annexed?.number &&
     !req.body.ubication &&
@@ -255,8 +255,8 @@ const updatePatch = async (req, res) => {
     device.serialNumber = req.body.serialNumber || device.serialNumber;
     device.hostname = req.body.hostname || device.hostname;
     device.details = req.body.details || device.details;
-    device.status.value = req.body.status.value || device.status.value;
-    device.status.label = req.body.status.label || device.status.label;
+    device.status.value = req.body.status?.value || device.status?.value;
+    device.status.label = req.body.status?.label || device.status?.label;
     device.annexed.number = req.body.annexed?.number || device.annexed?.number;
     device.ubication = req.body.ubication || device.ubication;
     device.phisicRef = req.body.phisicRef || device.phisicRef;
@@ -635,6 +635,64 @@ const unassingMonitor = async (req, res) => {
   } catch (error) {}
 };
 
+const ShowMonitors = async (req, res) => {
+  const { status, page = 1, limit = 10, search } = req.query;
+  const skip = (page - 1) * limit;
+
+  try {
+    let devices;
+    let devicesCount;
+    let query = {};
+    query.typeDevice = "monitor";
+    query.status.value = status;
+
+    if (search) {
+      const searchRegex = new RegExp(search, "i");
+      query.$or = [
+        { brand: searchRegex },
+        { model: searchRegex },
+        { serialNumber: searchRegex },
+        { hostname: searchRegex },
+        { details: searchRegex },
+        { "annexed.number": searchRegex },
+        { phisicRef: searchRegex },
+        { ip: searchRegex },
+        { mac: searchRegex },
+        { "person.name": searchRegex },
+        { "departament.name": searchRegex },
+        { "monitor.serialNumber": searchRegex },
+      ];
+    }
+    devices = await Device.find(query).skip(skip).limit(Number(limit));
+
+    devicesCount = await Device.countDocuments(query);
+
+    if (devices.length === 0) {
+      return res.status(204).json({
+        data: [],
+        message: "No hay dispositivos para mostrar.",
+      });
+    }
+
+    const totalPages = Math.ceil(devicesCount / limit);
+
+    return res.status(200).json({
+      data: devices,
+      pagination: {
+        totalItems: devicesCount,
+        totalPages,
+        currentPage: Number(page),
+      },
+      message: "Lista de dispositivos registrados.",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      data: {},
+      message: error.message,
+    });
+  }
+};
+
 export default {
   showAll,
   register,
@@ -644,4 +702,5 @@ export default {
   unassing,
   assingMonitor,
   unassingMonitor,
+  ShowMonitors,
 };

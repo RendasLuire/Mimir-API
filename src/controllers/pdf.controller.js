@@ -50,23 +50,23 @@ const generateResponsiveCSM = async (req, res) => {
     const responsive = {
       ...initialResponsive,
       pc: {
-        brand: device.brand,
-        model: device.model,
-        serialNumber: device.serialNumber,
+        brand: capitalizeFirstLetterOfEachWord(device.brand),
+        model: capitalizeFirstLetterOfEachWord(device.model),
+        serialNumber: device.serialNumber.toUpperCase(),
       },
-      phisicRef: device.phisicRef,
+      phisicRef: capitalizeFirstLetterOfEachWord(device.phisicRef),
       annexed: device.annexed.number,
       custom: device.custom,
       person: {
         name: capitalizeFirstLetterOfEachWord(person.name),
-        department: person.department.name,
+        department: capitalizeFirstLetterOfEachWord(person.department.name),
       },
       boss: {
         name: capitalizeFirstLetterOfEachWord(boss.name) || "",
-        position: boss.position || "",
+        position: capitalizeFirstLetterOfEachWord(boss.position) || "",
       },
       monitor:
-        device.monitor.serialNumber !== "unassigned"
+        device.monitor.serialNumber !== "disponible"
           ? await getMonitorDetails(device.monitor.id)
           : initialResponsive.monitor,
     };
@@ -75,7 +75,7 @@ const generateResponsiveCSM = async (req, res) => {
 
     if (isValid) {
       responsive.annexed =
-        responsive.annexed && responsive.annexed !== "unassigned"
+        responsive.annexed && responsive.annexed !== "disponible"
           ? responsive.annexed
           : "";
       const pdfBytes = await generatePdf(
@@ -109,9 +109,9 @@ const validateResponsive = (responsive) => {
 const getMonitorDetails = async (monitorId) => {
   const monitor = await Device.findById(monitorId);
   return {
-    brand: monitor.brand || "N/A",
-    model: monitor.model || "N/A",
-    serialNumber: monitor.serialNumber || "N/A",
+    brand: capitalizeFirstLetterOfEachWord(monitor.brand) || "N/A",
+    model: capitalizeFirstLetterOfEachWord(monitor.model) || "N/A",
+    serialNumber: monitor.serialNumber.toUpperCase() || "N/A",
   };
 };
 

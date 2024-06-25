@@ -199,10 +199,16 @@ const generatePDF = async (responsive, isPrinter = false) => {
     thickness: 1,
   });
 
-  drawTextBlock(page, `${responsive.boss.name}\n${responsive.boss.position}`, {
+  drawTextBlock(page, `${responsive.boss.name}`, {
     x: marginLeft + width / 2,
     y: yPos(15),
-    maxWidth: marginRight - (marginLeft + width / 2),
+    fontBold,
+    maxWidth: marginRight - (marginLeft + width) / 2 + 3,
+  });
+  drawTextBlock(page, `${responsive.boss.position}`, {
+    x: marginLeft + width / 2,
+    y: yPos(14),
+    maxWidth: marginRight - (marginLeft + width) / 2,
   });
 
   drawTextBlock(page, "Enterado", {
