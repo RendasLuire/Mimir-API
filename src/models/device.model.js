@@ -30,9 +30,16 @@ const deviceSchema = new mongoose.Schema({
     set: (value) => value?.toLowerCase() ?? "",
   },
   status: {
-    type: String,
-    default: "available",
-    set: (value) => value?.toLowerCase() ?? "available",
+    value: {
+      type: String,
+      default: "disponible",
+      set: (value) => value?.toLowerCase() ?? "disponible",
+    },
+    label: {
+      type: String,
+      default: "disponible",
+      set: (value) => value?.toLowerCase() ?? "disponible",
+    },
   },
   annexed: {
     id: {
@@ -42,7 +49,7 @@ const deviceSchema = new mongoose.Schema({
     number: {
       type: String,
       default: "unassigned",
-      set: (value) => value?.toLowerCase() ?? "unassigned",
+      set: (value) => value?.toLowerCase() ?? "disponible",
     },
   },
   ubication: {
@@ -75,8 +82,8 @@ const deviceSchema = new mongoose.Schema({
     },
     name: {
       type: String,
-      default: "unassigned",
-      set: (value) => value?.toLowerCase() ?? "unassigned",
+      default: "disponible",
+      set: (value) => value?.toLowerCase() ?? "disponible",
     },
   },
   custom: {
@@ -85,8 +92,8 @@ const deviceSchema = new mongoose.Schema({
   },
   bussinesUnit: {
     type: String,
-    default: "unassigned",
-    set: (value) => value?.toLowerCase() ?? "unassigned",
+    default: "disponible",
+    set: (value) => value?.toLowerCase() ?? "disponible",
   },
   departament: {
     id: {
@@ -95,8 +102,8 @@ const deviceSchema = new mongoose.Schema({
     },
     name: {
       type: String,
-      default: "unassigned",
-      set: (value) => value?.toLowerCase() ?? "unassigned",
+      default: "disponible",
+      set: (value) => value?.toLowerCase() ?? "disponible",
     },
   },
   monitor: {
@@ -106,8 +113,8 @@ const deviceSchema = new mongoose.Schema({
     },
     serialNumber: {
       type: String,
-      default: "unassigned",
-      set: (value) => value?.toLowerCase() ?? "unassigned",
+      default: "disponible",
+      set: (value) => value?.toLowerCase() ?? "disponible",
     },
   },
   comments: [
@@ -182,8 +189,11 @@ deviceSchema.pre("save", function (next) {
   if (this.details !== undefined) {
     this.details = this.details.toLowerCase();
   }
-  if (this.status) {
-    this.status = this.status.toLowerCase();
+  if (this.status.value) {
+    this.status = this.status.value.toLowerCase();
+  }
+  if (this.status.label) {
+    this.status = this.status.label.toLowerCase();
   }
   if (this.annexed.number) {
     this.annexed.number = this.annexed.number.toLowerCase();

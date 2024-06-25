@@ -27,8 +27,8 @@ const personSchema = new mongoose.Schema({
     },
     name: {
       type: String,
-      default: "unassigned",
-      set: (value) => value?.toLowerCase() ?? "unassigned",
+      default: "disponible",
+      set: (value) => value?.toLowerCase() ?? "disponible",
     },
   },
 });

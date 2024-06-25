@@ -5,27 +5,27 @@ const settings = [
     options: [
       {
         label: "Disponible",
-        value: "available",
+        value: "disponible",
       },
       {
         label: "En reparación",
-        value: "under_repair",
+        value: "en_reparacion",
       },
       {
         label: "Asignado",
-        value: "assigned",
+        value: "asignado",
       },
       {
-        label: "Reemplazo solicitado",
-        value: "replacement_requested",
+        label: "Remplazo requerido",
+        value: "remplazo_requerido",
       },
       {
         label: "Descompuesto",
-        value: "broken",
+        value: "descompuesto",
       },
       {
-        label: "Extraviado",
-        value: "lost",
+        label: "Perdido",
+        value: "perdido",
       },
     ],
   },

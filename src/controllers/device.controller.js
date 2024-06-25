@@ -24,7 +24,8 @@ const showAll = async (req, res) => {
         { serialNumber: searchRegex },
         { hostname: searchRegex },
         { details: searchRegex },
-        { status: searchRegex },
+        { "status.value": searchRegex },
+        { "status.label": searchRegex },
         { "annexed.number": searchRegex },
         { phisicRef: searchRegex },
         { typeDevice: searchRegex },
@@ -205,7 +206,8 @@ const updatePatch = async (req, res) => {
     !req.body.model &&
     !req.body.serialNumber &&
     !req.body.hostname &&
-    !req.body.status &&
+    !req.body.status.value &&
+    !req.body.status.label &&
     !req.body.details &&
     !req.body.annexed?.number &&
     !req.body.ubication &&
@@ -253,7 +255,8 @@ const updatePatch = async (req, res) => {
     device.serialNumber = req.body.serialNumber || device.serialNumber;
     device.hostname = req.body.hostname || device.hostname;
     device.details = req.body.details || device.details;
-    device.status = req.body.status || device.status;
+    device.status.value = req.body.status.value || device.status.value;
+    device.status.label = req.body.status.label || device.status.label;
     device.annexed.number = req.body.annexed?.number || device.annexed?.number;
     device.ubication = req.body.ubication || device.ubication;
     device.phisicRef = req.body.phisicRef || device.phisicRef;
@@ -351,13 +354,15 @@ const assing = async (req, res) => {
     device.person.name = userData.name;
     device.departament.id = userData.department.id;
     device.departament.name = userData.department.name;
-    device.status = "assigned";
+    device.status.value = "asignado";
+    device.status.label = "asignado";
 
-    if (device.monitor.serialNumber !== "unassigned") {
+    if (device.monitor.serialNumber !== "disponible") {
       const monitor = await Device.findById(device.monitor.id);
       monitor.person.id = userData._id;
       monitor.person.name = userData.name;
-      monitor.status = "assigned";
+      monitor.status.value = "asignado";
+      monitor.status.label = "asignado";
 
       const updatedMonitor = await monitor.save();
       if (!updatedMonitor) {
@@ -448,16 +453,18 @@ const unassing = async (req, res) => {
     }
 
     device.user.id = null;
-    device.user.name = "unassigned";
+    device.user.name = "disponible";
     device.departament.id = null;
-    device.departament.name = "unassigned";
-    device.status = "available";
+    device.departament.name = "disponible";
+    device.status.label = "disponible";
+    device.status.value = "disponible";
 
-    if (device.monitor.id !== "unassigned") {
+    if (device.monitor.id !== "disponible") {
       const monitor = await Device.findById(device.monitor.id);
       monitor.user.id = null;
-      monitor.user.name = "unassigned";
-      monitor.status = "available";
+      monitor.user.name = "disponible";
+      monitor.status.value = "disponible";
+      monitor.status.label = "disponible";
 
       const updatedMonitor = await monitor.save();
       if (!updatedMonitor) {
@@ -568,7 +575,8 @@ const assingMonitor = async (req, res) => {
 
     monitor.person.id = device.person.id;
     monitor.person.name = device.person.name;
-    monitor.status = "assigned";
+    monitor.status.value = "asignado";
+    monitor.status.label = "asignado";
 
     await monitor.save();
 
@@ -617,7 +625,8 @@ const unassingMonitor = async (req, res) => {
 
     monitor.person.id = null;
     monitor.person.name = "unassigned";
-    monitor.status = "available";
+    monitor.status.label = "asignado";
+    monitor.status.value = "asignado";
 
     await monitor.save();
 
