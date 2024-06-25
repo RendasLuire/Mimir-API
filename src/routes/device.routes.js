@@ -8,7 +8,7 @@ router.get("/", token.auth, deviceController.showAll);
 
 router.post("/", token.auth, deviceController.register);
 
-router.get("/:id", token.auth, deviceController.showOne);
+router.get("/showOne/:id", token.auth, deviceController.showOne);
 
 router.patch("/:id", token.auth, deviceController.updatePatch);
 
@@ -24,6 +24,6 @@ router.patch(
   deviceController.unassingMonitor
 );
 
-router.get("/monitors", token.auth, deviceController.ShowMonitors);
+router.get("/monitors/", token.auth, deviceController.ShowMonitors);
 
 export default router;

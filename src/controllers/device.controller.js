@@ -257,7 +257,7 @@ const updatePatch = async (req, res) => {
     device.details = req.body.details || device.details;
     device.status.value = req.body.status?.value || device.status?.value;
     device.status.label = req.body.status?.label || device.status?.label;
-    device.annexed.number = req.body.annexed?.number || device.annexed?.number;
+    device.annexed.number = req.body.annexed || device.annexed?.number;
     device.ubication = req.body.ubication || device.ubication;
     device.phisicRef = req.body.phisicRef || device.phisicRef;
     device.typeDevice = req.body.typeDevice || device.typeDevice;
