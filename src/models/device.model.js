@@ -135,7 +135,6 @@ const deviceSchema = new mongoose.Schema({
       content: {
         type: String,
         required: [true, "Content is required"],
-        set: (value) => value?.toLowerCase() ?? "",
       },
     },
   ],
@@ -224,9 +223,6 @@ deviceSchema.pre("save", function (next) {
     this.comments.forEach((comment) => {
       if (comment.nameUser) {
         comment.nameUser = comment.nameUser.toLowerCase();
-      }
-      if (comment.content) {
-        comment.content = comment.content.toLowerCase();
       }
     });
   }

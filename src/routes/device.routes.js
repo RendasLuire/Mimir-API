@@ -26,4 +26,8 @@ router.patch(
 
 router.get("/monitors/", token.auth, deviceController.ShowMonitors);
 
+router.get("/:id/comments", deviceController.listComments);
+router.post("/:id/comments", deviceController.addComment);
+router.delete("/:id/comments/:commentId", deviceController.deleteComment);
+
 export default router;

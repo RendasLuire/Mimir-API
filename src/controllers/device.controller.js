@@ -2,9 +2,10 @@ import Device from "../models/device.model.js";
 import registerMovement from "../helpers/movement.helper.js";
 import User from "../models/user.model.js";
 import Person from "../models/person.model.js";
+import moment from "moment/moment.js";
 
 const showAll = async (req, res) => {
-  const { typeDevice, page = 1, limit = 10, search } = req.query;
+  const { filter, typeDevice, page = 1, limit = 10, search } = req.query;
   const skip = (page - 1) * limit;
 
   try {
@@ -12,8 +13,17 @@ const showAll = async (req, res) => {
     let devicesCount;
     let query = {};
 
-    if (typeDevice) {
+    if (typeDevice && filter == "all") {
       query.typeDevice = typeDevice;
+    }
+
+    if (filter == "computo") {
+      query.$or = [
+        { typeDevice: "desktop" },
+        { typeDevice: "laptop" },
+        { typeDevice: "tablet" },
+        { typeDevice: "impresora" },
+      ];
     }
 
     if (search) {
@@ -219,7 +229,6 @@ const updatePatch = async (req, res) => {
     !req.body.custom &&
     !req.body.bussinesUnit &&
     !req.body.departament &&
-    !req.body.monitor &&
     !req.body.headphones &&
     !req.body.adaptVGA &&
     !req.body.mouse
@@ -267,7 +276,6 @@ const updatePatch = async (req, res) => {
     device.custom = req.body.custom;
     device.bussinesUnit = req.body.bussinesUnit || device.bussinesUnit;
     device.departament = req.body.departament || device.departament;
-    device.monitor = req.body.monitor;
     device.headphones = req.body.headphones;
     device.adaptVGA = req.body.adaptVGA;
     device.mouse = req.body.mouse;
@@ -642,9 +650,10 @@ const ShowMonitors = async (req, res) => {
   try {
     let devices;
     let devicesCount;
-    let query = {};
-    query.typeDevice = "monitor";
-    query.status.value = status;
+    let query = {
+      typeDevice: "monitor",
+      "status.value": status,
+    };
 
     if (search) {
       const searchRegex = new RegExp(search, "i");
@@ -693,6 +702,109 @@ const ShowMonitors = async (req, res) => {
   }
 };
 
+const listComments = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const device = await Device.findById(id).populate(
+      "comments.idUser",
+      "name"
+    );
+
+    if (!device) {
+      return res.status(404).json({
+        data: [],
+        message: "Dispositivo no encontrado.",
+      });
+    }
+
+    return res.status(200).json({
+      data: device.comments,
+      message: "Lista de comentarios.",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      data: {},
+      message: error.message,
+    });
+  }
+};
+
+const addComment = async (req, res) => {
+  const { id } = req.params;
+  const { user, nameUser, content } = req.body;
+
+  try {
+    const device = await Device.findById(id);
+
+    if (!device) {
+      return res.status(404).json({
+        data: {},
+        message: "Dispositivo no encontrado.",
+      });
+    }
+
+    const newComment = {
+      user,
+      nameUser,
+      dateCreation: moment(),
+      content,
+    };
+
+    device.comments.push(newComment);
+    await device.save();
+
+    return res.status(201).json({
+      data: newComment,
+      message: "Comentario añadido exitosamente.",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      data: {},
+      message: error.message,
+    });
+  }
+};
+
+const deleteComment = async (req, res) => {
+  const { id, commentId } = req.params;
+
+  try {
+    const device = await Device.findById(id);
+
+    if (!device) {
+      return res.status(404).json({
+        data: {},
+        message: "Dispositivo no encontrado.",
+      });
+    }
+
+    const commentIndex = device.comments.findIndex(
+      (comment) => comment._id.toString() === commentId
+    );
+
+    if (commentIndex === -1) {
+      return res.status(404).json({
+        data: {},
+        message: "Comentario no encontrado.",
+      });
+    }
+
+    device.comments.splice(commentIndex, 1);
+    await device.save();
+
+    return res.status(200).json({
+      data: {},
+      message: "Comentario eliminado exitosamente.",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      data: {},
+      message: error.message,
+    });
+  }
+};
+
 export default {
   showAll,
   register,
@@ -703,4 +815,7 @@ export default {
   assingMonitor,
   unassingMonitor,
   ShowMonitors,
+  listComments,
+  addComment,
+  deleteComment,
 };
