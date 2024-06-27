@@ -53,16 +53,16 @@ const showAll = async (req, res) => {
 };
 
 const register = async (req, res) => {
-  const { number, startDate, endDate, bill, userTI } = req.body;
+  const { number, startDate, endDate, bill, user } = req.body;
 
-  if (!number || !userTI || !bill) {
+  if (!number || !user || !bill) {
     return res.status(400).json({
       data: {},
       message: "Los campos son obligatorios.",
     });
   }
 
-  if (!userTI.match(/^[0-9a-fA-F]{24}$/)) {
+  if (!user.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
       data: {},
       message: "El ID del usuario no es valido.",
@@ -77,7 +77,7 @@ const register = async (req, res) => {
   });
 
   try {
-    const userData = await User.findById(userTI);
+    const userData = await User.findById(user);
 
     if (!userData) {
       return res.status(404).json({
@@ -95,7 +95,7 @@ const register = async (req, res) => {
     }
 
     await registerMovement(
-      userTI,
+      user,
       "Annexo",
       newAnnexed.number,
       newAnnexed._id,
@@ -219,12 +219,12 @@ const showDevicesGrp = async (req, res) => {
 const masiveRegister = async (req, res) => {
   let devicesCreated = [];
   let devicesUpdated = [];
-  const { userTI, brand, model, description, typeDevice, serialNumber } =
+  const { user, brand, model, description, typeDevice, serialNumber } =
     req.body;
   const { id } = req.params;
 
   if (
-    !userTI ||
+    !user ||
     !brand ||
     !model ||
     !description ||
@@ -238,7 +238,7 @@ const masiveRegister = async (req, res) => {
     });
   }
 
-  if (!userTI.match(/^[0-9a-fA-F]{24}$/) || !id.match(/^[0-9a-fA-F]{24}$/)) {
+  if (!user.match(/^[0-9a-fA-F]{24}$/) || !id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
       data: {},
       message: "El ID del anexo o el usuario no es valido no es valido.",
@@ -246,8 +246,8 @@ const masiveRegister = async (req, res) => {
   }
 
   try {
-    const userTIData = await User.findById(userTI);
-    if (!userTIData) {
+    const userData = await User.findById(user);
+    if (!userData) {
       return res.status(400).json({
         data: {},
         message: "El usuario de TI no existe.",
@@ -298,7 +298,7 @@ const masiveRegister = async (req, res) => {
         }
 
         await registerMovement(
-          userTIData._id,
+          userData._id,
           savedDevice.typeDevice,
           savedDevice.serialNumber,
           savedDevice._id,
@@ -329,7 +329,7 @@ const masiveRegister = async (req, res) => {
         }
 
         await registerMovement(
-          userTI,
+          userData,
           savedDevice.typeDevice,
           savedDevice.serialNumber,
           savedDevice._id,
@@ -362,7 +362,7 @@ const masiveRegister = async (req, res) => {
     }
 
     await registerMovement(
-      userTI,
+      userData,
       "Anexo",
       annexedUpdated.annexedNumber,
       annexedUpdated._id,
