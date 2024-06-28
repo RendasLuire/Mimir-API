@@ -13,13 +13,11 @@ const personSchema = new mongoose.Schema({
     name: {
       type: String,
       required: [true, "Department name is required"],
-      set: (value) => value?.toLowerCase() ?? "",
     },
   },
   position: {
     type: String,
     required: [true, "Position is required"],
-    set: (value) => value?.toLowerCase() ?? "",
   },
   manager: {
     id: {
@@ -36,12 +34,6 @@ const personSchema = new mongoose.Schema({
 personSchema.pre("save", function (next) {
   if (this.name) {
     this.name = this.name.toLowerCase();
-  }
-  if (this.department.name) {
-    this.department.name = this.department.name.toLowerCase();
-  }
-  if (this.position) {
-    this.position = this.position.toLowerCase();
   }
   if (this.manager.name) {
     this.manager.name = this.manager.name.toLowerCase();

@@ -233,7 +233,7 @@ const updatePatch = async (req, res) => {
     !req.body.adaptVGA &&
     !req.body.mouse
   ) {
-    res.status(400).json({
+    return res.status(400).json({
       data: {},
       message: "Al menos alguno de estos campos debe ser enviado.",
     });
@@ -632,14 +632,14 @@ const unassingMonitor = async (req, res) => {
     }
 
     monitor.person.id = null;
-    monitor.person.name = "unassigned";
-    monitor.status.label = "asignado";
-    monitor.status.value = "asignado";
+    monitor.person.name = "disponible";
+    monitor.status.label = "disponible";
+    monitor.status.value = "disponible";
 
     await monitor.save();
 
     device.monitor.id = null;
-    device.monitor.serialNumber = "unassigned";
+    device.monitor.serialNumber = "disponible";
   } catch (error) {}
 };
 

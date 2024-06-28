@@ -7,12 +7,10 @@ const deviceSchema = new mongoose.Schema({
   brand: {
     type: String,
     required: [true, "Brand is required"],
-    set: (value) => value?.toLowerCase() ?? "",
   },
   model: {
     type: String,
     required: [true, "Model is required"],
-    set: (value) => value?.toLowerCase() ?? "",
   },
   serialNumber: {
     type: String,
@@ -27,7 +25,6 @@ const deviceSchema = new mongoose.Schema({
   details: {
     type: String,
     default: "",
-    set: (value) => value?.toLowerCase() ?? "",
   },
   status: {
     value: {
@@ -68,12 +65,11 @@ const deviceSchema = new mongoose.Schema({
   ip: {
     type: String,
     default: "",
-    set: (value) => value?.toLowerCase() ?? "",
   },
   mac: {
     type: String,
     default: "",
-    set: (value) => value?.toLowerCase() ?? "",
+    set: (value) => value?.toUpperCase() ?? "",
   },
   person: {
     id: {
@@ -93,7 +89,6 @@ const deviceSchema = new mongoose.Schema({
   bussinesUnit: {
     type: String,
     default: "disponible",
-    set: (value) => value?.toLowerCase() ?? "disponible",
   },
   departament: {
     id: {
@@ -103,7 +98,6 @@ const deviceSchema = new mongoose.Schema({
     name: {
       type: String,
       default: "disponible",
-      set: (value) => value?.toLowerCase() ?? "disponible",
     },
   },
   monitor: {
@@ -173,20 +167,11 @@ const deviceSchema = new mongoose.Schema({
 });
 
 deviceSchema.pre("save", function (next) {
-  if (this.brand) {
-    this.brand = this.brand.toLowerCase();
-  }
-  if (this.model) {
-    this.model = this.model.toLowerCase();
-  }
   if (this.serialNumber) {
     this.serialNumber = this.serialNumber.toLowerCase();
   }
   if (this.hostname) {
     this.hostname = this.hostname.toLowerCase();
-  }
-  if (this.details !== undefined) {
-    this.details = this.details.toLowerCase();
   }
   if (this.status.value) {
     this.status = this.status.value.toLowerCase();
@@ -200,20 +185,11 @@ deviceSchema.pre("save", function (next) {
   if (this.typeDevice) {
     this.typeDevice = this.typeDevice.toLowerCase();
   }
-  if (this.ip) {
-    this.ip = this.ip.toLowerCase();
-  }
   if (this.mac) {
     this.mac = this.mac.toLowerCase();
   }
   if (this.person.name) {
     this.person.name = this.person.name.toLowerCase();
-  }
-  if (this.bussinesUnit) {
-    this.bussinesUnit = this.bussinesUnit.toLowerCase();
-  }
-  if (this.departament.name) {
-    this.departament.name = this.departament.name.toLowerCase();
   }
   if (this.monitor.serialNumber) {
     this.monitor.serialNumber = this.monitor.serialNumber.toLowerCase();
