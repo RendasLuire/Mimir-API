@@ -650,10 +650,18 @@ const ShowMonitors = async (req, res) => {
   try {
     let devices;
     let devicesCount;
-    let query = {
-      typeDevice: "monitor",
-      "status.value": status,
-    };
+    let query;
+
+    if (!status) {
+      query = {
+        typeDevice: "monitor",
+      };
+    } else {
+      query = {
+        typeDevice: "monitor",
+        "status.value": status,
+      };
+    }
 
     if (search) {
       const searchRegex = new RegExp(search, "i");

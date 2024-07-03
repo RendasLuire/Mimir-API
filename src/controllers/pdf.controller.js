@@ -50,20 +50,20 @@ const generateResponsiveCSM = async (req, res) => {
     const responsive = {
       ...initialResponsive,
       pc: {
-        brand: capitalizeFirstLetterOfEachWord(device.brand),
-        model: capitalizeFirstLetterOfEachWord(device.model),
+        brand: device.brand,
+        model: device.model,
         serialNumber: device.serialNumber.toUpperCase(),
       },
-      phisicRef: capitalizeFirstLetterOfEachWord(device.phisicRef),
+      phisicRef: device.phisicRef,
       annexed: device.annexed.number,
       custom: device.custom,
       person: {
         name: capitalizeFirstLetterOfEachWord(person.name),
-        department: capitalizeFirstLetterOfEachWord(person.department.name),
+        department: person.department.name,
       },
       boss: {
         name: capitalizeFirstLetterOfEachWord(boss.name) || "",
-        position: capitalizeFirstLetterOfEachWord(boss.position) || "",
+        position: boss.position || "",
       },
       monitor:
         device.monitor.serialNumber !== "disponible"
@@ -109,18 +109,18 @@ const validateResponsive = (responsive) => {
 const getMonitorDetails = async (monitorId) => {
   const monitor = await Device.findById(monitorId);
   return {
-    brand: capitalizeFirstLetterOfEachWord(monitor.brand) || "N/A",
-    model: capitalizeFirstLetterOfEachWord(monitor.model) || "N/A",
+    brand: monitor.brand || "N/A",
+    model: monitor.model || "N/A",
     serialNumber: monitor.serialNumber.toUpperCase() || "N/A",
   };
 };
 
 const generatePdf = async (responsive, typeDevice, unidBuss) => {
-  if (typeDevice === "printer" && unidBuss === "Maver CSM") {
+  if (typeDevice === "impresora" && unidBuss === "Maver CSM") {
     return await responsiveService.responsivePrinterCSM({ responsive });
   } else if (unidBuss === "Maver CSM") {
     return await responsiveService.responsiveCSM({ responsive });
-  } else if (typeDevice === "printer" && unidBuss === "Maver") {
+  } else if (typeDevice === "impresora" && unidBuss === "Maver") {
     return await responsiveService.responsivePrinterAlamo({ responsive });
   } else if (unidBuss === "Maver") {
     return await responsiveService.responsiveAlamo({ responsive });
