@@ -13,17 +13,14 @@ const showAll = async (req, res) => {
     let devicesCount;
     let query = {};
 
-    if (typeDevice && filter == "all") {
+    if (typeDevice && filter === "all") {
       query.typeDevice = typeDevice;
     }
 
-    if (filter == "computo") {
-      query.$or = [
-        { typeDevice: "desktop" },
-        { typeDevice: "laptop" },
-        { typeDevice: "tablet" },
-        { typeDevice: "impresora" },
-      ];
+    if (filter === "computo") {
+      query.typeDevice = {
+        $in: ["desktop", "laptop", "tablet", "impresora"],
+      };
     }
 
     if (search) {
@@ -38,12 +35,12 @@ const showAll = async (req, res) => {
         { "status.label": searchRegex },
         { "annexed.number": searchRegex },
         { phisicRef: searchRegex },
-        { typeDevice: searchRegex },
         { ip: searchRegex },
         { mac: searchRegex },
         { "person.name": searchRegex },
         { "departament.name": searchRegex },
         { "monitor.serialNumber": searchRegex },
+        { "comments.content": searchRegex },
       ];
     }
     devices = await Device.find(query).skip(skip).limit(Number(limit));

@@ -386,9 +386,11 @@ const masiveRegister = async (req, res) => {
 
 const updatePatch = async (req, res) => {
   const { id } = req.params;
-  const { number, startDate, endDate, bill, userTI } = req.body;
+  const { number, startDate, endDate, bill, user } = req.body;
 
-  if (!id || !userTI) {
+  console.log("hola");
+
+  if (!id || !user) {
     return res.status(400).json({
       data: {},
       message: "Es necesario el ID.",
@@ -410,7 +412,7 @@ const updatePatch = async (req, res) => {
   }
 
   try {
-    const user = await User.findById(userTI);
+    const user = await User.findById(user);
     if (!user) {
       return res.status(409).json({
         data: {},
@@ -466,7 +468,7 @@ const updatePatch = async (req, res) => {
     }
 
     await registerMovement(
-      userTI,
+      user,
       "Anexo",
       updatedAnnexed.number,
       updatedAnnexed._id,
@@ -475,14 +477,15 @@ const updatePatch = async (req, res) => {
       updatedAnnexed
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       data: updatedAnnexed,
       message: "Anexo actualizado.",
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       data: {},
-      message: error,
+      message: "error:",
+      error,
     });
   }
 };
