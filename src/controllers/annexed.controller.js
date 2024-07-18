@@ -388,7 +388,7 @@ const updatePatch = async (req, res) => {
   const { id } = req.params;
   const { number, startDate, endDate, bill, user } = req.body;
 
-  console.log("hola");
+  console.log("1");
 
   if (!id || !user) {
     return res.status(400).json({
@@ -397,12 +397,16 @@ const updatePatch = async (req, res) => {
     });
   }
 
+  console.log("2");
+
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
       data: {},
       message: "El ID del dispositivo no es valido.",
     });
   }
+
+  console.log("3");
 
   if (!number && !startDate && !endDate && !bill) {
     return res.status(400).json({
@@ -411,14 +415,19 @@ const updatePatch = async (req, res) => {
     });
   }
 
+  console.log("4");
+
   try {
-    const user = await User.findById(user);
-    if (!user) {
+    const userData = await User.findById(user);
+
+    if (!userData) {
       return res.status(409).json({
         data: {},
         message: `Este usuario no existe.`,
       });
     }
+
+    console.log("5");
 
     let annexed = await Annexed.findById(id);
     if (!annexed) {
@@ -427,6 +436,8 @@ const updatePatch = async (req, res) => {
         message: "El anexo no fue encontrado",
       });
     }
+
+    console.log("6");
 
     const annexedOld = annexed;
 
@@ -445,6 +456,8 @@ const updatePatch = async (req, res) => {
                 `No se pudo actualizar el dispositivo con ID ${device._id}`
               );
             }
+
+            console.log("7");
           } catch (error) {
             console.error(
               `Error al actualizar el dispositivo con ID ${device._id}: ${error}`
@@ -458,7 +471,11 @@ const updatePatch = async (req, res) => {
     annexed.endDate = endDate || annexed.endDate;
     annexed.bill = bill || annexed.bill;
 
+    console.log("8");
+
     const updatedAnnexed = await annexed.save();
+
+    console.log("9");
 
     if (!updatedAnnexed) {
       return res.status(400).json({
@@ -467,8 +484,10 @@ const updatePatch = async (req, res) => {
       });
     }
 
+    console.log("10");
+
     await registerMovement(
-      user,
+      userData,
       "Anexo",
       updatedAnnexed.number,
       updatedAnnexed._id,
@@ -476,6 +495,8 @@ const updatePatch = async (req, res) => {
       annexedOld,
       updatedAnnexed
     );
+
+    console.log("11");
 
     return res.status(200).json({
       data: updatedAnnexed,
