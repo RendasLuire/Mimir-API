@@ -19,7 +19,7 @@ const showAll = async (req, res) => {
 
     if (filter === "computo") {
       query.typeDevice = {
-        $in: ["desktop", "laptop", "tablet", "impresora"],
+        $in: ["desktop", "laptop", "tablet"],
       };
     }
 
@@ -707,6 +707,73 @@ const ShowMonitors = async (req, res) => {
   }
 };
 
+const ShowPrinters = async (req, res) => {
+  const { status, page = 1, limit = 10, search } = req.query;
+  const skip = (page - 1) * limit;
+
+  try {
+    let printers;
+    let printersCount;
+    let query;
+
+    if (!status) {
+      query = {
+        typeDevice: "impresora",
+      };
+    } else {
+      query = {
+        typeDevice: "impresora",
+        "status.value": status,
+      };
+    }
+
+    if (search) {
+      const searchRegex = new RegExp(search, "i");
+      query.$or = [
+        { brand: searchRegex },
+        { model: searchRegex },
+        { serialNumber: searchRegex },
+        { hostname: searchRegex },
+        { details: searchRegex },
+        { "annexed.number": searchRegex },
+        { phisicRef: searchRegex },
+        { ip: searchRegex },
+        { mac: searchRegex },
+        { "person.name": searchRegex },
+        { "departament.name": searchRegex },
+        { "monitor.serialNumber": searchRegex },
+      ];
+    }
+
+    printers = await Device.find(query).skip(skip).limit(Number(limit));
+    printersCount = await Device.countDocuments(query);
+
+    if (printers.length === 0) {
+      return res.status(204).json({
+        data: [],
+        message: "No hay impresoras para mostrar.",
+      });
+    }
+
+    const totalPages = Math.ceil(printersCount / limit);
+
+    return res.status(200).json({
+      data: printers,
+      pagination: {
+        totalItems: printersCount,
+        totalPages,
+        currentPage: Number(page),
+      },
+      message: "Lista de impresoras registradas.",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      data: {},
+      message: error.message,
+    });
+  }
+};
+
 const listComments = async (req, res) => {
   const { id } = req.params;
 
@@ -820,6 +887,7 @@ export default {
   assingMonitor,
   unassingMonitor,
   ShowMonitors,
+  ShowPrinters,
   listComments,
   addComment,
   deleteComment,

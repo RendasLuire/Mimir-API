@@ -16,9 +16,11 @@ const deviceSchema = new mongoose.Schema({
     type: String,
     required: [true, "Serial number is required"],
     set: (value) => value?.toLowerCase() ?? "",
+    unique: true,
   },
   hostname: {
     type: String,
+    unique: true,
     required: [true, "Hostname is required"],
     set: (value) => value?.toLowerCase() ?? "",
   },

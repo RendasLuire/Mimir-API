@@ -25,6 +25,7 @@ router.patch(
 );
 
 router.get("/monitors/", token.auth, deviceController.ShowMonitors);
+router.get("/printers/", token.auth, deviceController.ShowPrinters);
 
 router.get("/:id/comments", deviceController.listComments);
 router.post("/:id/comments", deviceController.addComment);
