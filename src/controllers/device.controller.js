@@ -169,7 +169,12 @@ const showOne = async (req, res) => {
   }
 
   try {
-    device = await Device.findById(id);
+    device = await Device.findById(id)
+      .populate("annexed.id")
+      .populate("ubication")
+      .populate("person.id")
+      .populate("departament.id")
+      .populate("monitor.id");
     if (!device) {
       return res.status(404).json({
         data: {},
