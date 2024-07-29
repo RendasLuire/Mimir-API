@@ -173,10 +173,8 @@ const showAllDevicesAssigment = async (req, res) => {
 
   try {
     const devices = await Device.find({
-      "user.id": id,
+      "person.id": id,
     });
-
-    console.log(devices);
 
     if (devices.length === 0) {
       return res.status(204).json({
