@@ -156,6 +156,8 @@ const showOne = async (req, res) => {
 
 const showAllDevicesAssigment = async (req, res) => {
   const { id } = req.params;
+  const { page = 1, limit = 10, search } = req.query;
+  const skip = (page - 1) * limit;
 
   if (!id) {
     return res.status(400).json({
@@ -174,7 +176,11 @@ const showAllDevicesAssigment = async (req, res) => {
   try {
     const devices = await Device.find({
       "person.id": id,
-    });
+    })
+      .skip(skip)
+      .limit(Number(limit));
+
+    const devicesCount = await Device.countDocuments({ "person.id": id });
 
     if (devices.length === 0) {
       return res.status(204).json({
@@ -183,8 +189,15 @@ const showAllDevicesAssigment = async (req, res) => {
       });
     }
 
+    const totalPages = Math.ceil(devicesCount / limit);
+
     return res.status(200).json({
       data: devices,
+      pagination: {
+        totalItems: devicesCount,
+        totalPages,
+        currentPage: Number(page),
+      },
       message: "Lista de equipos asignados.",
     });
   } catch (error) {
@@ -246,7 +259,7 @@ const updatePatch = async (req, res) => {
 
     person.name = req.body.name || person.name;
     person.position = req.body.position || person.position;
-    person.department = req.body.department || person.department;
+    person.department.name = req.body.department || person.department;
     person.manager = req.body.manager || person.manager;
 
     const updatedPerson = await person.save();

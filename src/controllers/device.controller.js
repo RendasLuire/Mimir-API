@@ -633,16 +633,32 @@ const unassingMonitor = async (req, res) => {
       });
     }
 
-    monitor.person.id = null;
-    monitor.person.name = "disponible";
+    monitor.person = {
+      name: "disponible",
+    };
     monitor.status.label = "disponible";
     monitor.status.value = "disponible";
 
     await monitor.save();
 
-    device.monitor.id = null;
-    device.monitor.serialNumber = "disponible";
-  } catch (error) {}
+    device.monitor = {
+      serialNumber: "disponible",
+    };
+
+    await device.save();
+
+    return res.status(200).json({
+      data: device,
+      message: "Listo",
+    });
+  } catch (error) {
+    console.log("error: ", error);
+    return res.status(500).json({
+      data: {},
+      message: "Existe un error: ",
+      error,
+    });
+  }
 };
 
 const ShowMonitors = async (req, res) => {
