@@ -16,6 +16,8 @@ router.get(
   personController.showAllDevicesAssigment
 );
 
+router.patch("/changeDevice", token.auth, personController.changeDevice);
+
 router.patch("/:id", token.auth, personController.updatePatch);
 
 router.patch("/assing/:id", token.auth, personController.assing);

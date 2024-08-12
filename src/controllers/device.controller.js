@@ -4,6 +4,8 @@ import User from "../models/user.model.js";
 import Person from "../models/person.model.js";
 import moment from "moment/moment.js";
 
+moment.locale("es-mx");
+
 const showAll = async (req, res) => {
   const { filter, typeDevice, page = 1, limit = 10, search } = req.query;
   const skip = (page - 1) * limit;
@@ -173,7 +175,6 @@ const showOne = async (req, res) => {
       .populate("annexed.id")
       .populate("ubication")
       .populate("person.id")
-      .populate("departament.id")
       .populate("monitor.id");
     if (!device) {
       return res.status(404).json({
@@ -281,6 +282,7 @@ const updatePatch = async (req, res) => {
     device.headphones = req.body.headphones;
     device.adaptVGA = req.body.adaptVGA;
     device.mouse = req.body.mouse;
+    device.lastChange = moment();
 
     const updatedDevice = await device.save();
 
@@ -366,6 +368,7 @@ const assing = async (req, res) => {
     device.departament.name = userData.department.name;
     device.status.value = "asignado";
     device.status.label = "asignado";
+    device.lastChange = moment();
 
     if (device.monitor.serialNumber !== "disponible") {
       const monitor = await Device.findById(device.monitor.id);
@@ -373,6 +376,7 @@ const assing = async (req, res) => {
       monitor.person.name = userData.name;
       monitor.status.value = "asignado";
       monitor.status.label = "asignado";
+      monitor.lastChange = moment();
 
       const updatedMonitor = await monitor.save();
       if (!updatedMonitor) {
@@ -468,6 +472,7 @@ const unassing = async (req, res) => {
     device.departament.name = "disponible";
     device.status.label = "disponible";
     device.status.value = "disponible";
+    device.lastChange = moment();
 
     if (device.monitor.id !== "disponible") {
       const monitor = await Device.findById(device.monitor.id);
@@ -475,6 +480,7 @@ const unassing = async (req, res) => {
       monitor.user.name = "disponible";
       monitor.status.value = "disponible";
       monitor.status.label = "disponible";
+      monitor.lastChange = moment();
 
       const updatedMonitor = await monitor.save();
       if (!updatedMonitor) {
@@ -580,6 +586,7 @@ const assingMonitor = async (req, res) => {
 
     device.monitor.id = monitor._id;
     device.monitor.serialNumber = monitor.serialNumber;
+    device.lastChange = moment();
 
     await device.save();
 
@@ -587,6 +594,7 @@ const assingMonitor = async (req, res) => {
     monitor.person.name = device.person.name;
     monitor.status.value = "asignado";
     monitor.status.label = "asignado";
+    monitor.lastChange = moment();
 
     await monitor.save();
 
@@ -638,12 +646,14 @@ const unassingMonitor = async (req, res) => {
     };
     monitor.status.label = "disponible";
     monitor.status.value = "disponible";
+    monitor.lastChange = moment();
 
     await monitor.save();
 
     device.monitor = {
       serialNumber: "disponible",
     };
+    device.lastChange = moment();
 
     await device.save();
 

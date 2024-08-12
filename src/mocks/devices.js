@@ -274,7 +274,6 @@ const devices = [
     custom: true,
     bussinesUnit: "Entretenimiento",
     departament: {
-      id: "6642747f51eaa8d1245c52fb",
       name: "Gaming",
     },
     monitor: {

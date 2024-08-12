@@ -21,8 +21,6 @@ const generateResponsiveCSM = async (req, res) => {
     phisicRef: "",
     annexed: "",
     custom: false,
-    date: moment().format("L"),
-    date2: `Tlaquepaque, Jalisco a ${moment().format("LL")}`,
   };
 
   const { id } = req.params;
@@ -69,6 +67,9 @@ const generateResponsiveCSM = async (req, res) => {
         device.monitor.serialNumber !== "disponible"
           ? await getMonitorDetails(device.monitor.id)
           : initialResponsive.monitor,
+
+      date: moment(device.lastChange).format("L"),
+      date2: `Tlaquepaque, Jalisco a ${moment(device.lastChange).format("LL")}`,
     };
 
     const isValid = validateResponsive(responsive);

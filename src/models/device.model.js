@@ -92,6 +92,10 @@ const deviceSchema = new mongoose.Schema({
     type: String,
     default: "disponible",
   },
+  lastChange: {
+    type: Date,
+    default: moment(),
+  },
   departament: {
     id: {
       type: mongoose.Schema.Types.ObjectId,

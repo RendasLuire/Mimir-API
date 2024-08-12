@@ -208,6 +208,72 @@ const showAllDevicesAssigment = async (req, res) => {
   }
 };
 
+const changeDevice = async (req, res) => {
+  const { idOldDevice, idNewDevice, idPerson } = req.body;
+  let person;
+  let oldDevice;
+  let newDevice;
+
+  if (!idPerson || !idOldDevice || !idNewDevice) {
+    return res.status(404).json({
+      data: {},
+      message: "El ID del equipo proporcionado es requerido.",
+    });
+  }
+
+  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(404).json({
+      data: {},
+      message: "El ID del equipo no es valido.",
+    });
+  }
+
+  try {
+    oldDevice = await Device.findById(idOldDevice);
+    newDevice = await Device.findById(idNewDevice);
+    person = await Person.findById(idPerson);
+
+    if (!oldDevice || !newDevice || person) {
+      return res.status(400).json({
+        data: {},
+        message: "No se encontro la informacion solicitada.",
+      });
+    }
+
+    oldDevice.status = {
+      value: "retirado",
+      label: "retirado",
+    };
+
+    newDevice.person = {
+      id: person._id,
+      name: person.name,
+    };
+
+    newDevice.status = {
+      value: "asignado",
+      label: "asignado",
+    };
+
+    oldDevice.save();
+    newDevice.save();
+
+    return res.status(200).json({
+      data: {
+        oldDevice,
+        newDevice,
+        person,
+      },
+      message: "Se a realizado el cambio de equipo.",
+    });
+  } catch (error) {
+    return res.status(400).json({
+      data: {},
+      message: error.message,
+    });
+  }
+};
+
 const updatePatch = async (req, res) => {
   let person;
   const { id } = req.params;
@@ -465,6 +531,7 @@ export default {
   register,
   showOne,
   showAllDevicesAssigment,
+  changeDevice,
   updatePatch,
   assing,
   unassing,
