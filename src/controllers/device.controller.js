@@ -7,7 +7,14 @@ import moment from "moment/moment.js";
 moment.locale("es-mx");
 
 const showAll = async (req, res) => {
-  const { filter, typeDevice, page = 1, limit = 10, search } = req.query;
+  const {
+    filter,
+    typeDevice,
+    page = 1,
+    limit = 10,
+    search,
+    status,
+  } = req.query;
   const skip = (page - 1) * limit;
 
   try {
@@ -22,6 +29,18 @@ const showAll = async (req, res) => {
     if (filter === "computo") {
       query.typeDevice = {
         $in: ["desktop", "laptop", "tablet"],
+      };
+    }
+
+    if (filter === "dispositivos") {
+      query.typeDevice = {
+        $in: ["desktop", "laptop", "tablet", "impresora"],
+      };
+    }
+
+    if (status) {
+      query.status = {
+        value: status,
       };
     }
 
