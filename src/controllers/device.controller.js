@@ -39,9 +39,7 @@ const showAll = async (req, res) => {
     }
 
     if (status) {
-      query.status = {
-        value: status,
-      };
+      query["status.value"] = status;
     }
 
     if (search) {
