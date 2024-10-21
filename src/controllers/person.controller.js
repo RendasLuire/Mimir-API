@@ -221,7 +221,11 @@ const changeDevice = async (req, res) => {
     });
   }
 
-  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+  if (
+    !idOldDevice.match(/^[0-9a-fA-F]{24}$/) ||
+    !idPerson.match(/^[0-9a-fA-F]{24}$/) ||
+    !idNewDevice.match(/^[0-9a-fA-F]{24}$/)
+  ) {
     return res.status(404).json({
       data: {},
       message: "El ID del equipo no es valido.",
@@ -233,7 +237,7 @@ const changeDevice = async (req, res) => {
     newDevice = await Device.findById(idNewDevice);
     person = await Person.findById(idPerson);
 
-    if (!oldDevice || !newDevice || person) {
+    if (!oldDevice || !newDevice || !person) {
       return res.status(400).json({
         data: {},
         message: "No se encontro la informacion solicitada.",
