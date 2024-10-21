@@ -1,18 +1,22 @@
 import mongoose from "mongoose";
 
 const storageSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    require: true,
-  },
-  bussinessUnit: {
-    type: String,
-    require: true,
-  },
-  department: {
-    type: String,
-    require: true,
-  },
+  complex: [
+    {
+      building: [
+        {
+          ubication: {
+            type: String,
+            required: [true, "ubication is required."],
+          },
+          level: {
+            type: String,
+            default: "PB",
+          },
+        },
+      ],
+    },
+  ],
 });
 
 export default mongoose.model("Storage", storageSchema);
