@@ -35,7 +35,7 @@ const addComplex = async (req, res) => {
 
     return res.status(201).json({
       data: newComplex,
-      message: "Complex added successfully.",
+      message: "Complejo agregado correctamente.",
     });
   } catch (error) {
     return res.status(500).json({
@@ -52,13 +52,13 @@ const deleteComplex = async (req, res) => {
     if (!complex) {
       return res.status(404).json({
         data: {},
-        message: "Complex not found.",
+        message: "Complejo no encontrado.",
       });
     }
 
     return res.status(200).json({
       data: complex,
-      message: "Complex deleted successfully.",
+      message: "Complejo eliminado correctamente.",
     });
   } catch (error) {
     return res.status(500).json({
@@ -76,7 +76,7 @@ const addBuilding = async (req, res) => {
     if (!storage) {
       return res.status(404).json({
         data: {},
-        message: "Complex not found.",
+        message: "Complejo no encontrado.",
       });
     }
 
@@ -85,7 +85,7 @@ const addBuilding = async (req, res) => {
 
     return res.status(201).json({
       data: storage,
-      message: "Building added successfully.",
+      message: "Edificio agregado correctamente.",
     });
   } catch (error) {
     return res.status(500).json({
@@ -213,26 +213,6 @@ const showOne = async (req, res) => {
   }
 };
 
-const showOneAsString = async (req, res) => {
-  const { complexId } = req.params;
-  try {
-    const storage = await Storage.findById(complexId);
-    if (!storage) {
-      return res.status(404).json({
-        data: {},
-        message: "Complejo no encontrado.",
-      });
-    }
-
-    return res.status(200).send(storage.toString());
-  } catch (error) {
-    return res.status(500).json({
-      data: {},
-      message: error.message,
-    });
-  }
-};
-
 export default {
   showAll,
   addComplex,
@@ -242,5 +222,4 @@ export default {
   addUbication,
   deleteUbication,
   showOne,
-  showOneAsString,
 };
