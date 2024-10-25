@@ -43,7 +43,7 @@ app.use("/api/annexeds", annexedRoutes);
 app.use("/api/device", deviceRoutes);
 app.use("/api/movements", movementRoutes);
 app.use("/api/persons", personRoutes);
-app.use("/storages", storageRoutes);
+app.use("/api/storages", storageRoutes);
 app.use("/api/reports", pdfRoutes);
 app.use("/api/settings", settingRoutes);
 

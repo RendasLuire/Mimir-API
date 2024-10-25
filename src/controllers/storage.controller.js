@@ -1,12 +1,11 @@
 import Storage from "../models/storage.model.js";
-import moment from "moment.js";
+import moment from "moment";
 
 moment.locale("es-mx");
 
 const showAll = async (req, res) => {
-  let locations;
   try {
-    locations = await Storage.find();
+    const locations = await Storage.find();
 
     if (locations.length === 0) {
       return res.status(204).json({
@@ -39,7 +38,7 @@ const addComplex = async (req, res) => {
     });
   } catch (error) {
     return res.status(500).json({
-      data: {},
+      data: req.body,
       message: error.message,
     });
   }
@@ -70,7 +69,7 @@ const deleteComplex = async (req, res) => {
 
 const addBuilding = async (req, res) => {
   const { complexId } = req.params;
-  const { building } = req.body;
+  const { buildingName } = req.body;
   try {
     const storage = await Storage.findById(complexId);
     if (!storage) {
@@ -80,7 +79,7 @@ const addBuilding = async (req, res) => {
       });
     }
 
-    storage.complex.push({ building });
+    storage.buildings.push({ name: buildingName });
     await storage.save();
 
     return res.status(201).json({
@@ -102,16 +101,24 @@ const deleteBuilding = async (req, res) => {
     if (!storage) {
       return res.status(404).json({
         data: {},
-        message: "Complex not found.",
+        message: "Complejo no encontrado.",
       });
     }
 
-    storage.complex.id(buildingId).remove();
+    const building = storage.buildings.id(buildingId);
+    if (!building) {
+      return res.status(404).json({
+        data: {},
+        message: "Edificio no encontrado.",
+      });
+    }
+
+    building.remove();
     await storage.save();
 
     return res.status(200).json({
       data: storage,
-      message: "Building deleted successfully.",
+      message: "Edificio eliminado correctamente.",
     });
   } catch (error) {
     return res.status(500).json({
@@ -123,30 +130,30 @@ const deleteBuilding = async (req, res) => {
 
 const addUbication = async (req, res) => {
   const { complexId, buildingId } = req.params;
-  const { ubication, level } = req.body;
+  const { ubication, level, complete } = req.body;
   try {
     const storage = await Storage.findById(complexId);
     if (!storage) {
       return res.status(404).json({
         data: {},
-        message: "Complex not found.",
+        message: "Complejo no encontrado.",
       });
     }
 
-    const building = storage.complex.id(buildingId);
+    const building = storage.buildings.id(buildingId);
     if (!building) {
       return res.status(404).json({
         data: {},
-        message: "Building not found.",
+        message: "Edificio no encontrado.",
       });
     }
 
-    building.building.push({ ubication, level });
+    building.ubications.push({ ubication, level, complete });
     await storage.save();
 
     return res.status(201).json({
       data: storage,
-      message: "Ubication added successfully.",
+      message: "Ubicación agregada correctamente.",
     });
   } catch (error) {
     return res.status(500).json({
@@ -163,24 +170,32 @@ const deleteUbication = async (req, res) => {
     if (!storage) {
       return res.status(404).json({
         data: {},
-        message: "Complex not found.",
+        message: "Complejo no encontrado.",
       });
     }
 
-    const building = storage.complex.id(buildingId);
+    const building = storage.buildings.id(buildingId);
     if (!building) {
       return res.status(404).json({
         data: {},
-        message: "Building not found.",
+        message: "Edificio no encontrado.",
       });
     }
 
-    building.building.id(ubicationId).remove();
+    const ubication = building.ubications.id(ubicationId);
+    if (!ubication) {
+      return res.status(404).json({
+        data: {},
+        message: "Ubicación no encontrada.",
+      });
+    }
+
+    ubication.remove();
     await storage.save();
 
     return res.status(200).json({
       data: storage,
-      message: "Ubication deleted successfully.",
+      message: "Ubicación eliminada correctamente.",
     });
   } catch (error) {
     return res.status(500).json({
@@ -197,13 +212,13 @@ const showOne = async (req, res) => {
     if (!storage) {
       return res.status(404).json({
         data: {},
-        message: "Complex not found.",
+        message: "Complejo no encontrado.",
       });
     }
 
     return res.status(200).json({
       data: storage,
-      message: "Complex details.",
+      message: "Detalles del complejo.",
     });
   } catch (error) {
     return res.status(500).json({
