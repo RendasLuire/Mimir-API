@@ -130,7 +130,9 @@ const deleteBuilding = async (req, res) => {
 
 const addUbication = async (req, res) => {
   const { complexId, buildingId } = req.params;
-  const { ubication, level, complete } = req.body;
+  const { ubication, level } = req.body;
+
+  let complete;
   try {
     const storage = await Storage.findById(complexId);
     if (!storage) {
@@ -148,6 +150,8 @@ const addUbication = async (req, res) => {
       });
     }
 
+    complete =
+      storage.name + " " + building.name + " - " + ubication + " " + level;
     building.ubications.push({ ubication, level, complete });
     await storage.save();
 
