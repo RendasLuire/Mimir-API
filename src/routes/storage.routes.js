@@ -20,4 +20,10 @@ router.post(
   storageController.addUbication
 );
 
+router.get("/:id", token.auth, storageController.showOne);
+
+router.post("/ubication/", token.auth, storageController.searchByComplete);
+
+router.post("/adddata/", token.auth, storageController.chargeData);
+
 export default router;

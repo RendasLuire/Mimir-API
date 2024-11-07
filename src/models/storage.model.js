@@ -4,7 +4,6 @@ const ubicationSchema = new mongoose.Schema({
   ubication: {
     type: String,
     required: [true, "Ubication is required."],
-    unique: [true, "This ubication already exists."],
   },
   level: {
     type: String,
@@ -13,7 +12,6 @@ const ubicationSchema = new mongoose.Schema({
   complete: {
     type: String,
     required: [true, "Sentence complete is required."],
-    unique: [true, "This complete sentence already exists."],
   },
 });
 
@@ -21,7 +19,6 @@ const buildingSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, "Building name is required."],
-    unique: [true, "This building already exists."],
   },
   ubications: [ubicationSchema],
 });
