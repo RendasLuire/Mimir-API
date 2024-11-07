@@ -263,29 +263,52 @@ const showOne = async (req, res) => {
 };
 
 const searchByComplete = async (req, res) => {
-  const { complete } = req.body;
-
-  if (!complete) {
-    return res.status(404).json({
-      data: {},
-      message: "Es necesario agregar la ubicacion completa",
-    });
-  }
-
   try {
-    const result = await Storage.findOne({
-      "buildings.ubications.complete": complete,
-    }).populate("buildings.ubications");
+    const { complete } = req.body;
 
-    return res.status(200).json({
-      data: result,
-      message: "All good.",
-    });
+    if (!complete) {
+      return res.status(400).json({ message: "Complete field is required." });
+    }
+
+    // Busca en todos los complejos y edificios la ubicación del campo `complete`
+    const complexes = await Storage.find({
+      "buildings.ubications.complete": complete,
+    }).select("_id complex buildings._id buildings.name buildings.ubications");
+
+    // Filtra los resultados para encontrar el edificio y complejo correctos
+    let result = null;
+
+    for (const complex of complexes) {
+      for (const building of complex.buildings) {
+        const ubication = building.ubications.find(
+          (u) => u.complete === complete
+        );
+        if (ubication) {
+          result = {
+            complexId: complex._id,
+            complex: complex.complex,
+            buildingId: building._id,
+            building: building.name,
+            ubication: {
+              ubicationId: ubication._id,
+              ubication: ubication.ubication,
+              level: ubication.level,
+              complete: ubication.complete,
+            },
+          };
+          break;
+        }
+      }
+      if (result) break;
+    }
+
+    if (result) {
+      return res.json(result);
+    } else {
+      return res.status(404).json({ message: "Location not found." });
+    }
   } catch (error) {
-    return res.status(500).json({
-      data: error,
-      message: error.message,
-    });
+    return res.status(500).json({ message: "Server error.", error });
   }
 };
 
