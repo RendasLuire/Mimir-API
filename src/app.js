@@ -13,6 +13,7 @@ import movementRoutes from "./routes/movement.routes.js";
 import personRoutes from "./routes/person.routes.js";
 import storageRoutes from "./routes/storage.routes.js";
 import pdfRoutes from "./routes/pdf.routes.js";
+import reportsRoutes from "./routes/reports.routes.js";
 import settingRoutes from "./routes/setting.routes.js";
 import {
   inicializeDataBaseDev,
@@ -45,6 +46,7 @@ app.use("/api/movements", movementRoutes);
 app.use("/api/persons", personRoutes);
 app.use("/api/storages", storageRoutes);
 app.use("/api/reports", pdfRoutes);
+app.use("/api/reports-v2", reportsRoutes);
 app.use("/api/settings", settingRoutes);
 
 if (process.env.NODE_ENV.trim() == "development") {

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es-mx">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+           font-family: Arial, Helvetica, sans-serif;
+            margin-top: 2cm;
+            margin-left: 3cm;
+            margin-bottom: 1.75cm;
+            margin-right: 3cm;
+            position: flex;
+        }
+        h2 {
+            
+            font-size: 14pt;
+            text-align: center;
+            line-height: 1.0pt;
+        }
+        h3 {
+            font-size: 12pt;
+            text-align: center;
+            line-height: 1.0pt;
+        }
+        h4 {
+            font-size: 12pt;
+        }
+        p {
+            font-size: 12pt;
+            text-align: justify;
+        }
+        footer {
+           position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 10px 0;
+            page-break-before: always;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .column {
+            width: 48%;
+        }
+        footer p {
+            font-size: 9pt;
+        }
+
+        .date {
+            position: absolute;
+            bottom: 50pt;
+            right: 3cm;
+            text-align: right;
+            font-size: 9pt;
+        }
+        .checkbox-container {
+            display: flex;
+            flex-direction: column;
+        }
+        .checkbox-container p {
+            margin: -2px 0; /* Ajusta el valor para cambiar el espaciado */
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <header>
+
+    <h2>PNO-SIT-01-F02 CARTA RESPONSIVA DE EQUIPO DE CÓMPUTO</h2>
+        </header>
+    <h3>{{shortDate}}</h3>
+    </div>
+    <br>
+    <p>El departamento de Tecnologías de la Información hace entrega del siguiente equipo de cómputo en funcionamiento a <strong>{{userName}}</strong> con los siguientes datos para su control interno:</p>
+    <br>
+
+    <div class="container">
+        <div style="width: 60%;" class="column">
+            <div>
+                <h4>GABINETE / PORTATIL</h4>
+                <p style="line-height: 1.0pt;">Marca: {{brandPc}}</p>
+                <p style="line-height: 1.0pt;">Modelo: {{modelPc}}</p>
+                <p style="line-height: 1.0pt;">Numero de Serie: {{serialNumberPc}}</p>
+            </div>
+            <div>
+                <h4>MONITOR</h4>
+                <p style="line-height: 1.0pt;">Marca: {{brandMon}}</p>
+                <p style="line-height: 1.0pt;">Modelo: {{modelMon}}</p>
+                <p style="line-height: 1.0pt;">Numero de Serie: {{serialNumberMon}}</p>
+            </div>
+        </div>
+        <div class="column">
+            <div>
+                <h4 style="line-height: 1.0pt;">USO:</h4>
+                <div class="checkbox-container">
+
+                <p>
+                    <input type="checkbox" {{#if personal}}checked{{/if}}/>
+                    <label>Personal</label>
+                </p>
+                <p>
+                    <input type="checkbox" {{#if nopersonal}}checked{{/if}}/>
+                    <label>Compartido</label>
+                </p>
+                </div>
+            </div>
+            <div>
+                <h4 style="line-height: 1.0pt;">Anexo:</h4>
+                <p style="line-height: 1.0pt;">{{anexo}}</p>
+                <h4 style="line-height: 1.0pt;">Referencia fisica:</h4>
+                <p >{{refPhisic}}</p>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <p>Al firmar esta carta, manifiesto conocer el contenido y alcance de mis responsabilidades descritas en el <strong>“Reglamento de uso de correo Interno y Externo”</strong>, las <strong>“Políticas de Uso de Dispositivos de Información”</strong> y el <strong>“Contrato de confidencialidad de la información”</strong>, para el uso de equipo de cómputo.</p>
+    <p>A partir de este momento yo <strong>{{userName}}</strong> soy el único responsable del equipo de cómputo asignado y de su buen uso, es mi responsabilidad notificar cualquier cambio de responsable, daño o problema con el mismo; correspondiendo únicamente al departamento de Tecnologías de la Información su mantenimiento.</p>
+    <p>Por último, reconozco que en caso de daño por el mal uso, robo o hurto me obligare a pagar el equipo o el deducible del mismo.</p>
+
+    <br>
+    <br>
+
+    <div class="container">
+        <div class="column">
+            <div>
+                <h4 style="text-align: center;">Usuario responsable del equipo</h4>
+                <br>
+                <hr/>
+                <p style="text-align: center; line-height: 1.0pt"><strong>{{userName}}</strong></p>
+                <p style="text-align: center; line-height: 1.0pt">{{unitBussiness}} – {{department}}</p>
+            </div>
+            <br>
+            <br>
+            <br>
+            <div>
+                <h4 style="text-align: center;">Enterado</h4>
+                <br>
+                <hr/>
+                <p style="text-align: center; line-height: 1.0pt"><strong>Tecnologías de la Información</strong></p>
+            </div>
+        </div>
+        <div class="column">
+            <h4 style="text-align: center;">Gerente o director responsable</h4>
+                <br>
+                <hr/>
+                <p style="text-align: center; line-height: 1.0pt"><strong>{{bossName}}</strong></p>
+                <p style="text-align: center; line-height: 1.0pt">{{bossPosition}}</p>
+        </div>
+    </div>
+    <!-- Footer-->
+    <p class="date">{{longDate}}</p>
+    <footer>
+    <div class="container">
+        <div class="column">
+            <p style="text-align: left;">PNO-SIT-01-F02</p>
+        </div>
+        <div class="column">
+            <p>Versión 03</p>
+        </div>
+        <div class="column">
+            <p style="text-align: left;">Página 1 de 1</p>
+        </div>
+    </div>
+    </footer>
+</body>
+</html>
