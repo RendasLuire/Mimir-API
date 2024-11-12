@@ -126,7 +126,7 @@ const responsivePC = async (req, res) => {
       nopersonal: !device.custom,
       anexo: device.annexed.number,
       refPhisic: device.phisicRef,
-      unitBussiness: "",
+      unitBussiness: device.bussinesUnit,
       department: person.department.name,
       bossName: boss.name,
       bossPosition: boss.position,
@@ -135,7 +135,11 @@ const responsivePC = async (req, res) => {
       )}`,
     };
 
-    const templatePath = path.resolve("./src/helpers/csm.responsive.hbs");
+    if (dynamic.unitBussiness == "San Martin") {
+      const templatePath = path.resolve("./src/helpers/csm.responsive.hbs");
+    } else {
+      const templatePath = path.resolve("./src/helpers/ca.responsive.hbs");
+    }
 
     if (!fs.existsSync(templatePath)) {
       throw new Error(`Template file not found: ${templatePath}`);
@@ -179,7 +183,12 @@ const responsivePC = async (req, res) => {
   }
 };
 
+const responsivePrint = async (req, res) => {
+  //TODO Make function for print responsive printers
+};
+
 export default {
   test,
   responsivePC,
+  responsivePrint,
 };
