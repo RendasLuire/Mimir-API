@@ -301,7 +301,8 @@ const updatePatch = async (req, res) => {
     !req.body.name &&
     !req.body.position &&
     !req.body.department &&
-    !req.body.manager
+    !req.body.manager &&
+    !req.body.bussinesUnit
   ) {
     return res.status(400).json({
       data: {},
@@ -331,6 +332,7 @@ const updatePatch = async (req, res) => {
     person.position = req.body.position || person.position;
     person.department.name = req.body.department || person.department;
     person.manager = req.body.manager || person.manager;
+    person.bussinesUnit = req.body.bussinesUnit || person.bussinesUnit;
 
     const updatedPerson = await person.save();
 

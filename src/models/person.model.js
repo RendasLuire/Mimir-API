@@ -4,7 +4,6 @@ const personSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, "Name is required"],
-    set: (value) => value?.toLowerCase() ?? "",
   },
   department: {
     id: {
@@ -26,20 +25,17 @@ const personSchema = new mongoose.Schema({
     name: {
       type: String,
       default: "disponible",
-      set: (value) => value?.toLowerCase() ?? "disponible",
     },
   },
-});
-
-personSchema.pre("save", function (next) {
-  if (this.name) {
-    this.name = this.name.toLowerCase();
-  }
-  if (this.manager.name) {
-    this.manager.name = this.manager.name.toLowerCase();
-  }
-
-  next();
+  bussinesUnit: {
+    id: {
+      type: mongoose.Schema.Types.ObjectId,
+    },
+    name: {
+      type: String,
+      default: "",
+    },
+  },
 });
 
 export default mongoose.model("Person", personSchema);

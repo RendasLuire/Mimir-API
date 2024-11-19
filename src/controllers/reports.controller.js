@@ -124,10 +124,11 @@ const responsivePC = async (req, res) => {
       serialNumberMon: monitor.serialNumber.toUpperCase(),
       personal: device.custom,
       nopersonal: !device.custom,
-      anexo: device.annexed.number == "disponible" ? "" : device.annexed.number,
+      anexo:
+        device.annexed.number == "disponible" ? " " : device.annexed.number,
       refPhisic: device.phisicRef,
       unitBussiness:
-        device.bussinesUnit == "San Martin"
+        person.bussinesUnit == "San Martin"
           ? "CSM-MAVER"
           : device.bussinesUnit == "Alamo"
           ? "MAVER"
@@ -142,7 +143,7 @@ const responsivePC = async (req, res) => {
 
     let templatePath;
 
-    if (dynamic.unitBussiness == "San Martin") {
+    if (dynamic.unitBussiness == "CSM-MAVER") {
       templatePath = path.resolve("./src/helpers/csm.responsive.hbs");
     } else {
       templatePath = path.resolve("./src/helpers/ca.responsive.hbs");
@@ -237,17 +238,18 @@ const responsivePrint = async (req, res) => {
       serialNumberMon: monitor.serialNumber.toUpperCase(),
       personal: device.custom,
       nopersonal: !device.custom,
-      anexo: device.annexed.number == "disponible" ? "" : device.annexed.number,
+      anexo:
+        device.annexed.number == "disponible" ? " " : device.annexed.number,
       refPhisic: device.phisicRef,
       unitBussiness:
-        device.bussinesUnit == "San Martin"
+        person.bussinesUnit == "San Martin"
           ? "CSM-MAVER"
           : device.bussinesUnit == "Alamo"
           ? "MAVER"
           : device.bussinesUnit,
-      department: capitalizeFirstLetterOfEachWord(person.department.name),
+      department: person.department.name,
       bossName: capitalizeFirstLetterOfEachWord(boss.name),
-      bossPosition: capitalizeFirstLetterOfEachWord(boss.position),
+      bossPosition: boss.position,
       longDate: `Tlaquepaque, Jalisco a ${moment(device.lastChange).format(
         "LL"
       )}`,
