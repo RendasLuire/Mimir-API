@@ -128,11 +128,11 @@ const responsivePC = async (req, res) => {
         device.annexed.number == "disponible" ? " " : device.annexed.number,
       refPhisic: device.phisicRef,
       unitBussiness:
-        person.bussinesUnit == "San Martin"
+        person.bussinesUnit.name == "San Martin"
           ? "CSM-MAVER"
-          : device.bussinesUnit == "Alamo"
+          : person.bussinesUnit.name == "Alamo"
           ? "MAVER"
-          : device.bussinesUnit,
+          : person.bussinesUnit.name,
       department: capitalizeFirstLetterOfEachWord(person.department.name),
       bossName: capitalizeFirstLetterOfEachWord(boss.name),
       bossPosition: capitalizeFirstLetterOfEachWord(boss.position),
@@ -242,11 +242,11 @@ const responsivePrint = async (req, res) => {
         device.annexed.number == "disponible" ? " " : device.annexed.number,
       refPhisic: device.phisicRef,
       unitBussiness:
-        person.bussinesUnit == "San Martin"
+        person.bussinesUnit.name == "San Martin"
           ? "CSM-MAVER"
-          : device.bussinesUnit == "Alamo"
+          : person.bussinesUnit.name == "Alamo"
           ? "MAVER"
-          : device.bussinesUnit,
+          : person.bussinesUnit.name,
       department: person.department.name,
       bossName: capitalizeFirstLetterOfEachWord(boss.name),
       bossPosition: boss.position,
