@@ -53,7 +53,7 @@ const showOptions = async (req, res) => {
 
 const addOption = async (req, res) => {
   const { name } = req.params;
-  const { label, value } = req.body;
+  const { label, value, option } = req.body;
   let setting;
 
   if (!label || !value) {
@@ -73,7 +73,7 @@ const addOption = async (req, res) => {
       });
     }
 
-    setting.options.push({ label, value });
+    setting.options.push({ label, value, option });
     await setting.save();
 
     return res.status(200).json({
