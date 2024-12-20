@@ -256,7 +256,7 @@ const responsivePrint = async (req, res) => {
     };
 
     let templatePath;
-    if (dynamic.unitBussiness == "San Martin") {
+    if (dynamic.unitBussiness == "CSM-MAVER") {
       templatePath = path.resolve("./src/helpers/csm.responsivePrint.hbs");
     } else {
       templatePath = path.resolve("./src/helpers/ca.responsivePrint.hbs");

@@ -47,4 +47,13 @@ const registerMovement = async (
   await movement.save();
 };
 
+const registerChange = async (
+  deviceId,
+  category,
+  content,
+  userId,
+  userName,
+  dateCreation
+) => {};
+
 export default registerMovement;

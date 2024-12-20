@@ -1,5 +1,4 @@
 import Device from "../models/device.model.js";
-import registerMovement from "../helpers/movement.helper.js";
 import User from "../models/user.model.js";
 import Person from "../models/person.model.js";
 import moment from "moment/moment.js";
@@ -148,16 +147,6 @@ const register = async (req, res) => {
       });
     }
 
-    await registerMovement(
-      user,
-      newDevice.typeDevice,
-      newDevice.serialNumber,
-      newDevice._id,
-      "registrado",
-      null,
-      newDevice
-    );
-
     res.status(201).json({
       data: newDevice,
       message: "Equipo registrado con exito.",
@@ -290,15 +279,22 @@ const updatePatch = async (req, res) => {
     device.ubication = req.body.ubication || device.ubication;
     device.phisicRef = req.body.phisicRef || device.phisicRef;
     device.typeDevice = req.body.typeDevice || device.typeDevice;
-    device.ip = req.body.ip || device.ip;
-    device.mac = req.body.mac || device.mac;
+    device.network.ip = req.body.network.ip || device.network?.ip;
+    device.network.mac = req.body.network.mac || device.network?.mac;
+    device.office.officeVersion =
+      req.body.office.officeVersion || device.office?.officeVersion;
+    device.office.officeKey =
+      req.body.office.officeKey || device.office?.officeKey;
     device.person = req.body.person || device.person;
     device.custom = req.body.custom;
     device.bussinesUnit = req.body.bussinesUnit || device.bussinesUnit;
     device.departament = req.body.departament || device.departament;
-    device.headphones = req.body.headphones;
-    device.adaptVGA = req.body.adaptVGA;
-    device.mouse = req.body.mouse;
+    device.headphones.assigned = req.body.headphones.assigned;
+    device.headphones.date_assigned = req.body.headphones.date_assigned;
+    device.adaptVGA.assigned = req.body.adaptVGA.assigned;
+    device.adaptVGA.date_assigned = req.body.adaptVGA.date_assigned;
+    device.mouse.assigned = req.body.mouse.assigned;
+    device.mouse.date_assigned = req.body.mouse.date_assigned;
     device.lastChange = moment();
 
     const updatedDevice = await device.save();
@@ -309,16 +305,6 @@ const updatePatch = async (req, res) => {
         message: "El dispositivo no fue actualizado.",
       });
     }
-
-    await registerMovement(
-      user,
-      updatedDevice.typeDevice,
-      updatedDevice.serialNumber,
-      updatedDevice._id,
-      "actualizada",
-      device,
-      oldDevice
-    );
 
     res.status(200).json({
       data: updatedDevice,
@@ -383,16 +369,16 @@ const assing = async (req, res) => {
     device.person.name = userData.name;
     device.departament.id = userData.department.id;
     device.departament.name = userData.department.name;
-    device.status.value = "asignado";
-    device.status.label = "asignado";
+    device.status.value = "reasignado";
+    device.status.label = "reasignado";
     device.lastChange = moment();
 
-    if (device.monitor.serialNumber !== "disponible") {
+    if (device.monitor.serialNumber !== "") {
       const monitor = await Device.findById(device.monitor.id);
       monitor.person.id = userData._id;
       monitor.person.name = userData.name;
-      monitor.status.value = "asignado";
-      monitor.status.label = "asignado";
+      monitor.status.value = "reasignado";
+      monitor.status.label = "reasignado";
       monitor.lastChange = moment();
 
       const updatedMonitor = await monitor.save();
@@ -402,16 +388,6 @@ const assing = async (req, res) => {
           message: "El dispositivo no fue actualizado.",
         });
       }
-
-      await registerMovement(
-        user,
-        updatedMonitor.typeDevice,
-        updatedMonitor.serialNumber,
-        updatedMonitor._id,
-        "asignada",
-        monitor,
-        updatedMonitor
-      );
     }
 
     const updatedDevice = await device.save();
@@ -421,16 +397,6 @@ const assing = async (req, res) => {
         message: "El dispositivo no fue actualizado.",
       });
     }
-
-    await registerMovement(
-      user,
-      updatedDevice.typeDevice,
-      updatedDevice.serialNumber,
-      updatedDevice._id,
-      "asignada",
-      device,
-      updatedDevice
-    );
 
     res.status(200).json({
       data: updatedDevice,
@@ -484,19 +450,19 @@ const unassing = async (req, res) => {
     }
 
     device.user.id = null;
-    device.user.name = "disponible";
+    device.user.name = "";
     device.departament.id = null;
-    device.departament.name = "disponible";
-    device.status.label = "disponible";
-    device.status.value = "disponible";
+    device.departament.name = "";
+    device.status.label = "En resguardo";
+    device.status.value = "en_resguardo";
     device.lastChange = moment();
 
-    if (device.monitor.id !== "disponible") {
+    if (device.monitor.id !== "") {
       const monitor = await Device.findById(device.monitor.id);
       monitor.user.id = null;
-      monitor.user.name = "disponible";
-      monitor.status.value = "disponible";
-      monitor.status.label = "disponible";
+      monitor.user.name = "";
+      monitor.status.value = "en_resguardo";
+      monitor.status.label = "En resguardo";
       monitor.lastChange = moment();
 
       const updatedMonitor = await monitor.save();
@@ -506,16 +472,6 @@ const unassing = async (req, res) => {
           message: "El dispositivo no fue actualizado.",
         });
       }
-
-      await registerMovement(
-        user,
-        updatedMonitor.typeDevice,
-        updatedMonitor.serialNumber,
-        updatedMonitor._id,
-        "liberado",
-        monitor,
-        updatedMonitor
-      );
     }
 
     const updatedDevice = await device.save();
@@ -525,16 +481,6 @@ const unassing = async (req, res) => {
         message: "El dispositivo no fue actualizado.",
       });
     }
-
-    await registerMovement(
-      user,
-      updatedDevice.typeDevice,
-      updatedDevice.serialNumber,
-      updatedDevice._id,
-      "liberado",
-      device,
-      updatedDevice
-    );
 
     res.status(200).json({
       data: updatedDevice,
@@ -609,8 +555,8 @@ const assingMonitor = async (req, res) => {
 
     monitor.person.id = device.person.id;
     monitor.person.name = device.person.name;
-    monitor.status.value = "asignado";
-    monitor.status.label = "asignado";
+    monitor.status.value = "reasignado";
+    monitor.status.label = "reasignado";
     monitor.lastChange = moment();
 
     await monitor.save();
@@ -659,16 +605,16 @@ const unassingMonitor = async (req, res) => {
     }
 
     monitor.person = {
-      name: "disponible",
+      name: "",
     };
-    monitor.status.label = "disponible";
-    monitor.status.value = "disponible";
+    monitor.status.label = "En resguardo";
+    monitor.status.value = "en_resguardo";
     monitor.lastChange = moment();
 
     await monitor.save();
 
     device.monitor = {
-      serialNumber: "disponible",
+      serialNumber: "",
     };
     device.lastChange = moment();
 

@@ -31,13 +31,13 @@ const deviceSchema = new mongoose.Schema({
   status: {
     value: {
       type: String,
-      default: "disponible",
-      set: (value) => value?.toLowerCase() ?? "disponible",
+      default: "en_resguardo",
+      set: (value) => value?.toLowerCase() ?? "en_resguardo",
     },
     label: {
       type: String,
-      default: "disponible",
-      set: (value) => value?.toLowerCase() ?? "disponible",
+      default: "En resguardo",
+      set: (value) => value?.toLowerCase() ?? "En resguardo",
     },
   },
   annexed: {
@@ -47,8 +47,7 @@ const deviceSchema = new mongoose.Schema({
     },
     number: {
       type: String,
-      default: "disponible",
-      set: (value) => value?.toLowerCase() ?? "disponible",
+      default: "",
     },
   },
   ubication: {
@@ -64,14 +63,29 @@ const deviceSchema = new mongoose.Schema({
     required: [true, "Type of device is required"],
     set: (value) => value?.toLowerCase() ?? "",
   },
-  ip: {
-    type: String,
-    default: "",
+  network: {
+    ip: {
+      type: String,
+      default: "",
+    },
+    macEthernet: {
+      type: String,
+      default: "",
+    },
+    macWifi: {
+      type: String,
+      default: "",
+    },
   },
-  mac: {
-    type: String,
-    default: "",
-    set: (value) => value?.toUpperCase() ?? "",
+  office: {
+    officeVersion: {
+      type: String,
+      default: "",
+    },
+    officeKey: {
+      type: String,
+      default: "",
+    },
   },
   person: {
     id: {
@@ -80,8 +94,7 @@ const deviceSchema = new mongoose.Schema({
     },
     name: {
       type: String,
-      default: "disponible",
-      set: (value) => value?.toLowerCase() ?? "disponible",
+      default: "",
     },
   },
   custom: {
@@ -90,7 +103,7 @@ const deviceSchema = new mongoose.Schema({
   },
   bussinesUnit: {
     type: String,
-    default: "disponible",
+    default: "",
   },
   lastChange: {
     type: Date,
@@ -103,7 +116,7 @@ const deviceSchema = new mongoose.Schema({
     },
     name: {
       type: String,
-      default: "disponible",
+      default: "",
     },
   },
   monitor: {
@@ -113,8 +126,7 @@ const deviceSchema = new mongoose.Schema({
     },
     serialNumber: {
       type: String,
-      default: "disponible",
-      set: (value) => value?.toLowerCase() ?? "disponible",
+      default: "",
     },
   },
   comments: [
@@ -132,43 +144,45 @@ const deviceSchema = new mongoose.Schema({
         type: Date,
         default: moment(),
       },
+      category: {
+        type: String,
+        default: "Comment",
+      },
       content: {
         type: String,
         required: [true, "Content is required"],
       },
     },
   ],
-  movements: [
-    {
-      idUser: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-      typeMovement: {
-        type: String,
-        required: [true, "Type of movement is required"],
-      },
-      dateCreation: {
-        type: Date,
-        default: moment(),
-      },
-      description: {
-        type: String,
-        required: [true, "Description is required"],
-      },
-    },
-  ],
   headphones: {
-    type: Boolean,
-    default: false,
+    assigned: {
+      type: Boolean,
+      default: false,
+    },
+    date_assigned: {
+      type: Date,
+      default: moment(),
+    },
   },
   adaptVGA: {
-    type: Boolean,
-    default: false,
+    assigned: {
+      type: Boolean,
+      default: false,
+    },
+    date_assigned: {
+      type: Date,
+      default: moment(),
+    },
   },
   mouse: {
-    type: Boolean,
-    default: false,
+    assigned: {
+      type: Boolean,
+      default: false,
+    },
+    date_assigned: {
+      type: Date,
+      default: moment(),
+    },
   },
 });
 
@@ -185,20 +199,8 @@ deviceSchema.pre("save", function (next) {
   if (this.status.label) {
     this.status = this.status.label.toLowerCase();
   }
-  if (this.annexed.number) {
-    this.annexed.number = this.annexed.number.toLowerCase();
-  }
   if (this.typeDevice) {
     this.typeDevice = this.typeDevice.toLowerCase();
-  }
-  if (this.mac) {
-    this.mac = this.mac.toLowerCase();
-  }
-  if (this.person.name) {
-    this.person.name = this.person.name.toLowerCase();
-  }
-  if (this.monitor.serialNumber) {
-    this.monitor.serialNumber = this.monitor.serialNumber.toLowerCase();
   }
 
   if (this.comments && this.comments.length > 0) {
