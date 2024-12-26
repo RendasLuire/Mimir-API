@@ -77,6 +77,63 @@ const test = async (req, res) => {
   }
 };
 
+const checkInfo = async (req, res) => {
+  const { id } = req.params;
+
+  if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(404).json({
+      data: false,
+      message: "El ID del equipo no es válido o es necesario.",
+    });
+  }
+
+  try {
+    const device = await Device.findById(id);
+
+    if (!device) {
+      return res.status(404).json({
+        data: false,
+        message: "El equipo no existe.",
+      });
+    }
+
+    if (device.phisicRef === "") {
+      return res.status(404).json({
+        data: false,
+        message: "La referencia física no está definida.",
+      });
+    }
+
+    const person = await Person.findById(device.person.id);
+
+    if (!person) {
+      return res.status(404).json({
+        data: false,
+        message: "La persona no existe.",
+      });
+    }
+
+    const boss = await Person.findById(person.manager.id);
+
+    if (!boss) {
+      return res.status(404).json({
+        data: false,
+        message: "El jefe no existe.",
+      });
+    }
+
+    return res.status(200).json({
+      data: true,
+      message: "La información está completa.",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      data: false,
+      message: "Error al obtener la información.",
+    });
+  }
+};
+
 const responsivePC = async (req, res) => {
   const { id } = req.params;
 
@@ -308,4 +365,5 @@ export default {
   test,
   responsivePC,
   responsivePrint,
+  checkInfo,
 };

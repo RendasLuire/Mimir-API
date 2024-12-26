@@ -14,4 +14,6 @@ router.get(
   reportsController.responsivePrint
 );
 
+router.get("/checkInfo/:id", token.auth, reportsController.checkInfo);
+
 export default router;
