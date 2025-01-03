@@ -279,12 +279,15 @@ const updatePatch = async (req, res) => {
     device.ubication = req.body.ubication || device.ubication;
     device.phisicRef = req.body.phisicRef || device.phisicRef;
     device.typeDevice = req.body.typeDevice || device.typeDevice;
-    device.network.ip = req.body.network.ip || device.network?.ip;
-    device.network.mac = req.body.network.mac || device.network?.mac;
+    device.network.ip = req.body.network?.ip || device.network?.ip;
+    device.network.macEthernet =
+      req.body.network?.macEthernet || device.network?.macEthernet;
+    device.network.macWifi =
+      req.body.network?.macWifi || device.network?.macWifi;
     device.office.officeVersion =
-      req.body.office.officeVersion || device.office?.officeVersion;
+      req.body.office?.officeVersion || device.office?.officeVersion;
     device.office.officeKey =
-      req.body.office.officeKey || device.office?.officeKey;
+      req.body.office?.officeKey || device.office?.officeKey;
     device.person = req.body.person || device.person;
     device.custom = req.body.custom;
     device.bussinesUnit = req.body.bussinesUnit || device.bussinesUnit;

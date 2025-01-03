@@ -273,16 +273,6 @@ const responsivePrint = async (req, res) => {
       device.person.id !== "Sin asignar"
         ? await Person.findById(person.manager.id)
         : {};
-    let monitor;
-    if (device.monitor.serialNumber !== "disponible") {
-      monitor = await Device.findById(device.monitor.id);
-    } else {
-      monitor = {
-        serialNumber: "N/A",
-        brand: "N/A",
-        model: "N/A",
-      };
-    }
 
     const dynamic = {
       userName: capitalizeFirstLetterOfEachWord(person.name),
@@ -290,9 +280,6 @@ const responsivePrint = async (req, res) => {
       brandPc: device.brand,
       modelPc: device.model,
       serialNumberPc: device.serialNumber.toUpperCase(),
-      brandMon: monitor.brand,
-      modelMon: monitor.model,
-      serialNumberMon: monitor.serialNumber.toUpperCase(),
       personal: device.custom,
       nopersonal: !device.custom,
       anexo:
