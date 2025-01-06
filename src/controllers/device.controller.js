@@ -23,18 +23,22 @@ const showAll = async (req, res) => {
 
     if (typeDevice && filter === "all") {
       query.typeDevice = typeDevice;
-    }
-
-    if (filter === "computo") {
-      query.typeDevice = {
-        $in: ["desktop", "laptop", "tablet"],
-      };
-    }
-
-    if (filter === "dispositivos") {
-      query.typeDevice = {
-        $in: ["desktop", "laptop", "tablet", "impresora"],
-      };
+    } else {
+      if (filter === "computo") {
+        query.typeDevice = {
+          $in: ["desktop", "laptop", "tablet"],
+        };
+      } else {
+        if (filter === "dispositivos") {
+          query.typeDevice = {
+            $in: ["desktop", "laptop", "tablet", "impresora"],
+          };
+        } else {
+          if (typeDevice) {
+            query.typeDevice = typeDevice;
+          }
+        }
+      }
     }
 
     if (status) {
@@ -501,7 +505,9 @@ const assingMonitor = async (req, res) => {
   const { user, monitorId } = req.body;
   const { id } = req.params;
 
-  if (!monitorId || !id || !user) {
+  console.log(user);
+
+  if (!monitorId || !id) {
     return res.status(404).json({
       data: {
         monitor: monitorId,
@@ -512,11 +518,7 @@ const assingMonitor = async (req, res) => {
     });
   }
 
-  if (
-    !id.match(/^[0-9a-fA-F]{24}$/) ||
-    !monitorId.match(/^[0-9a-fA-F]{24}$/) ||
-    !user.match(/^[0-9a-fA-F]{24}$/)
-  ) {
+  if (!id.match(/^[0-9a-fA-F]{24}$/) || !monitorId.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
       data: {
         message: "El ID del dispositivo no es valido.",
@@ -577,10 +579,9 @@ const assingMonitor = async (req, res) => {
 };
 
 const unassingMonitor = async (req, res) => {
-  const { user } = req.body;
   const { id } = req.params;
 
-  if (!id.match(/^[0-9a-fA-F]{24}$/) || !user.match(/^[0-9a-fA-F]{24}$/)) {
+  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(404).json({
       data: {
         message: "El ID del dispositivo no es valido.",
