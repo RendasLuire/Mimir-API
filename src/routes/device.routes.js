@@ -24,6 +24,8 @@ router.patch(
   deviceController.unassingMonitor
 );
 
+router.patch("/changeDevice/:id", token.auth, deviceController.changeDevice);
+
 router.get("/monitors/", token.auth, deviceController.ShowMonitors);
 router.get("/printers/", token.auth, deviceController.ShowPrinters);
 

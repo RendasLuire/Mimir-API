@@ -97,6 +97,16 @@ const deviceSchema = new mongoose.Schema({
       default: "",
     },
   },
+  lastPerson: {
+    id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Person",
+    },
+    name: {
+      type: String,
+      default: "",
+    },
+  },
   custom: {
     type: Boolean,
     default: false,

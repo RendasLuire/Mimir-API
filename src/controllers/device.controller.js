@@ -96,7 +96,15 @@ const showAll = async (req, res) => {
 };
 
 const register = async (req, res) => {
-  const { brand, model, serialNumber, typeDevice, user } = req.body;
+  const {
+    brand,
+    model,
+    serialNumber,
+    typeDevice,
+    user,
+    statusValue,
+    statusLabel,
+  } = req.body;
 
   if (!brand || !model || !serialNumber || !typeDevice || !user) {
     return res.status(400).json({
@@ -140,6 +148,11 @@ const register = async (req, res) => {
         data: {},
         message: `Este ${device.typeDevice} ya esta registrada.`,
       });
+    }
+
+    if (statusLabel && statusValue) {
+      device.status.value = statusValue;
+      device.status.label = statusLabel;
     }
 
     const newDevice = await device.save();
@@ -326,7 +339,7 @@ const updatePatch = async (req, res) => {
 };
 
 const assing = async (req, res) => {
-  const { user, person } = req.body;
+  const { person } = req.body;
   const { id } = req.params;
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
@@ -337,7 +350,7 @@ const assing = async (req, res) => {
     });
   }
 
-  if (!id || !user || !person) {
+  if (!id || !person) {
     res.status(400).json({
       data: {
         message: "Al menos alguno de estos campos debe ser enviado.",
@@ -346,15 +359,6 @@ const assing = async (req, res) => {
   }
 
   try {
-    const internUser = await User.findById(user);
-
-    if (!internUser) {
-      return res.status(409).json({
-        data: {},
-        message: `Este usuario no existe.`,
-      });
-    }
-
     const device = await Device.findById(id);
     if (!device) {
       return res.status(404).json({
@@ -419,7 +423,6 @@ const assing = async (req, res) => {
 };
 
 const unassing = async (req, res) => {
-  const { user } = req.body;
   const { id } = req.params;
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
@@ -430,7 +433,7 @@ const unassing = async (req, res) => {
     });
   }
 
-  if (!id || !user) {
+  if (!id) {
     res.status(400).json({
       data: {
         message: "Al menos alguno de estos campos debe ser enviado.",
@@ -439,15 +442,6 @@ const unassing = async (req, res) => {
   }
 
   try {
-    const internUser = await User.findById(user);
-
-    if (!internUser) {
-      return res.status(409).json({
-        data: {},
-        message: `Este usuario no existe.`,
-      });
-    }
-
     const device = await Device.findById(id);
     if (!device) {
       return res.status(404).json({
@@ -456,22 +450,23 @@ const unassing = async (req, res) => {
       });
     }
 
-    device.user.id = null;
-    device.user.name = "";
+    device.person.id = null;
+    device.person.name = "";
     device.departament.id = null;
     device.departament.name = "";
     device.status.label = "En resguardo";
     device.status.value = "en_resguardo";
     device.lastChange = moment();
 
-    if (device.monitor.id !== "") {
+    if (device.monitor.serialNumber !== "") {
       const monitor = await Device.findById(device.monitor.id);
-      monitor.user.id = null;
-      monitor.user.name = "";
+      monitor.person.id = null;
+      monitor.person.name = "";
       monitor.status.value = "en_resguardo";
       monitor.status.label = "En resguardo";
       monitor.lastChange = moment();
 
+      console.log(monitor);
       const updatedMonitor = await monitor.save();
       if (!updatedMonitor) {
         return res.status(400).json({
@@ -494,6 +489,7 @@ const unassing = async (req, res) => {
       message: "Dispositivo liberado.",
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       data: {},
       message: error.message,
@@ -875,6 +871,68 @@ const deleteComment = async (req, res) => {
   }
 };
 
+const changeDevice = async (req, res) => {
+  const { oldDevice, newDevice } = req.body;
+
+  if (!oldDevice || !newDevice) {
+    return res.status(400).json({
+      data: {},
+      message: "Al menos alguno de estos campos debe ser enviado.",
+    });
+  }
+
+  if (
+    !oldDevice.match(/^[0-9a-fA-F]{24}$/) ||
+    !newDevice.match(/^[0-9a-fA-F]{24}$/)
+  ) {
+    return res.status(404).json({
+      data: {},
+      message: "El ID del dispositivo no es valido.",
+    });
+  }
+
+  try {
+    const oldDevice = await Device.findById(oldDevice);
+    const newDevice = await Device.findById(newDevice);
+
+    if (!oldDevice || !newDevice) {
+      return res.status(404).json({
+        data: {},
+        message: "El dispositivo no fue encontrado.",
+      });
+    }
+
+    newDevice.status.value = "reasignado";
+    newDevice.status.label = "reasignado";
+    newDevice.ubication = oldDevice.ubication;
+    newDevice.phisicRef = oldDevice.phisicRef;
+    newDevice.office = oldDevice.office;
+    newDevice.person = oldDevice.person;
+    newDevice.custom = oldDevice.custom;
+    newDevice.bussinesUnit = oldDevice.bussinesUnit;
+    newDevice.departament = oldDevice.departament;
+    newDevice.headphones = oldDevice.headphones;
+    newDevice.lastChange = moment();
+
+    oldDevice.status.value = "retirado";
+    oldDevice.status.label = "Retirado";
+    oldDevice.lastChange = moment();
+
+    await newDevice.save();
+    await oldDevice.save();
+
+    return res.status(200).json({
+      data: newDevice,
+      message: "Dispositivo reasignado.",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      data: {},
+      message: error.message,
+    });
+  }
+};
+
 export default {
   showAll,
   register,
@@ -889,4 +947,5 @@ export default {
   listComments,
   addComment,
   deleteComment,
+  changeDevice,
 };
