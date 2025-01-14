@@ -160,7 +160,7 @@ const responsivePC = async (req, res) => {
         ? await Person.findById(person.manager.id)
         : {};
     let monitor;
-    if (device.monitor.serialNumber !== "disponible") {
+    if (device.monitor.serialNumber !== "") {
       monitor = await Device.findById(device.monitor.id);
     } else {
       monitor = {

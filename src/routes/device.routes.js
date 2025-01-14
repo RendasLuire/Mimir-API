@@ -18,6 +18,8 @@ router.patch("/unassing/:id", token.auth, deviceController.unassing);
 
 router.patch("/assingMonitor/:id", token.auth, deviceController.assingMonitor);
 
+router.post("/resignDevice/", token.auth, deviceController.resignDevice);
+
 router.patch(
   "/unassingMonitor/:id",
   token.auth,

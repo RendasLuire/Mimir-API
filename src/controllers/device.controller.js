@@ -871,10 +871,12 @@ const deleteComment = async (req, res) => {
   }
 };
 
-const changeDevice = async (req, res) => {
-  const { oldDevice, newDevice } = req.body;
+const resignDevice = async (req, res) => {
+  const { idPerson, idDevice } = req.body;
 
-  if (!oldDevice || !newDevice) {
+  console.log(idDevice, idPerson);
+
+  if (!idDevice || !idPerson) {
     return res.status(400).json({
       data: {},
       message: "Al menos alguno de estos campos debe ser enviado.",
@@ -882,47 +884,113 @@ const changeDevice = async (req, res) => {
   }
 
   if (
-    !oldDevice.match(/^[0-9a-fA-F]{24}$/) ||
-    !newDevice.match(/^[0-9a-fA-F]{24}$/)
+    !idDevice.match(/^[0-9a-fA-F]{24}$/) ||
+    !idPerson.match(/^[0-9a-fA-F]{24}$/)
   ) {
     return res.status(404).json({
-      data: {},
+      data: {
+        idDevice,
+        idPerson,
+      },
       message: "El ID del dispositivo no es valido.",
     });
   }
 
   try {
-    const oldDevice = await Device.findById(oldDevice);
-    const newDevice = await Device.findById(newDevice);
+    const device = await Device.findById(idDevice);
+    const person = await Person.findById(idPerson);
 
-    if (!oldDevice || !newDevice) {
+    if (!device || !person) {
+      return res.status(404).json({
+        data: {},
+        message: "El dispositivo o la persona no fue encontrado.",
+      });
+    }
+
+    device.lastPerson.id = device.person.id;
+    device.lastPerson.name = device.person.name;
+    device.person.id = person._id;
+    device.person.name = person.name;
+
+    if (device.monitor.serialNumber !== "") {
+      const monitor = await Device.findById(device.monitor.id);
+      monitor.lastPerson.id = monitor.person.id;
+      monitor.lastPerson.name = monitor.person.name;
+      monitor.person.id = person._id;
+      monitor.person.name = person.name;
+
+      await monitor.save();
+    }
+
+    await device.save();
+
+    return res.status(200).json({
+      data: device,
+      message: "Dispositivo reasignado.",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      data: {},
+      message: error.message,
+    });
+  }
+};
+
+const changeDevice = async (req, res) => {
+  const { id } = req.params;
+  const { newDevice } = req.body;
+
+  if (!id || !newDevice) {
+    return res.status(400).json({
+      data: {},
+      message: "Al menos alguno de estos campos debe ser enviado.",
+    });
+  }
+
+  if (!id.match(/^[0-9a-fA-F]{24}$/) || !newDevice.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(404).json({
+      data: {
+        id,
+        newDevice,
+      },
+      message: "El ID del dispositivo no es valido.",
+    });
+  }
+
+  try {
+    const oldDevice = await Device.findById(id);
+    const newDeviceInfo = await Device.findById(newDevice);
+
+    if (!oldDevice || !newDeviceInfo) {
       return res.status(404).json({
         data: {},
         message: "El dispositivo no fue encontrado.",
       });
     }
 
-    newDevice.status.value = "reasignado";
-    newDevice.status.label = "reasignado";
-    newDevice.ubication = oldDevice.ubication;
-    newDevice.phisicRef = oldDevice.phisicRef;
-    newDevice.office = oldDevice.office;
-    newDevice.person = oldDevice.person;
-    newDevice.custom = oldDevice.custom;
-    newDevice.bussinesUnit = oldDevice.bussinesUnit;
-    newDevice.departament = oldDevice.departament;
-    newDevice.headphones = oldDevice.headphones;
-    newDevice.lastChange = moment();
+    newDeviceInfo.status.value = "reasignado";
+    newDeviceInfo.status.label = "reasignado";
+    newDeviceInfo.ubication = oldDevice.ubication;
+    newDeviceInfo.phisicRef = oldDevice.phisicRef;
+    newDeviceInfo.office = oldDevice.office;
+    newDeviceInfo.person = oldDevice.person;
+    newDeviceInfo.custom = oldDevice.custom;
+    newDeviceInfo.bussinesUnit = oldDevice.bussinesUnit;
+    newDeviceInfo.departament = oldDevice.departament;
+    newDeviceInfo.headphones = oldDevice.headphones;
+    newDeviceInfo.lastChange = moment();
 
     oldDevice.status.value = "retirado";
     oldDevice.status.label = "Retirado";
     oldDevice.lastChange = moment();
+    newDeviceInfo.hostname = oldDevice.hostname;
+    oldDevice.hostname = oldDevice.hostname + "-retirado";
 
-    await newDevice.save();
     await oldDevice.save();
+    await newDeviceInfo.save();
 
     return res.status(200).json({
-      data: newDevice,
+      data: newDeviceInfo,
       message: "Dispositivo reasignado.",
     });
   } catch (error) {
@@ -948,4 +1016,5 @@ export default {
   addComment,
   deleteComment,
   changeDevice,
+  resignDevice,
 };
