@@ -874,8 +874,6 @@ const deleteComment = async (req, res) => {
 const resignDevice = async (req, res) => {
   const { idPerson, idDevice } = req.body;
 
-  console.log(idDevice, idPerson);
-
   if (!idDevice || !idPerson) {
     return res.status(400).json({
       data: {},
@@ -1001,6 +999,80 @@ const changeDevice = async (req, res) => {
   }
 };
 
+const updateNetworkData = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { ip, macEthernet, macWifi } = req.body;
+
+    if (!id || id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        data: {},
+        message: "El id del dispositivo es necesario.",
+      });
+    }
+
+    const device = await Device.findById(id);
+
+    const formatIP = (value) => {
+      if (!value) return null;
+      const validIP =
+        value
+          .replace(/[^\d]/g, "")
+          .match(/(\d{1,3})/g)
+          ?.join(".") || "";
+      const octets = validIP.split(".");
+      if (
+        octets.length === 4 &&
+        octets.every((octet) => octet >= 0 && octet <= 255)
+      ) {
+        return validIP;
+      }
+      return res.status(400).json({
+        data: {},
+        message: "La ip no es valida.",
+      });
+    };
+
+    const formatMAC = (value) => {
+      if (!value) return null;
+      const validMAC =
+        value
+          .replace(/[^\da-fA-F]/g, "")
+          .match(/.{1,2}/g)
+          ?.join(":") || "";
+      if (/^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$/.test(validMAC)) {
+        return validMAC;
+      }
+      return res.status(400).json({
+        data: {},
+        message: "La mac no es valida.",
+      });
+    };
+
+    const formattedIP = formatIP(ip);
+    const formattedMacEthernet = formatMAC(macEthernet);
+    const formattedMacWifi = formatMAC(macWifi);
+
+    const updatedNetworkData = {
+      ip: formattedIP,
+      macEthernet: formattedMacEthernet,
+      macWifi: formattedMacWifi,
+    };
+
+    device.network = updateNetworkData;
+    await device.save();
+
+    res.status(200).json({
+      message: "Network data updated successfully",
+      data: updatedNetworkData,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message || "Error updating network data",
+    });
+  }
+};
+
 export default {
   showAll,
   register,
@@ -1017,4 +1089,5 @@ export default {
   deleteComment,
   changeDevice,
   resignDevice,
+  updateNetworkData,
 };

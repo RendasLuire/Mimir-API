@@ -66,15 +66,15 @@ const deviceSchema = new mongoose.Schema({
   network: {
     ip: {
       type: String,
-      default: "",
+      default: "000.000.000.000",
     },
     macEthernet: {
       type: String,
-      default: "",
+      default: "00:00:00:00:00:00",
     },
     macWifi: {
       type: String,
-      default: "",
+      default: "00:00:00:00:00:00",
     },
   },
   office: {

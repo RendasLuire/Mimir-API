@@ -26,6 +26,12 @@ router.patch(
   deviceController.unassingMonitor
 );
 
+router.patch(
+  "/updateNetwork/:id",
+  token.auth,
+  deviceController.updateNetworkData
+);
+
 router.patch("/changeDevice/:id", token.auth, deviceController.changeDevice);
 
 router.get("/monitors/", token.auth, deviceController.ShowMonitors);
