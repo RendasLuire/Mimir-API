@@ -1004,7 +1004,7 @@ const updateNetworkData = async (req, res) => {
     const { id } = req.params;
     const { ip, macEthernet, macWifi } = req.body;
 
-    if (!id || id.match(/^[0-9a-fA-F]{24}$/)) {
+    if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
       return res.status(400).json({
         data: {},
         message: "El id del dispositivo es necesario.",
@@ -1059,7 +1059,7 @@ const updateNetworkData = async (req, res) => {
       macWifi: formattedMacWifi,
     };
 
-    device.network = updateNetworkData;
+    device.network = updatedNetworkData;
     await device.save();
 
     res.status(200).json({
