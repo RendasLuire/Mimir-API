@@ -1073,6 +1073,63 @@ const updateNetworkData = async (req, res) => {
   }
 };
 
+const updateOfficeData = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { officeVersion, officeKey } = req.body;
+
+    console.log(officeKey);
+
+    if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        data: {},
+        message: "El id del dispositivo es necesario.",
+      });
+    }
+
+    const formatOfficeKey = (value) => {
+      if (!value) return null;
+      const sanitized = value.replace(/[^a-zA-Z0-9]/g, "");
+      return sanitized.match(/.{1,4}/g)?.join("-") || sanitized;
+    };
+
+    const formattedOfficeKey = formatOfficeKey(officeKey);
+
+    console.log(formattedOfficeKey);
+
+    if (!formattedOfficeKey || formattedOfficeKey.length !== 19) {
+      return res.status(400).json({
+        data: {},
+        message: "La clave de Office no es válida.",
+      });
+    }
+
+    const device = await Device.findById(id);
+    if (!device) {
+      return res.status(404).json({
+        data: {},
+        message: "Dispositivo no encontrado.",
+      });
+    }
+
+    device.office = {
+      officeVersion: officeVersion,
+      officeKey: formattedOfficeKey,
+    };
+
+    await device.save();
+
+    res.status(200).json({
+      message: "Datos de Office actualizados correctamente.",
+      data: device.officeData,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || "Error al actualizar los datos de Office.",
+    });
+  }
+};
+
 export default {
   showAll,
   register,
@@ -1090,4 +1147,5 @@ export default {
   changeDevice,
   resignDevice,
   updateNetworkData,
+  updateOfficeData,
 };

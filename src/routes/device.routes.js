@@ -32,6 +32,12 @@ router.patch(
   deviceController.updateNetworkData
 );
 
+router.patch(
+  "/updateOffice/:id",
+  token.auth,
+  deviceController.updateOfficeData
+);
+
 router.patch("/changeDevice/:id", token.auth, deviceController.changeDevice);
 
 router.get("/monitors/", token.auth, deviceController.ShowMonitors);
