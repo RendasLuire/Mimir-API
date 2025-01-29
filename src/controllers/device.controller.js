@@ -971,6 +971,7 @@ const changeDevice = async (req, res) => {
     newDeviceInfo.ubication = oldDevice.ubication;
     newDeviceInfo.phisicRef = oldDevice.phisicRef;
     newDeviceInfo.office = oldDevice.office;
+    newDevice.network.ip = oldDevice.network?.ip;
     newDeviceInfo.person = oldDevice.person;
     newDeviceInfo.custom = oldDevice.custom;
     newDeviceInfo.bussinesUnit = oldDevice.bussinesUnit;
@@ -1078,8 +1079,6 @@ const updateOfficeData = async (req, res) => {
     const { id } = req.params;
     const { officeVersion, officeKey } = req.body;
 
-    console.log(officeKey);
-
     if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
       return res.status(400).json({
         data: {},
@@ -1090,14 +1089,12 @@ const updateOfficeData = async (req, res) => {
     const formatOfficeKey = (value) => {
       if (!value) return null;
       const sanitized = value.replace(/[^a-zA-Z0-9]/g, "");
-      return sanitized.match(/.{1,4}/g)?.join("-") || sanitized;
+      return sanitized.match(/.{1,5}/g)?.join("-") || sanitized;
     };
 
     const formattedOfficeKey = formatOfficeKey(officeKey);
 
-    console.log(formattedOfficeKey);
-
-    if (!formattedOfficeKey || formattedOfficeKey.length !== 19) {
+    if (!formattedOfficeKey || formattedOfficeKey.length !== 29) {
       return res.status(400).json({
         data: {},
         message: "La clave de Office no es válida.",
