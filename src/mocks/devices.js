@@ -1,289 +1,132 @@
+import mongoose from "mongoose";
+
 const devices = [
-  {
-    _id: "664fa55a6fd77dcabdf18028",
-    brand: "HP",
-    model: "Cerebro de la NASA",
-    serialNumber: "00000000000",
-    hostname: "Skynet-1",
-    details: "Vamos a la dominacion mundial.",
-    status: {
-      value: "disponible",
-      label: "disponible",
-    },
-    annexed: {
-      id: "664273c15f54ca6fde19d5c7",
-      number: "Propio",
-    },
-    typeDevice: "desktop",
-    ip: "000.000.000.0",
-    person: {
-      id: "664273fd41d5e9eee8345724",
-      name: "Andres Uriel Aguirre Ocampo",
-    },
-    custom: true,
-    bussinesUnit: "Mundo",
-    departament: {
-      id: "6642747f51eaa8d1245c52f5",
-      name: "TI",
-    },
-    monitor: {
-      id: "66427493f69c19d5815a4d05",
-      serialNumber: "111111111",
-    },
-    headphones: false,
-    adaptVGA: false,
-    mouse: false,
-  },
-  {
-    _id: "66427493f69c19d5815a4d05",
-    brand: "HP",
-    serialNumber: "111111111",
-    model: "Ojos de la NASA",
-    hostname: "Skynet-2",
-    details: "Vamos a la dominacion mundial.",
-    status: {
-      value: "disponible",
-      label: "disponible",
-    },
-    annexed: {
-      id: "664273c15f54ca6fde19d5c7",
-      number: "Propio",
-    },
-    typeDevice: "monitor",
-    ip: "N/A",
-    person: {
-      id: "664273fd41d5e9eee8345724",
-      name: "Andres Uriel Aguirre Ocampo",
-    },
-  },
-  {
-    _id: "664fa59e8bfe052015d23235",
-    brand: "HP",
-    serialNumber: "22222222",
-    model: "Boca de la NASA",
-    hostname: "Skynet-3",
-    details: "Vamos a la dominacion mundial.",
-    status: {
-      value: "disponible",
-      label: "disponible",
-    },
-    annexed: {
-      id: "664273c15f54ca6fde19d5c7",
-      number: "Propio",
-    },
-    typeDevice: "impresora",
-    ip: "N/A",
-    person: {
-      id: "664273fd41d5e9eee8345724",
-      name: "Andres Uriel Aguirre Ocampo",
-    },
-  },
-  {
-    _id: "664fa60e8bfe052015d23236",
-    brand: "Dell",
-    model: "XPS 13",
-    serialNumber: "33333333333",
-    hostname: "Dell-1",
-    details: "Alta performance para desarrolladores.",
-    status: {
-      value: "asignado",
-      label: "asignado",
-    },
-    annexed: {
-      id: "664273c15f54ca6fde19d5c8",
-      number: "Prestado",
-    },
-    typeDevice: "laptop",
-    ip: "192.168.1.1",
-    person: {
-      id: "664273fd41d5e9eee8345725",
-      name: "Maria Fernanda Lopez",
-    },
-    custom: false,
-    bussinesUnit: "Desarrollo",
-    departament: {
-      id: "6642747f51eaa8d1245c52f6",
-      name: "Desarrollo de Software",
-    },
-    monitor: {
-      id: "66427493f69c19d5815a4d06",
-      serialNumber: "444444444",
-    },
-    headphones: true,
-    adaptVGA: true,
-    mouse: true,
-  },
-  {
-    _id: "664fa60e8bfe052015d23237",
-    brand: "Apple",
-    model: "iMac 27",
-    serialNumber: "44444444444",
-    hostname: "iMac-1",
-    details: "Estación de trabajo de diseño.",
-    status: {
-      value: "en_reparacion",
-      label: "en_reparacion",
-    },
-    annexed: {
-      id: "664273c15f54ca6fde19d5c9",
-      number: "Propio",
-    },
-    typeDevice: "desktop",
-    ip: "192.168.1.2",
-    person: {
-      id: "664273fd41d5e9eee8345726",
-      name: "Carlos Ramirez",
-    },
-    custom: false,
-    bussinesUnit: "Diseño",
-    departament: {
-      id: "6642747f51eaa8d1245c52f7",
-      name: "Diseño Gráfico",
-    },
-    monitor: {
-      id: "66427493f69c19d5815a4d07",
-      serialNumber: "555555555",
-    },
-    headphones: true,
-    adaptVGA: false,
-    mouse: true,
-  },
-  {
-    _id: "664fa60e8bfe052015d23238",
-    brand: "Samsung",
-    model: "Galaxy Tab S7",
-    serialNumber: "55555555555",
-    hostname: "Tab-1",
-    details: "Tablet para reuniones y presentaciones.",
-    status: {
-      value: "disponible",
-      label: "disponible",
-    },
-    annexed: {
-      id: "664273c15f54ca6fde19d5ca",
-      number: "Propio",
-    },
-    typeDevice: "tablet",
-    ip: "192.168.1.3",
-    person: {
-      id: "664273fd41d5e9eee8345727",
-      name: "Laura Martinez",
-    },
-    custom: false,
-    bussinesUnit: "Ventas",
-    departament: {
-      id: "6642747f51eaa8d1245c52f8",
-      name: "Ventas",
-    },
-    monitor: null,
-    headphones: true,
-    adaptVGA: false,
-    mouse: false,
-  },
-  {
-    _id: "664fa60e8bfe052015d23239",
-    brand: "Lenovo",
-    model: "ThinkPad T14",
-    serialNumber: "66666666666",
-    hostname: "Lenovo-1",
-    details: "Laptop para administración.",
-    status: {
-      value: "asignado",
-      label: "asignado",
-    },
-    annexed: {
-      id: "664273c15f54ca6fde19d5cb",
-      number: "Prestado",
-    },
-    typeDevice: "laptop",
-    ip: "192.168.1.4",
-    person: {
-      id: "664273fd41d5e9eee8345728",
-      name: "Juan Perez",
-    },
-    custom: true,
-    bussinesUnit: "Administración",
-    departament: {
-      id: "6642747f51eaa8d1245c52f9",
-      name: "Administración",
-    },
-    monitor: {
-      id: "66427493f69c19d5815a4d08",
-      serialNumber: "777777777",
-    },
-    headphones: false,
-    adaptVGA: true,
-    mouse: true,
-  },
-  {
-    _id: "664fa60e8bfe052015d23240",
-    brand: "Acer",
-    model: "Aspire 5",
-    serialNumber: "77777777777",
-    hostname: "Acer-1",
-    details: "Laptop para recursos humanos.",
-    status: {
-      value: "disponible",
-      label: "disponible",
-    },
-    annexed: {
-      id: "664273c15f54ca6fde19d5cc",
-      number: "Propio",
-    },
-    typeDevice: "laptop",
-    ip: "192.168.1.5",
-    person: {
-      id: "664273fd41d5e9eee8345729",
-      name: "Susana Garcia",
-    },
-    custom: false,
-    bussinesUnit: "Recursos Humanos",
-    departament: {
-      id: "6642747f51eaa8d1245c52fa",
-      name: "Recursos Humanos",
-    },
-    monitor: {
-      id: "66427493f69c19d5815a4d09",
-      serialNumber: "888888888",
-    },
-    headphones: true,
-    adaptVGA: true,
-    mouse: false,
-  },
-  {
-    _id: "664fa60e8bfe052015d23241",
-    brand: "Asus",
-    model: "ROG Strix",
-    serialNumber: "88888888888",
-    hostname: "Asus-1",
-    details: "Laptop para gaming.",
-    status: {
-      value: "disponible",
-      label: "disponible",
-    },
-    annexed: {
-      id: "664273c15f54ca6fde19d5cd",
-      number: "Propio",
-    },
-    typeDevice: "laptop",
-    ip: "192.168.1.6",
-    person: {
-      id: "664273fd41d5e9eee8345730",
-      name: "Pedro Sanchez",
-    },
-    custom: true,
-    bussinesUnit: "Entretenimiento",
-    departament: {
-      name: "Gaming",
-    },
-    monitor: {
-      id: "66427493f69c19d5815a4d10",
-      serialNumber: "999999999",
-    },
-    headphones: true,
-    adaptVGA: true,
-    mouse: true,
-  },
+  ...Array(5)
+    .fill(null)
+    .flatMap((_, i) => {
+      const desktopId = new mongoose.Types.ObjectId();
+      const monitorId = new mongoose.Types.ObjectId();
+      return [
+        {
+          brand: "Dell",
+          model: `OptiPlex 70${i}`,
+          serialNumber: `desktop-serial-${i}`,
+          hostname: `desktop-${i}`,
+          details: "PC de oficina",
+          status: {
+            value: "en_resguardo",
+            label: "En resguardo",
+          },
+          annexed: {
+            id: null,
+            number: "",
+          },
+          ubication: null,
+          phisicRef: `Escritorio ${i + 1}`,
+          typeDevice: "desktop",
+          network: {
+            ip: `192.168.1.1${i}`,
+            macEthernet: `AA:BB:CC:DD:EE:F${i}`,
+            macWifi: "",
+          },
+          office: {
+            officeVersion: "Office 2021",
+            officeKey: "YYYYY-YYYYY-YYYYY-YYYYY-YYYYY",
+          },
+          person: {
+            id: null,
+            name: "",
+          },
+          lastPerson: {
+            id: null,
+            name: "",
+          },
+          custom: false,
+          bussinesUnit: "Administración",
+          lastChange: new Date(),
+          departament: {
+            id: null,
+            name: "Finanzas",
+          },
+          monitor: {
+            id: null,
+            serialNumber: "",
+          },
+          comments: [],
+          headphones: {
+            assigned: false,
+            date_assigned: new Date(),
+          },
+          adaptVGA: {
+            assigned: true,
+            date_assigned: new Date(),
+          },
+          mouse: {
+            assigned: true,
+            date_assigned: new Date(),
+          },
+        },
+        {
+          brand: "LG",
+          model: `UltraWide 29WK60${i}`,
+          serialNumber: `monitor-serial-${i}`,
+          hostname: `monitor-${i}`,
+          details: "Monitor disponible",
+          status: {
+            value: "en_resguardo",
+            label: "En resguardo",
+          },
+          annexed: {
+            id: null,
+            number: "",
+          },
+          ubication: null,
+          phisicRef: `Escritorio ${i + 1}`,
+          typeDevice: "monitor",
+          network: {
+            ip: "",
+            macEthernet: "",
+            macWifi: "",
+          },
+          office: {
+            officeVersion: "",
+            officeKey: "",
+          },
+          person: {
+            id: null,
+            name: "",
+          },
+          lastPerson: {
+            id: null,
+            name: "",
+          },
+          custom: false,
+          bussinesUnit: "Administración",
+          lastChange: new Date(),
+          departament: {
+            id: null,
+            name: "Finanzas",
+          },
+          monitor: {
+            id: null,
+            serialNumber: "",
+          },
+          comments: [],
+          headphones: {
+            assigned: false,
+            date_assigned: new Date(),
+          },
+          adaptVGA: {
+            assigned: false,
+            date_assigned: new Date(),
+          },
+          mouse: {
+            assigned: false,
+            date_assigned: new Date(),
+          },
+        },
+      ];
+    }),
 ];
 
 export default devices;

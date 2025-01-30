@@ -4,28 +4,34 @@ const settings = [
     name: "statusDevice",
     options: [
       {
-        label: "Disponible",
-        value: "disponible",
+        label: "En resguardo",
+        value: "en_resguardo",
+        option: "#28a745", // Verde
       },
       {
         label: "En reparación",
         value: "en_reparacion",
+        option: "#ffc107", // Amarillo
       },
       {
         label: "Asignado",
         value: "asignado",
+        option: "#007bff", // Azul
       },
       {
         label: "Remplazo requerido",
         value: "remplazo_requerido",
+        option: "#fd7e14", // Naranja
       },
       {
         label: "Descompuesto",
         value: "descompuesto",
+        option: "#dc3545", // Rojo
       },
       {
         label: "Perdido",
         value: "perdido",
+        option: "#6c757d", // Gris
       },
     ],
   },
