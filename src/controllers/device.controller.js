@@ -971,7 +971,7 @@ const changeDevice = async (req, res) => {
     newDeviceInfo.ubication = oldDevice.ubication;
     newDeviceInfo.phisicRef = oldDevice.phisicRef;
     newDeviceInfo.office = oldDevice.office;
-    newDevice.network.ip = oldDevice.network?.ip;
+    newDeviceInfo.network.ip = oldDevice.network?.ip;
     newDeviceInfo.person = oldDevice.person;
     newDeviceInfo.custom = oldDevice.custom;
     newDeviceInfo.bussinesUnit = oldDevice.bussinesUnit;
