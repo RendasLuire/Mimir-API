@@ -1013,6 +1013,12 @@ const updateNetworkData = async (req, res) => {
     }
 
     const device = await Device.findById(id);
+    if (!device) {
+      return res.status(404).json({
+        data: {},
+        message: "El dispositivo no existe.",
+      });
+    }
 
     const formatIP = (value) => {
       if (!value) return null;
@@ -1028,10 +1034,7 @@ const updateNetworkData = async (req, res) => {
       ) {
         return validIP;
       }
-      return res.status(400).json({
-        data: {},
-        message: "La ip no es valida.",
-      });
+      return null;
     };
 
     const formatMAC = (value) => {
@@ -1044,15 +1047,31 @@ const updateNetworkData = async (req, res) => {
       if (/^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$/.test(validMAC)) {
         return validMAC;
       }
-      return res.status(400).json({
-        data: {},
-        message: "La mac no es valida.",
-      });
+      return null;
     };
 
     const formattedIP = formatIP(ip);
     const formattedMacEthernet = formatMAC(macEthernet);
     const formattedMacWifi = formatMAC(macWifi);
+
+    if (ip && !formattedIP) {
+      return res.status(400).json({
+        data: {},
+        message: "La IP no es válida.",
+      });
+    }
+    if (macEthernet && !formattedMacEthernet) {
+      return res.status(400).json({
+        data: {},
+        message: "La MAC Ethernet no es válida.",
+      });
+    }
+    if (macWifi && !formattedMacWifi) {
+      return res.status(400).json({
+        data: {},
+        message: "La MAC WiFi no es válida.",
+      });
+    }
 
     const updatedNetworkData = {
       ip: formattedIP,
@@ -1063,12 +1082,12 @@ const updateNetworkData = async (req, res) => {
     device.network = updatedNetworkData;
     await device.save();
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Network data updated successfully",
       data: updatedNetworkData,
     });
   } catch (error) {
-    res.status(400).json({
+    return res.status(500).json({
       message: error.message || "Error updating network data",
     });
   }
