@@ -16,4 +16,10 @@ router.get(
 
 router.get("/checkInfo/:id", token.auth, reportsController.checkInfo);
 
+router.get(
+  "/export-csv/devices",
+  token.auth,
+  reportsController.exportCSVDevices
+);
+
 export default router;

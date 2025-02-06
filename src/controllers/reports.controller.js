@@ -5,6 +5,7 @@ import path from "path";
 import Person from "../models/person.model.js";
 import Device from "../models/device.model.js";
 import moment from "moment";
+import fastCsv from "fast-csv";
 
 moment.locale("es");
 
@@ -348,9 +349,67 @@ const responsivePrint = async (req, res) => {
   }
 };
 
+const exportCSVDevices = async (req, res) => {
+  try {
+    const devices = await Device.find({ typeDevice: { $ne: "Monitor" } })
+      .populate("person.id", "name")
+      .populate("lastPerson.id", "name")
+      .populate("monitor.id", "brand model serialNumber")
+      .populate("ubication", "name")
+      .populate("phisicRef.id", "name")
+      .populate("annexed.id", "number")
+      .lean();
+
+    if (devices.length === 0) {
+      return res.status(404).json({
+        data: [],
+        message: "No hay equipos registrados.",
+      });
+    }
+
+    const formattedDevices = devices.map((device) => ({
+      ID: device._id,
+      Marca: device.brand,
+      Modelo: device.model,
+      "Número de Serie": device.serialNumber,
+      "Marca Monitor": device.monitor?.id?.brand || "N/A",
+      "Modelo Monitor": device.monitor?.id?.model || "N/A",
+      "Número de Serie Monitor": device.monitor?.id?.serialNumber || "N/A",
+      "Anexo de Resguardo": device.annexed?.id?.number || "Sin anexo",
+      Hostname: device.hostname,
+      Estado: device.status?.label || "",
+      Ubicación: device.ubication?.name || "",
+      Compartida: device.custom ? "Sí" : "No",
+      "Unidad de Negocio": device.person?.bussinesUnit?.name || "Sin asignar",
+      "Persona Asignada": device.person?.id?.name || "No asignado",
+      "Última Persona": device.lastPerson?.id?.name || "No disponible",
+      Departamento: device.departament?.id?.name || "Sin departamento",
+      "Tipo de Dispositivo": device.typeDevice,
+      "Dirección IP": device.network?.ip || "000.000.000.000",
+      "MAC Ethernet": device.network?.macEthernet || "00:00:00:00:00:00",
+      "MAC WiFi": device.network?.macWifi || "00:00:00:00:00:00",
+      "Version Office": device.officeVersion,
+      "Clave Office": device.officeKey,
+      "Última Modificación": device.lastChange
+        ? moment(device.lastChange).format("YYYY-MM-DD HH:mm")
+        : "",
+    }));
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader("Content-Disposition", 'attachment; filename="devices.csv"');
+
+    const csvStream = fastCsv.write(formattedDevices, { headers: true });
+    csvStream.pipe(res);
+  } catch (error) {
+    console.error("Error al exportar:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
 export default {
   test,
   responsivePC,
   responsivePrint,
   checkInfo,
+  exportCSVDevices,
 };
