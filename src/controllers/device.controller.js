@@ -316,6 +316,10 @@ const updatePatch = async (req, res) => {
     device.mouse.assigned = req.body.mouse.assigned;
     device.mouse.date_assigned = req.body.mouse.date_assigned;
     device.lastChange = moment();
+    device.lastChangeDevice =
+      req.body.lastChangeDevice || device.lastChangeDevice
+        ? device.lastChangeDevice
+        : "";
 
     const updatedDevice = await device.save();
 
@@ -978,6 +982,7 @@ const changeDevice = async (req, res) => {
     newDeviceInfo.departament = oldDevice.departament;
     newDeviceInfo.headphones = oldDevice.headphones;
     newDeviceInfo.lastChange = moment();
+    newDeviceInfo.lastChangeDevice = moment();
 
     oldDevice.status.value = "retirado";
     oldDevice.status.label = "Retirado";
