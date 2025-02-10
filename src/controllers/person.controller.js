@@ -330,7 +330,7 @@ const updatePatch = async (req, res) => {
 
     person.name = req.body.name || person.name;
     person.position = req.body.position || person.position;
-    person.department.name = req.body.department || person.department;
+    person.department.name = req.body.department.name || person.department.name;
     person.manager = req.body.manager || person.manager;
     person.bussinesUnit = req.body.bussinesUnit || person.bussinesUnit;
 
