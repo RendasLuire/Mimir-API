@@ -1027,18 +1027,20 @@ const updateNetworkData = async (req, res) => {
 
     const formatIP = (value) => {
       if (!value) return null;
-      const validIP =
-        value
-          .replace(/[^\d]/g, "")
-          .match(/(\d{1,3})/g)
-          ?.join(".") || "";
+
+      const validIP = value.replace(/[^0-9.]/g, "");
+
       const octets = validIP.split(".");
+
       if (
         octets.length === 4 &&
-        octets.every((octet) => octet >= 0 && octet <= 255)
+        octets.every(
+          (octet) => /^[0-9]+$/.test(octet) && octet >= 0 && octet <= 255
+        )
       ) {
         return validIP;
       }
+
       return null;
     };
 
