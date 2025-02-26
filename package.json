@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "set NODE_ENV=test && jest --runInBand",
-    "dev": "set NODE_ENV=development && nodemon src/app.js",
+    "dev": "set NODE_ENV=production && nodemon src/app.js",
     "start": "set NODE_ENV=production && node src/app.js"
   },
   "jest": {
