@@ -913,6 +913,9 @@ const resignDevice = async (req, res) => {
     device.lastPerson.name = device.person.name;
     device.person.id = person._id;
     device.person.name = person.name;
+    device.status.label = "reasignado";
+    device.status.value = "reasignado";
+    device.lastChange = moment();
 
     if (device.monitor.serialNumber !== "") {
       const monitor = await Device.findById(device.monitor.id);
@@ -920,6 +923,9 @@ const resignDevice = async (req, res) => {
       monitor.lastPerson.name = monitor.person.name;
       monitor.person.id = person._id;
       monitor.person.name = person.name;
+      monitor.status.label = "reasignado";
+      monitor.status.value = "reasignado";
+      monitor.lastChange = moment();
 
       await monitor.save();
     }
